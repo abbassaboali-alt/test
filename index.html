@@ -5962,21 +5962,15 @@ finalLevel:finalPlacementLevel,
     speakingCompleted:true,
     assessmentCompleted:true
   });
-  // Show the completed assessment, including every submitted response.
-  // Correct answers are intentionally not shown; this prevents exposing the bank.
-  document.getElementById("result").innerHTML = renderAssessmentReview({
-    ...current,
-    finalCEFR,
-    finalPlacementLevel,
-    placementResponses: current.placementResponses || placementResponses || [],
-    speakingQuestions: speakingResults || [],
-    writingTopic: current.writingTopic || "",
-    writingText: current.writingText || "",
-    writingScore: current.writingScore || 0,
-    writingGrammar: current.writingGrammar || 0,
-    writingVocabulary: current.writingVocabulary || 0,
-    writingCoherence: current.writingCoherence || 0
-  });
+  // Student page: never reveal answers, scores, CEFR, or the recommended
+  // course. Full evidence is saved in Firestore for the admin reports page.
+  document.getElementById("result").innerHTML = `
+    <div class="result">
+      <h2>Assessment Completed</h2>
+      <p>Your responses have been submitted successfully.</p>
+      <p>The institute will review your assessment and contact you with your placement result.</p>
+    </div>
+  `;
 
   document.getElementById("result").scrollIntoView({behavior:"smooth", block:"start"});
 
