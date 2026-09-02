@@ -546,6 +546,18 @@ Stop Recording
   "
 ></audio>
 
+<div style="margin:18px 0 8px;text-align:center;font-weight:900;color:#164478">
+  OR UPLOAD A SPEAKING AUDIO FILE
+</div>
+<input
+  id="speakingFile"
+  type="file"
+  accept="audio/*,video/mp4,.mp3,.m4a,.aac,.wav,.ogg,.webm,.mp4,.flac"
+  onchange="handleSpeakingFileUpload(event)"
+  style="display:block;width:100%;max-width:420px;margin:0 auto"
+>
+<div id="speakingUploadStatus" style="display:none;margin-top:10px;text-align:center;font-weight:800;color:#164478"></div>
+
 <br><br>
 
 <button id="analyzeSpeakingBtn" onclick="analyzeSpeakingAnswer()" disabled>
@@ -666,6 +678,7 @@ let currentSpeakingQuestion = "";
 let speakingResults = [];
 let speakingAudios = [];
 let currentAudioBlob = null;
+let currentAudioFileName = "";
 let recognition;
 let currentTranscript = "";
  
@@ -5115,9 +5128,82 @@ function getSupportedAudioMimeType(){
 function getAudioFileExtension(mimeType){
   const type = String(mimeType || "").toLowerCase();
   if(type.includes("mp4") || type.includes("m4a")) return "m4a";
+  if(type.includes("mpeg") || type.includes("mp3")) return "mp3";
+  if(type.includes("aac")) return "aac";
+  if(type.includes("flac")) return "flac";
   if(type.includes("ogg")) return "ogg";
   if(type.includes("wav")) return "wav";
   return "webm";
+}
+
+function getUploadedAudioMimeType(file){
+  if(file?.type) return file.type;
+
+  const name = String(file?.name || "").toLowerCase();
+  if(name.endsWith(".mp3")) return "audio/mpeg";
+  if(name.endsWith(".m4a")) return "audio/mp4";
+  if(name.endsWith(".mp4")) return "video/mp4";
+  if(name.endsWith(".aac")) return "audio/aac";
+  if(name.endsWith(".wav")) return "audio/wav";
+  if(name.endsWith(".ogg")) return "audio/ogg";
+  if(name.endsWith(".flac")) return "audio/flac";
+  return "audio/webm";
+}
+
+async function handleSpeakingFileUpload(event){
+  const file = event?.target?.files?.[0];
+  const status = document.getElementById("speakingUploadStatus");
+
+  if(!file) return;
+
+  const allowed =
+    /^audio\//i.test(file.type || "") ||
+    /^video\/mp4$/i.test(file.type || "") ||
+    /\.(mp3|m4a|aac|wav|ogg|webm|mp4|flac)$/i.test(file.name || "");
+
+  if(!allowed){
+    alert("Please select a valid audio file (MP3, M4A, MP4, WAV, AAC, OGG, WEBM or FLAC).");
+    event.target.value = "";
+    return;
+  }
+
+  if(file.size > 15 * 1024 * 1024){
+    alert("Please upload an audio file smaller than 15 MB.");
+    event.target.value = "";
+    return;
+  }
+
+  try{
+    // Ensure that the question is loaded before automatic analysis starts.
+    if(!currentSpeakingQuestion){
+      await startSpeakingTest();
+    }
+
+    currentAudioBlob = new Blob([file], {type:getUploadedAudioMimeType(file)});
+    currentAudioFileName = file.name || "uploaded-speaking-audio";
+    recordingReady = currentAudioBlob.size > 0;
+
+    const preview = document.getElementById("audioPreview");
+    preview.src = URL.createObjectURL(currentAudioBlob);
+    preview.style.display = "block";
+
+    if(status){
+      status.style.display = "block";
+      status.textContent = "Audio uploaded. Transcribing and analyzing automatically...";
+    }
+
+    await analyzeSpeakingAnswer();
+
+    if(status){
+      status.textContent = "Audio analyzed and saved successfully.";
+    }
+  }catch(error){
+    console.error("Uploaded speaking audio error:",error);
+    if(status){
+      status.style.display = "block";
+      status.textContent = error?.message || "Could not analyze this audio file.";
+    }
+  }
 }
 
 function explainMicrophoneError(err){
@@ -5145,6 +5231,7 @@ async function startRecording(){
 
   audioChunks = [];
   currentAudioBlob = null;
+  currentAudioFileName = "";
   currentTranscript = "";
   recordingReady = false;
 
@@ -5752,7 +5839,7 @@ async function uploadSpeakingAudio(blob){
   form.append(
     "file",
     blob,
-    `speaking-answer-${Date.now()}.${extension}`
+    currentAudioFileName || `speaking-answer-${Date.now()}.${extension}`
   );
 
   form.append(
@@ -5893,6 +5980,12 @@ await db
 
     speakingAudio:
       audioURL || "",
+
+    speakingAudioName:
+      currentAudioFileName || "",
+
+    speakingAudioMimeType:
+      currentAudioBlob?.type || "",
 
     speakingQuestions:
       speakingResults.map(r=>({
