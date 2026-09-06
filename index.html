@@ -1,1827 +1,3407 @@
 <!DOCTYPE html>
+
 <html lang="ar" dir="rtl">
+
 <head>
+
 <meta charset="UTF-8" />
+
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>الترحيل للدورات — Prudle</title>
+
+<title>الترحيل للدورات
+— Prudle</title>
 
 <!-- Firebase -->
+
 <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore-compat.js"></script>
 
 <!-- Excel -->
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <!-- Fonts -->
+
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet" />
 
 <!-- FontAwesome -->
+
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
 
 <style>
-/* ===== تصغير السجلات لعرض أكبر عدد ممكن ===== */
+
+/* ===== تصغير السجلات لعرض أكبر
+عدد ممكن ===== */
 
 /* الجدول */
+
 table{
-  font-size:12px !important;
+
+  font-size:12px !important;
+
 }
+
 .period-ltr{
-  direction:ltr;
-  unicode-bidi:isolate;
-  text-align:center;
+
+  direction:ltr;
+
+  unicode-bidi:isolate;
+
+  text-align:center;
+
 }
+
 /* ===== Highlight Current Course Columns ===== */
+
 .col-course,
+
 .col-period,
+
 .col-trainer,
+
 .col-room{
-  background:#e9f7ef !important;
-  color:#1e8e3e !important;
-  font-weight:900;
+
+  background:#e9f7ef !important;
+
+  color:#1e8e3e !important;
+
+  font-weight:900;
+
 }
 
 /* في الهيدر */
+
 th.col-course,
+
 th.col-period,
+
 th.col-trainer,
+
 th.col-room{
-  background:#1e8e3e !important;
-  color:#fff !important;
+
+  background:#1e8e3e !important;
+
+  color:#fff !important;
+
 }
+
 /* رؤوس الأعمدة */
+
 thead th{
-  padding:6px 4px !important;
-  font-size:12px !important;
-  line-height:1.1 !important;
+
+  padding:6px 4px !important;
+
+  font-size:12px !important;
+
+  line-height:1.1 !important;
+
 }
 
 /* خلايا الجدول */
+
 tbody td{
-  padding:5px 4px !important;   /* المفتاح */
-  font-size:12px !important;
-  line-height:1.15 !important;
-  vertical-align:middle !important;
+
+  padding:5px 4px !important;   /* المفتاح */
+
+  font-size:12px !important;
+
+  line-height:1.15 !important;
+
+  vertical-align:middle !important;
+
 }
 
 /* الاسم (عربي / إنجليزي) */
+
 td.name-cell{
-  padding:4px 6px !important;
+
+  padding:4px 6px !important;
+
 }
 
 .name-en{
-  font-size:12px !important;
-  line-height:1.15 !important;
+
+  font-size:12px !important;
+
+  line-height:1.15 !important;
+
 }
 
 .name-ar{
-  font-size:11px !important;
-  line-height:1.1 !important;
+
+  font-size:11px !important;
+
+  line-height:1.1 !important;
+
 }
 
 /* أزرار الإجراءات داخل الجدول */
+
 .mini{
-  padding:4px 8px !important;
-  font-size:11px !important;
+
+  padding:4px 8px !important;
+
+  font-size:11px !important;
+
 }
 
 /* أزرار حفظ / إلغاء التعديل */
+
 .inline .save,
+
 .inline .cancel{
-  padding:4px 6px !important;
-  font-size:11px !important;
+
+  padding:4px 6px !important;
+
+  font-size:11px !important;
+
 }
 
 /* checkbox */
+
 input[type="checkbox"]{
-  transform:scale(0.9);
+
+  transform:scale(0.9);
+
 }
 
-/* □ إزالة شريط التمرير الأفقي نهائياً (Weebly + Caspio Style) */
+/* □ إزالة شريط التمرير الأفقي نهائياً
+(Weebly + Caspio Style) */
+
 html, body{
-  margin:0 !important;
-  padding:0 !important;
-  width:100% !important;
-  max-width:100% !important;
-  overflow-x:hidden !important;
+
+  margin:0 !important;
+
+  padding:0 !important;
+
+  width:100% !important;
+
+  max-width:100% !important;
+
+  overflow-x:hidden !important;
+
 }
+
 *,
+
 *::before,
+
 *::after{ box-sizing:border-box !important; }
+
 table, div, section{ max-width:100% !important; }
+
 .container{ width:100% !important; max-width:100% !important; padding:16px !important; }
 
 /* ===== Base ===== */
+
 body{margin:0;background:#f4f6fb;font-family:'Tajawal',sans-serif}
 
-/* ===== Logout Badge ===== */
-.logout-badge{
-  background:#164478;color:#fff;
-  padding:7px 20px;border-radius:30px;border:none;
-  font-size:14px;font-weight:600;cursor:pointer;
-  display:flex;align-items:center;gap:8px;
-  box-shadow:0 3px 8px rgba(0,0,0,0.18);
-  transition:.25s;
-}
-.logout-badge i{font-size:15px}
-.logout-badge:hover{ background:#1e5799; transform:translateY(-2px); }
-
 /* ===== Header ===== */
+
 .header{
-  background:#164478;color:#fff;padding:22px;text-align:center;
-  font-size:26px;font-weight:900; position:relative;
+
+  background:#164478;color:#fff;padding:22px;text-align:center;
+
+  font-size:26px;font-weight:900; position:relative;
+
 }
+
 .note{
-  background:#e8f5e9;color:#1b5e20;
-  padding:10px;text-align:center;font-weight:900
+
+  background:#e8f5e9;color:#1b5e20;
+
+  padding:10px;text-align:center;font-weight:900
+
 }
 
 /* ===== Filters ===== */
+
 .filters{
-  background:#fff;margin:20px auto;width:min(1750px,96%);
-  padding:14px;border-radius:16px;
-  display:flex;gap:10px;align-items:center;flex-wrap:wrap;
-  box-shadow:0 6px 18px rgba(0,0,0,.08)
+
+  background:#fff;margin:20px auto;width:min(1750px,96%);
+
+  padding:14px;border-radius:16px;
+
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+
+  box-shadow:0 6px 18px rgba(0,0,0,.08)
+
 }
+
 .filters select,.filters input,.filters button{
-  padding:9px 12px;border-radius:10px;border:1px solid #ccc;
-  font-weight:900; outline:none;
+
+  padding:9px 12px;border-radius:10px;border:1px solid #ccc;
+
+  font-weight:900; outline:none;
+
 }
+
 .filters input::placeholder{font-weight:800;color:#888}
+
 button{
-  background:#164478;color:#fff;border:none;cursor:pointer;font-weight:900;
+
+  background:#164478;color:#fff;border:none;cursor:pointer;font-weight:900;
+
 }
+
 button:disabled{opacity:.55;cursor:not-allowed}
+
 .btn-gray{background:#9e9e9e}
+
 .btn-green{background:#1e8e3e}
+
 .btn-blue{background:#0b5ed7}
+
 .btn-red{background:#d93025}
+
 .btn-orange{background:#f29900}
 
 #hint{
-  display:inline-block;
-  padding:6px 10px;border-radius:10px;
-  background:#f2f6ff;color:#164478;font-weight:900;
-  border:1px solid #d9e6ff;
+
+  display:inline-block;
+
+  padding:6px 10px;border-radius:10px;
+
+  background:#f2f6ff;color:#164478;font-weight:900;
+
+  border:1px solid #d9e6ff;
+
 }
 
 /* إخفاء عمود طريقة الدفع */
+
 .hide-private-cols th:nth-child(20),
+
 .hide-private-cols td:nth-child(20){
-  display:none !important;
+
+  display:none !important;
+
 }
+
 /* ===== Table Wrap ===== */
+
 .table-wrap{
-  width:min(1750px,96%);
-  margin:0 auto 25px;
+
+  width:min(1750px,96%);
+
+  margin:0 auto 25px;
+
 }
+
 table{
-  width:100%;
-  border-collapse:separate;
-  border-spacing:0;
-  background:#fff;
-  border-radius:14px;
-  overflow:hidden;
-  box-shadow:0 6px 18px rgba(0,0,0,.08)
+
+  width:100%;
+
+  border-collapse:separate;
+
+  border-spacing:0;
+
+  background:#fff;
+
+  border-radius:14px;
+
+  overflow:hidden;
+
+  box-shadow:0 6px 18px rgba(0,0,0,.08)
+
 }
+
 thead th{
-  background:linear-gradient(135deg,#164478,#1e5799);
-  color:#fff;
-  padding:12px 8px;
-  font-size:13px;
-  font-weight:900;
-  text-align:center;
-  white-space:nowrap;
-  border-left:1px solid rgba(255,255,255,.15)
+
+  background:linear-gradient(135deg,#164478,#1e5799);
+
+  color:#fff;
+
+  padding:12px 8px;
+
+  font-size:13px;
+
+  font-weight:900;
+
+  text-align:center;
+
+  white-space:nowrap;
+
+  border-left:1px solid rgba(255,255,255,.15)
+
 }
+
 thead th:first-child{border-radius:14px 0 0 0}
+
 thead th:last-child{border-radius:0 14px 0 0}
 
 tbody td{
-  padding:10px 8px;
-  font-size:13px;
-  text-align:center;
-  border-bottom:1px solid #eee;
-  vertical-align:middle;
-  white-space:nowrap;
+
+  padding:10px 8px;
+
+  font-size:13px;
+
+  text-align:center;
+
+  border-bottom:1px solid #eee;
+
+  vertical-align:middle;
+
+  white-space:nowrap;
+
 }
+
 tbody tr:nth-child(even){background:#f8fafc}
+
 tbody tr:hover{background:#eef4ff}
 
 /* ===== Name Cell ===== */
+
 td.name-cell{
-  min-width:270px;
-  text-align:start;
-  white-space:normal !important;
+
+  min-width:270px;
+
+  text-align:start;
+
+  white-space:normal !important;
+
 }
+
 .name-en{
-  font-weight:900;color:#164478;
-  direction:ltr;text-align:left;
-  word-break:break-word; overflow-wrap:anywhere;
+
+  font-weight:900;color:#164478;
+
+  direction:ltr;text-align:left;
+
+  word-break:break-word; overflow-wrap:anywhere;
+
 }
+
 .name-ar{
-  font-size:12px;color:#666;
-  direction:rtl;text-align:right;
-  word-break:break-word; overflow-wrap:anywhere;
+
+  font-size:12px;color:#666;
+
+  direction:rtl;text-align:right;
+
+  word-break:break-word; overflow-wrap:anywhere;
+
 }
 
 /* ===== Status ===== */
+
 .ok{color:#1e8e3e;font-weight:900}
+
 .bad{color:#d93025;font-weight:900}
+
 .new{color:#0b5ed7;font-weight:900}
 
 /* ===== Badges ===== */
+
 .badge-move{background:#1f6fd1;color:#fff;padding:4px 10px;border-radius:14px;font-size:12px;font-weight:900;display:inline-block}
+
 .badge-del{background:#d93025;color:#fff;padding:4px 10px;border-radius:14px;font-size:12px;font-weight:900;display:inline-block}
+
 .badge-edit{background:#0b5ed7;color:#fff;padding:4px 10px;border-radius:14px;font-size:12px;font-weight:900;display:inline-block}
+
 .badge-warn{background:#f29900;color:#fff;padding:4px 10px;border-radius:14px;font-size:12px;font-weight:900;display:inline-block}
+
 .undo{color:#164478;font-weight:900;cursor:pointer;text-decoration:underline;display:inline-block;padding:2px 6px}
 
 /* ===== Row Done ===== */
+
 tr.row-done{background:#f1f3f4 !important}
+
 tr.row-done td{color:#888}
+
 tr.row-done .name-en, tr.row-done .name-ar{opacity:.85}
+
 tr.row-done input[type="checkbox"]{pointer-events:none;opacity:.4}
 
 /* ===== Duplicates Highlight ===== */
+
 tr.dup-row{background:#ffebee !important}
+
 .dup-tag{
-  display:inline-block;
-  margin-top:4px;
-  background:#d93025;color:#fff;
-  padding:2px 8px;border-radius:12px;
-  font-size:11px;font-weight:900;
+
+  display:inline-block;
+
+  margin-top:4px;
+
+  background:#d93025;color:#fff;
+
+  padding:2px 8px;border-radius:12px;
+
+  font-size:11px;font-weight:900;
+
 }
 
 /* ===== Inline Edit ===== */
+
 .inline{
-  display:flex;align-items:center;justify-content:center;gap:6px;
+
+  display:flex;align-items:center;justify-content:center;gap:6px;
+
 }
+
 .inline .val{
-  cursor:pointer;padding:2px 6px;border-radius:6px;font-weight:900;
+
+  cursor:pointer;padding:2px 6px;border-radius:6px;font-weight:900;
+
 }
+
 .inline .val:hover{background:#e3f2fd}
+
 .inline input{
-  width:100%;max-width:190px;
-  padding:7px 9px;border-radius:10px;
-  border:1px dashed #f29900;
-  font-weight:900;display:none;outline:none;
-  direction:ltr;
+
+  width:100%;max-width:190px;
+
+  padding:7px 9px;border-radius:10px;
+
+  border:1px dashed #f29900;
+
+  font-weight:900;display:none;outline:none;
+
+  direction:ltr;
+
 }
+
 .inline.editing .val{display:none}
+
 .inline.editing input{display:inline-block}
+
 .inline .save, .inline .cancel{
-  display:none;border-radius:10px;
-  padding:7px 10px;font-weight:900;font-size:12px;
+
+  display:none;border-radius:10px;
+
+  padding:7px 10px;font-weight:900;font-size:12px;
+
 }
+
 .inline.editing .save, .inline.editing .cancel{display:inline-block}
+
 .inline .save{background:#1e8e3e}
+
 .inline .cancel{background:#9e9e9e}
 
 /* ===== Mini Buttons ===== */
+
 .mini-actions{
-  display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+
+  display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+
 }
+
 .mini{
-  padding:7px 10px;border-radius:10px;border:none;
-  font-weight:900;font-size:12px;cursor:pointer;
-  display:inline-flex;gap:8px;align-items:center;justify-content:center;
-  box-shadow:0 3px 10px rgba(0,0,0,.10);
+
+  padding:7px 10px;border-radius:10px;border:none;
+
+  font-weight:900;font-size:12px;cursor:pointer;
+
+  display:inline-flex;gap:8px;align-items:center;justify-content:center;
+
+  box-shadow:0 3px 10px rgba(0,0,0,.10);
+
 }
+
 .mini i{font-size:13px}
+
 .mini-pay{background:#0b5ed7}
+
 .mini-lv{background:#f29900}
+
 .mini:hover{filter:brightness(.95)}
 
 /* ===== Modal ===== */
+
 .modal{
-  position:fixed; inset:0;
-  background:rgba(0,0,0,.45);
-  display:none; align-items:center; justify-content:center;
-  z-index:9999999;
+
+  position:fixed; inset:0;
+
+  background:rgba(0,0,0,.45);
+
+  display:none; align-items:center; justify-content:center;
+
+  z-index:9999999;
+
 }
+
 .modal-box{
-  background:#fff;padding:22px;
-  width:min(680px,92%);
-  border-radius:18px;border:3px solid #164478;
-  box-shadow:0 16px 40px rgba(0,0,0,.25);
+
+  background:#fff;padding:22px;
+
+  width:min(680px,92%);
+
+  border-radius:18px;border:3px solid #164478;
+
+  box-shadow:0 16px 40px rgba(0,0,0,.25);
+
 }
+
 .modal-box h3{
-  margin:0 0 10px;
-  color:#164478;text-align:center;font-weight:900;
+
+  margin:0 0 10px;
+
+  color:#164478;text-align:center;font-weight:900;
+
 }
+
 .modal-box .sub{
-  text-align:center;font-weight:900;color:#666;
-  margin:-2px 0 14px;font-size:12px;
+
+  text-align:center;font-weight:900;color:#666;
+
+  margin:-2px 0 14px;font-size:12px;
+
 }
+
 .modal-box label{font-size:12px;color:#555;font-weight:900;display:block;margin-top:10px}
+
 .modal-box input{
-  width:100%;
-  padding:12px;border-radius:12px;border:1px solid #ccc;
-  font-weight:900;font-size:15px
+
+  width:100%;
+
+  padding:12px;border-radius:12px;border:1px solid #ccc;
+
+  font-weight:900;font-size:15px
+
 }
+
 .modal-actions{display:flex;gap:10px;margin-top:18px}
+
 .modal-actions button{flex:1}
 
 /* ===== Notice ===== */
+
 .notice{padding:20px;text-align:center;color:#888;font-weight:900}
+
 .small{font-size:12px;color:#666;font-weight:800}
+
 .rem-red{color:#d93025;font-weight:900}
+
 .rem-green{color:#1e8e3e;font-weight:900}
+
 /* ===== Subscription End Alert (Levels 1/1) ===== */
+
 @keyframes blinkEndSub {
-  0%   { background:#fff3cd; }
-  50%  { background:#ffd54f; }
-  100% { background:#fff3cd; }
+
+  0%   { background:#fff3cd; }
+
+  50%  { background:#ffd54f; }
+
+  100% { background:#fff3cd; }
+
 }
+
 .end-sub-alert{
-  display:inline-block;
-  padding:3px 8px;
-  border-radius:10px;
-  font-weight:900;
-  color:#7a4b00;
-  border:1px solid #ffcc80;
-  animation: blinkEndSub 1s infinite;
+
+  display:inline-block;
+
+  padding:3px 8px;
+
+  border-radius:10px;
+
+  font-weight:900;
+
+  color:#7a4b00;
+
+  border:1px solid #ffcc80;
+
+  animation: blinkEndSub 1s infinite;
+
 }
+
+
+/* ===== Prudle enhanced filters ===== */
+.filters{
+  border:1px solid #dbe7f5;
+  background:linear-gradient(180deg,#ffffff,#f8fbff);
+}
+.filters select{
+  min-width:150px;
+  background:#fff;
+}
+.filters select:focus,.filters input:focus{
+  border-color:#164478;
+  box-shadow:0 0 0 3px rgba(22,68,120,.10);
+}
+.table-wrap{
+  overflow-x:auto !important;
+  border-radius:16px;
+}
+#mainTable{
+  min-width:2600px;
+}
+.detail-cell{
+  line-height:1.45;
+  white-space:normal !important;
+  min-width:125px;
+}
+.detail-chip{
+  display:inline-block;
+  background:#eef5ff;
+  color:#164478;
+  border:1px solid #d6e6fb;
+  border-radius:999px;
+  padding:3px 8px;
+  font-weight:900;
+}
+.meta-muted{
+  color:#667085;
+  font-size:11px;
+}
+
+
+/* ===== PRUDLE PROFESSIONAL DESIGN OVERRIDE ===== */
+:root{
+  --navy:#164478; --navy2:#0f3158; --blue:#1f6fd1;
+  --bg:#f4f7fb; --border:#dce6f2; --text:#24364b;
+}
+html,body{
+  background:linear-gradient(180deg,#f9fbfe,#eef3f8)!important;
+  color:var(--text);
+}
+body{font-family:'Tajawal',Arial,sans-serif!important}
+
+.header{
+  width:min(1750px,96%)!important;
+  margin:18px auto 0!important;
+  padding:24px!important;
+  border-radius:24px!important;
+  background:linear-gradient(135deg,var(--navy2),var(--navy),var(--blue))!important;
+  box-shadow:0 18px 42px rgba(22,68,120,.18)!important;
+  font-size:27px!important;
+  overflow:hidden;
+}
+.header img{
+  display:block;
+  margin:12px auto 0;
+  width:76px!important;height:76px!important;
+  object-fit:contain;background:#fff;padding:7px;
+  border-radius:18px;box-shadow:0 7px 18px rgba(0,0,0,.15)
+}
+.note{
+  width:min(1750px,96%)!important;
+  margin:12px auto 0!important;
+  border-radius:14px!important;
+  padding:10px 16px!important;
+  background:#edf8f1!important;
+  color:#176b34!important;
+  border:1px solid #cdebd8!important
+}
+.filters{
+  width:min(1750px,96%)!important;
+  margin:14px auto!important;
+  padding:16px!important;
+  gap:9px!important;
+  border-radius:20px!important;
+  border:1px solid var(--border)!important;
+  background:#fff!important;
+  box-shadow:0 12px 30px rgba(15,49,88,.08)!important
+}
+.filters select,.filters input,.filters button{
+  min-height:40px!important;
+  border-radius:11px!important;
+  font-size:12px!important
+}
+.filters select,.filters input:not([type="file"]){
+  background:#fbfdff!important;
+  border:1px solid #d7e1ed!important;
+  padding:8px 11px!important
+}
+.filters select:focus,.filters input:not([type="file"]):focus{
+  border-color:var(--blue)!important;
+  box-shadow:0 0 0 3px rgba(31,111,209,.12)!important
+}
+.filters input[type="file"]{
+  max-width:205px;
+  background:#f8fafc!important;
+  border:1px dashed #b9c8d9!important
+}
+.filters button{
+  border:0!important;
+  padding:8px 13px!important;
+  box-shadow:0 4px 10px rgba(15,49,88,.10)
+}
+.filters button:hover:not(:disabled){transform:translateY(-1px)}
+#hint{
+  margin-inline-start:auto;
+  display:inline-flex!important;align-items:center;
+  padding:6px 12px!important;border-radius:999px!important;
+  background:#eef5ff!important;border:1px solid #d4e4fa!important;
+  color:var(--navy)!important
+}
+.table-wrap{
+  width:min(1750px,96%)!important;
+  margin:0 auto 30px!important;
+  overflow:auto!important;
+  border-radius:20px!important;
+  border:1px solid var(--border)!important;
+  background:#fff!important;
+  box-shadow:0 16px 34px rgba(15,49,88,.09)!important
+}
+#mainTable{
+  width:100%!important;
+  margin:0!important;border:0!important;border-radius:0!important;
+  box-shadow:none!important;background:#fff!important
+}
+#mainTable thead{position:sticky;top:0;z-index:20}
+#mainTable thead th{
+  background:linear-gradient(180deg,#174b80,#123c68)!important;
+  color:#fff!important;padding:9px 7px!important;
+  height:44px;font-size:11.5px!important;
+  border-left:1px solid rgba(255,255,255,.11)!important
+}
+#mainTable thead th.col-course,
+#mainTable thead th.col-period,
+#mainTable thead th.col-trainer,
+#mainTable thead th.col-room{
+  background:linear-gradient(180deg,#278b49,#1d743a)!important
+}
+#mainTable tbody tr:nth-child(even){background:#f8fbff!important}
+#mainTable tbody tr:nth-child(odd){background:#fff!important}
+#mainTable tbody tr:hover{background:#edf5ff!important}
+#mainTable tbody td{
+  padding:7px 6px!important;font-size:11.5px!important;
+  line-height:1.35!important;color:#29374a!important;
+  border-bottom:1px solid #edf1f5!important
+}
+#mainTable td.name-cell{
+  min-width:210px!important;max-width:250px;
+  padding:7px 9px!important
+}
+#mainTable .name-en{color:var(--navy)!important;font-size:12px!important}
+#mainTable .name-ar{color:#718096!important;font-size:10.5px!important}
+.col-course,.col-period,.col-trainer,.col-room{
+  background:#f0faf4!important;color:#166534!important;font-weight:900!important
+}
+.mini{
+  border-radius:9px!important;padding:5px 8px!important;
+  min-height:30px;font-size:10.5px!important;
+  box-shadow:0 3px 8px rgba(15,49,88,.10)!important
+}
+.modal{
+  background:rgba(10,31,55,.58)!important;
+  backdrop-filter:blur(4px);padding:18px
+}
+.modal-box{
+  width:min(650px,94%)!important;border:0!important;
+  border-radius:22px!important;padding:22px!important;
+  box-shadow:0 28px 70px rgba(8,28,50,.28)!important;
+  position:relative;overflow:hidden
+}
+.modal-box::before{
+  content:"";position:absolute;top:0;right:0;left:0;height:5px;
+  background:linear-gradient(90deg,var(--navy),var(--blue))
+}
+.modal-box .sub{
+  background:#f5f8fc;border:1px solid #e1e9f2;
+  border-radius:10px;padding:8px 10px
+}
+.modal-box input,.modal-box select{
+  border:1px solid #d5dfeb!important;border-radius:11px!important;
+  background:#fbfdff!important
+}
+@media(max-width:900px){
+  .header,.note,.filters,.table-wrap{width:94%!important}
+  .filters select,.filters input,.filters button{flex:1 1 calc(50% - 8px)}
+}
+@media(max-width:560px){
+  .header{font-size:19px!important;border-radius:18px!important}
+  .filters select,.filters input,.filters button{flex:1 1 100%;width:100%}
+  #mainTable thead th{font-size:10.5px!important}
+  #mainTable tbody td{font-size:10.5px!important}
+}
+
 </style>
+
 </head>
 
 <body>
 
-<!-- زر تسجيل الخروج -->
-<button class="logout-badge" onclick="logout()" style="position:fixed;top:14px;right:14px;z-index:99999999">
-  <i class="fa-solid fa-right-from-bracket"></i> Logout
-</button>
-
 <div class="header">
-  ترحيل الطلاب للدورات<br/>
-  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJprpZXU4pTSCYXKhzWCpqdZ_mnPHMwqsACA&s" style="width:86px;height:86px" />
+
+  ترحيل الطلاب للدورات<br/>
+
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJprpZXU4pTSCYXKhzWCpqdZ_mnPHMwqsACA&s" style="width:86px;height:86px" />
+
 </div>
-<div class="note">الحمدانية — رجال — حضوري</div>
+
+<div class="note">جميع الفروع والأقسام — استخدم الفلاتر لعرض السجلات المطلوبة</div>
 
 <!-- FILTERS -->
+
 <div class="filters">
-  <select id="fStatus">
-    <option value="">الحالة (إخفاء ناجح/راسب افتراضيًا)</option>
-    <option value="new">جديد</option>
-    <option value="pass">ناجح</option>
-    <option value="fail">راسب</option>
+
+  <select id="fBranch">
+    <option value="">كل الفروع</option>
   </select>
 
-  <input id="fName" placeholder="الاسم (عربي / إنجليزي)" />
-  <input id="fAge" placeholder="العمر" />
-  <input id="fIqama" placeholder="رقم الهوية" />
-  <input id="fPhone" placeholder="رقم الجوال" />
+  <select id="fSection">
+    <option value="">كل الأقسام</option>
+  </select>
+
+  <select id="fType">
+    <option value="">كل أنواع الدورات</option>
+  </select>
+
+  <select id="fProgram">
+    <option value="">كل البرامج</option>
+  </select>
+
+  <select id="fStatus">
+
+    <option value="">الحالة (إخفاء ناجح/راسب افتراضيًا)</option>
+
+    <option value="new">جديد</option>
+
+    <option value="pass">ناجح</option>
+
+    <option value="fail">راسب</option>
+
+  </select>
+
+  <input id="fName" placeholder="الاسم (عربي / إنجليزي)" />
+
+  <input id="fAge" placeholder="العمر" />
+
+  <input id="fIqama" placeholder="رقم الهوية" />
+
+  <input id="fPhone" placeholder="رقم الجوال" />
+
 <input id="fEmail" placeholder="البريد الإلكتروني" />
-  <select id="fCourse"><option value="">الدورة</option></select>
 
-  <select id="fDate"><option value="">□ التاريخ</option></select>
+  <select id="fCourse"><option value="">الدورة</option></select>
 
-  <select id="targetCourse">
-    <option value="">□ الدورة الهدف (المفتوحة فقط)</option>
-  </select>
+  <select id="fDate"><option value="">□ التاريخ</option></select>
 
-  <input id="excelFile" type="file" accept=".xlsx,.xls" />
-  <button class="btn-blue" id="btnImport" type="button">استيراد</button>
+  <select id="targetCourse">
 
-  <button class="btn-orange" id="btnDup" type="button">⚠️ المكررين</button>
+    <option value="">□ الدورة الهدف (المفتوحة فقط)</option>
 
-  <button id="btnAll" type="button">✔ تحديد الكل</button>
-  <button class="btn-gray" id="btnNone" type="button">✖ إلغاء</button>
+  </select>
 
-  <button id="btnMigrate" type="button">⬆️ ترحيل</button>
-  <button class="btn-red" id="btnDelete" type="button">□ حذف</button>
+  <input id="excelFile" type="file" accept=".xlsx,.xls" />
 
-  <!-- ✅ ميزات الكود الثاني (خطط الدفع + تعديل جماعي) -->
-  <button class="btn-blue" id="btnBulkFees" type="button">✏️ تعديل جماعي (الرسوم/المدفوع)</button>
-  <!-- ✅ ميزة الكود الأول (تعديل المستويات قبل الترحيل) -->
-  <button class="btn-blue" id="btnBulkLevels" type="button">□ تعديل المستويات قبل الترحيل</button>
+  <button class="btn-blue" id="btnImport" type="button">استيراد</button>
 
-  <button class="btn-green" id="btnExcel" type="button">□ Excel</button>
+  <button class="btn-orange" id="btnDup" type="button">⚠️ المكررين</button>
 
-  <span class="small" id="hint"></span>
+  <button id="btnAll" type="button">✔ تحديد الكل</button>
+
+  <button class="btn-gray" id="btnNone" type="button">✖ إلغاء</button>
+
+  <button id="btnMigrate" type="button">⬆️ ترحيل</button>
+
+  <button class="btn-red" id="btnDelete" type="button">□ حذف</button>
+
+  <!-- ✅ ميزات الكود الثاني (خطط الدفع + تعديل جماعي) -->
+
+  <button class="btn-blue" id="btnBulkFees" type="button">✏️ تعديل جماعي (الرسوم/المدفوع)</button>
+
+  <!-- ✅ ميزة الكود الأول (تعديل المستويات قبل الترحيل) -->
+
+  <button class="btn-blue" id="btnBulkLevels" type="button">□ تعديل المستويات قبل الترحيل</button>
+
+  <button class="btn-green" id="btnExcel" type="button">□ Excel</button>
+
+  <span class="small" id="hint"></span>
+
 </div>
 
 <div class="table-wrap">
+
 <table id="mainTable" class="hide-private-cols">
-  <thead>
-    <tr>
-      <th style="width:44px"></th>
-      <th style="width:55px">#</th>
-      <th style="width:270px">الاسم</th>
-      <th style="width:90px">العمر</th>
-      <th style="width:160px">الهوية</th>
-      <th style="width:160px">الجوال</th>
-      <th style="width:220px">الإيميل</th>
+
+  <thead>
+
+    <tr>
+
+      <th style="width:44px"></th>
+
+      <th style="width:55px">#</th>
+
+      <th style="width:270px">الاسم</th>
+
+      <th style="width:90px">العمر</th>
+
+      <th style="width:160px">الهوية</th>
+
+      <th style="width:160px">الجوال</th>
+
+      <th style="width:220px">الإيميل</th>
+      <th>تاريخ الميلاد</th>
+      <th>الجنسية</th>
+      <th>الحالة الصحية</th>
+      <th>المؤهل العلمي</th>
+      <th>كيف تعرفت على برودل؟</th>
+      <th>الفرع</th>
+      <th>القسم</th>
+      <th>البرنامج</th>
+      <th>نوع الدورة</th>
+      <th>موافقة الشروط</th>
+
 <th style="width:220px">الدورة السابقة</th>
+
 <th class="col-course">الدورة الحالية</th>
 
-      <th style="width:320px">الدورة الهدف</th>
+      <th style="width:320px">الدورة الهدف</th>
 
-      <!-- (مخفية افتراضيًا عبر CSS) -->
-      <th style="width:90px">إجمالي</th>
-      <th style="width:90px">مستخدم</th>
-      <th style="width:90px">متبقي</th>
-      <th style="width:90px">الرسوم</th>
-      <th style="width:90px">المدفوع</th>
-      <th style="width:90px">المتبقي</th>
+      <!--
+(مخفية افتراضيًا عبر CSS) -->
+
+      <th style="width:90px">إجمالي</th>
+
+      <th style="width:90px">مستخدم</th>
+
+      <th style="width:90px">متبقي</th>
+
+      <th style="width:90px">الرسوم</th>
+
+      <th style="width:90px">المدفوع</th>
+
+      <th style="width:90px">المتبقي</th>
+
 <th style="width:120px">طريقة الدفع</th>
 
-      <!-- مرئية -->
-      <th style="width:80px">الدرجة</th>
-      <th style="width:90px">الحالة</th>
-      <th style="width:120px">التاريخ</th>
-      <th style="width:250px">إجراءات</th>
-      <th style="width:250px">النتيجة</th>
-    </tr>
-  </thead>
-  <tbody id="tbody">
-    <tr><td class="notice" colspan="25">جاري التحميل...</td></tr>
-  </tbody>
+      <!--
+مرئية -->
+
+      <th style="width:80px">الدرجة</th>
+
+      <th style="width:90px">الحالة</th>
+
+      <th style="width:120px">التاريخ</th>
+
+      <th style="width:250px">إجراءات</th>
+
+      <th style="width:250px">النتيجة</th>
+
+    </tr>
+
+  </thead>
+
+  <tbody id="tbody">
+
+    <tr><td class="notice" colspan="36">جاري التحميل...</td></tr>
+
+  </tbody>
+
 </table>
+
 </div>
 
 <!-- ================= MODAL: الدفعات ================= -->
+
 <div class="modal" id="feesModal">
-  <div class="modal-box">
-    <h3>□ الدفعات</h3>
-    <div class="sub" id="feesName">—</div>
 
-    <label>الرسوم (CourseFee)</label>
-    <input id="feeInput" type="number" min="0" step="1" />
+  <div class="modal-box">
 
-    <label>المدفوع (PaidAmount)</label>
-    <input id="paidInput" type="number" min="0" step="1" />
+    <h3>□ الدفعات</h3>
 
-    <label>المتبقي (RemainingAmount)</label>
-    <input id="remainInput" type="number" min="0" step="1" disabled />
+    <div class="sub" id="feesName">—</div>
+
+    <label>الرسوم (CourseFee)</label>
+
+    <input id="feeInput" type="number" min="0" step="1" />
+
+    <label>المدفوع (PaidAmount)</label>
+
+    <input id="paidInput" type="number" min="0" step="1" />
+
+    <label>المتبقي
+(RemainingAmount)</label>
+
+    <input id="remainInput" type="number" min="0" step="1" disabled />
 
 <label>طريقة الدفع (PaymentType)</label>
+
 <input id="methodInput" placeholder="مثال: كاش / تحويل / شبكة" />
 
-    <div class="modal-actions">
-      <button class="btn-blue" type="button" onclick="saveFees()">حفظ</button>
-      <button class="btn-gray" type="button" onclick="closeFees()">إغلاق</button>
-    </div>
-  </div>
+    <div class="modal-actions">
+
+      <button class="btn-blue" type="button" onclick="saveFees()">حفظ</button>
+
+      <button class="btn-gray" type="button" onclick="closeFees()">إغلاق</button>
+
+    </div>
+
+  </div>
+
 </div>
 
-<!-- ================= MODAL: المستويات (عرض/تعديل كاش students + Override) ================= -->
+<!-- ================= MODAL: المستويات (عرض/تعديل كاش students +
+Override) ================= -->
+
 <div class="modal" id="levelsModal">
-  <div class="modal-box">
-    <h3>□ المستويات</h3>
-    <div class="sub" id="levelsName">—</div>
 
-    <label>إجمالي المستويات (TotalLevels) — (Override قبل الترحيل)</label>
-    <input id="lvTotal" type="number" min="1" />
+  <div class="modal-box">
 
-    <label>المستخدمة (UsedLevels) — من آخر سجل في students</label>
+    <h3>□ المستويات</h3>
+
+    <div class="sub" id="levelsName">—</div>
+
+    <label>إجمالي المستويات (TotalLevels) —
+(Override قبل الترحيل)</label>
+
+    <input id="lvTotal" type="number" min="1" />
+
+    <label>المستخدمة (UsedLevels) — من آخر سجل في students</label>
+
 <input id="lvUsed" type="number" min="0" />
-    <label>المتبقي (RemainingLevels) — من آخر سجل في students</label>
-    <input id="lvRemain" type="number" min="0" disabled />
 
-    <div class="modal-actions">
-      <button class="btn-blue" type="button" onclick="saveLevelsOverride()">حفظ (Override)</button>
-      <button class="btn-gray" type="button" onclick="closeLevels()">إغلاق</button>
-    </div>
-  </div>
+    <label>المتبقي
+(RemainingLevels) — من آخر سجل في students</label>
+
+    <input id="lvRemain" type="number" min="0" disabled />
+
+    <div class="modal-actions">
+
+      <button class="btn-blue" type="button" onclick="saveLevelsOverride()">حفظ (Override)</button>
+
+      <button class="btn-gray" type="button" onclick="closeLevels()">إغلاق</button>
+
+    </div>
+
+  </div>
+
 </div>
 
-<!-- ================= MODAL: تعديل جماعي (الرسوم/المدفوع) ================= -->
+<!-- ================= MODAL: تعديل جماعي
+(الرسوم/المدفوع)
+================= -->
+
 <div class="modal" id="bulkFeesModal">
-  <div class="modal-box">
-    <h3>✏️ تعديل جماعي (الرسوم / المدفوع)</h3>
-    <div class="sub">سيتم حساب المتبقي = الرسوم - المدفوع (لن يقل عن 0)</div>
 
-    <label>الرسوم الجديدة (CourseFee) — اتركها فارغة لعدم التغيير</label>
-    <input id="bulkFeeInput" type="number" min="0" step="1" placeholder="مثال: 1200" />
+  <div class="modal-box">
 
-    <label>المدفوع الجديد (PaidAmount) — اتركها فارغة لعدم التغيير</label>
-    <input id="bulkPaidInput" type="number" min="0" step="1" placeholder="مثال: 0" />
+    <h3>✏️ تعديل جماعي (الرسوم / المدفوع)</h3>
 
-    <div class="modal-actions">
-      <button class="btn-gray" type="button" onclick="closeBulkFees()">إلغاء</button>
-      <button class="btn-blue" type="button" onclick="confirmBulkFees()">تطبيق</button>
-    </div>
-  </div>
+    <div class="sub">سيتم حساب المتبقي = الرسوم - المدفوع (لن يقل عن 0)</div>
+
+    <label>الرسوم الجديدة (CourseFee) — اتركها فارغة لعدم التغيير</label>
+
+    <input id="bulkFeeInput" type="number" min="0" step="1" placeholder="مثال: 1200" />
+
+    <label>المدفوع الجديد (PaidAmount) — اتركها فارغة لعدم التغيير</label>
+
+    <input id="bulkPaidInput" type="number" min="0" step="1" placeholder="مثال: 0" />
+
+    <div class="modal-actions">
+
+      <button class="btn-gray" type="button" onclick="closeBulkFees()">إلغاء</button>
+
+      <button class="btn-blue" type="button" onclick="confirmBulkFees()">تطبيق</button>
+
+    </div>
+
+  </div>
+
 </div>
 
 <!-- ================= MODAL: تعديل جماعي للمستويات (Override) ================= -->
+
 <div class="modal" id="bulkLevelsModal">
-  <div class="modal-box">
-    <h3>□ تعديل المستويات قبل الترحيل (دفعة)</h3>
-    <div class="sub">يتم حفظ Override على السجلات المحددة (لا يغيّر students الآن)</div>
 
-    <label>عدد المستويات للجميع (TotalLevels) — اتركها فارغة للإلغاء</label>
-    <input id="bulkLevelsInput" type="number" min="1" placeholder="مثال: 12" />
+  <div class="modal-box">
 
-    <div class="modal-actions">
-      <button class="btn-gray" type="button" onclick="closeBulkLevels()">إلغاء</button>
-      <button class="btn-blue" type="button" onclick="applyBulkLevels()">تطبيق على المحدد</button>
-    </div>
-  </div>
+    <h3>□ تعديل المستويات قبل الترحيل (دفعة)</h3>
+
+    <div class="sub">يتم حفظ Override على السجلات المحددة (لا يغيّر students الآن)</div>
+
+    <label>عدد المستويات للجميع (TotalLevels) — اتركها فارغة للإلغاء</label>
+
+    <input id="bulkLevelsInput" type="number" min="1" placeholder="مثال: 12" />
+
+    <div class="modal-actions">
+
+      <button class="btn-gray" type="button" onclick="closeBulkLevels()">إلغاء</button>
+
+      <button class="btn-blue" type="button" onclick="applyBulkLevels()">تطبيق على المحدد</button>
+
+    </div>
+
+  </div>
+
 </div>
 
 <!-- ================= MODAL: ترحيل فردي (TotalLevels + Fees) ================= -->
+
 <div class="modal" id="migrateSingleModal">
-  <div class="modal-box">
-    <h3>⬆️ إعدادات الترحيل (سجل واحد)</h3>
-    <div class="sub" id="migName">—</div>
 
-    <label>عدد المستويات (TotalLevels) — (Override لهذا السجل)</label>
-    <input id="migLevels" type="number" min="1" placeholder="مثال: 12" />
+  <div class="modal-box">
 
-    <label>الرسوم (CourseFee)</label>
-    <input id="migFee" type="number" min="0" step="1" placeholder="تلقائي من الدورة (قابل للتعديل)" />
+    <h3>⬆️ إعدادات الترحيل (سجل واحد)</h3>
 
-    <label>المدفوع (PaidAmount)</label>
-    <input id="migPaid" type="number" min="0" step="1" placeholder="مثال: 0" />
+    <div class="sub" id="migName">—</div>
 
-    <label>المتبقي (RemainingAmount)</label>
-    <input id="migRemain" type="number" min="0" step="1" disabled />
+    <label>عدد المستويات (TotalLevels) —
+(Override لهذا السجل)</label>
 
-    <div class="modal-actions">
-      <button class="btn-gray" type="button" onclick="closeMigrateSingle()">إلغاء</button>
-      <button type="button" onclick="confirmMigrateSingle()">تأكيد الترحيل</button>
-    </div>
-  </div>
+    <input id="migLevels" type="number" min="1" placeholder="مثال: 12" />
+
+    <label>الرسوم (CourseFee)</label>
+
+    <input id="migFee" type="number" min="0" step="1" placeholder="تلقائي من الدورة (قابل
+للتعديل)" />
+
+    <label>المدفوع (PaidAmount)</label>
+
+    <input id="migPaid" type="number" min="0" step="1" placeholder="مثال: 0" />
+
+    <label>المتبقي
+(RemainingAmount)</label>
+
+    <input id="migRemain" type="number" min="0" step="1" disabled />
+
+    <div class="modal-actions">
+
+      <button class="btn-gray" type="button" onclick="closeMigrateSingle()">إلغاء</button>
+
+      <button type="button" onclick="confirmMigrateSingle()">تأكيد الترحيل</button>
+
+    </div>
+
+  </div>
+
 </div>
 
 <script>
-/* ================= Logout + Protection ================= */
-function logout(){
-  localStorage.removeItem("username");
-  localStorage.removeItem("role");
-  localStorage.removeItem("loginDate");
-  location.href="https://www.prudle-education.com/log-in_out.html";
-}
-(function(){
-  // استثناء محرر Weebly
-  if(location.hostname.includes("editmysite") || location.hostname.includes("weebly")) return;
 
-  const user = localStorage.getItem("username");
-  const role = localStorage.getItem("role");
-  const last = localStorage.getItem("loginDate");
+/* ================= Prevent Submit (Weebly)
+================= */
 
-  if(!user || !role){
-    location.href="https://www.prudle-education.com/log-in_out.html";
-    return;
-  }
-  const today = new Date().toDateString();
-  if(last !== today){
-    localStorage.clear();
-    location.href="https://www.prudle-education.com/log-in_out.html";
-    return;
-  }
-})();
-
-/* ================= Prevent Submit (Weebly) ================= */
 document.addEventListener("submit", function(e){
-  e.preventDefault();
-  e.stopPropagation();
+
+  e.preventDefault();
+
+  e.stopPropagation();
+
 }, true);
 
 /* ================= FIREBASE ================= */
+
 firebase.initializeApp({
-  apiKey:"AIzaSyCCFBvZosI8dwShZjxvZzI-SU5igEbcOKk",
-  authDomain:"prudle-system.firebaseapp.com",
-  projectId:"prudle-system"
+
+  apiKey:"AIzaSyCCFBvZosI8dwShZjxvZzI-SU5igEbcOKk",
+
+  authDomain:"prudle-system.firebaseapp.com",
+
+  projectId:"prudle-system"
+
 });
+
 const db = firebase.firestore();
 
 /* ================= DOM ================= */
+
+const fBranch = document.getElementById("fBranch");
+const fSection = document.getElementById("fSection");
+const fType = document.getElementById("fType");
+const fProgram = document.getElementById("fProgram");
 const fStatus = document.getElementById("fStatus");
-const fName   = document.getElementById("fName");
-const fAge    = document.getElementById("fAge");
-const fIqama  = document.getElementById("fIqama");
-const fPhone  = document.getElementById("fPhone");
-const fEmail  = document.getElementById("fEmail");
+
+const fName   = document.getElementById("fName");
+
+const fAge    = document.getElementById("fAge");
+
+const fIqama  = document.getElementById("fIqama");
+
+const fPhone  = document.getElementById("fPhone");
+
+const fEmail  = document.getElementById("fEmail");
+
 const fCourse = document.getElementById("fCourse");
 
-const fDate   = document.getElementById("fDate");
+const fDate   = document.getElementById("fDate");
 
 const targetCourse = document.getElementById("targetCourse");
 
 const excelFile = document.getElementById("excelFile");
+
 const btnImport = document.getElementById("btnImport");
 
-const btnDup   = document.getElementById("btnDup");
-const btnAll   = document.getElementById("btnAll");
-const btnNone  = document.getElementById("btnNone");
+const btnDup   = document.getElementById("btnDup");
+
+const btnAll   = document.getElementById("btnAll");
+
+const btnNone  = document.getElementById("btnNone");
+
 const btnMigrate = document.getElementById("btnMigrate");
-const btnDelete  = document.getElementById("btnDelete");
+
+const btnDelete  = document.getElementById("btnDelete");
+
 const btnBulkFees = document.getElementById("btnBulkFees");
+
 const btnBulkLevels = document.getElementById("btnBulkLevels");
-const btnExcel    = document.getElementById("btnExcel");
+
+const btnExcel    = document.getElementById("btnExcel");
 
 const tbody = document.getElementById("tbody");
-const hint  = document.getElementById("hint");
+
+const hint  = document.getElementById("hint");
 
 /* Fees Modal */
-const feesModal  = document.getElementById("feesModal");
+
+const feesModal  = document.getElementById("feesModal");
+
 const feesNameEl = document.getElementById("feesName");
-const feeInput   = document.getElementById("feeInput");
-const paidInput  = document.getElementById("paidInput");
+
+const feeInput   = document.getElementById("feeInput");
+
+const paidInput  = document.getElementById("paidInput");
+
 const remainInput= document.getElementById("remainInput");
+
 const methodInput = document.getElementById("methodInput");
 
 /* Levels Modal */
+
 const levelsModal = document.getElementById("levelsModal");
+
 const levelsNameEl= document.getElementById("levelsName");
+
 const lvTotalIn = document.getElementById("lvTotal");
-const lvUsedIn  = document.getElementById("lvUsed");
+
+const lvUsedIn  = document.getElementById("lvUsed");
+
 const lvRemainIn= document.getElementById("lvRemain");
 
 /* Bulk Fees Modal */
+
 const bulkFeesModal = document.getElementById("bulkFeesModal");
-const bulkFeeInput  = document.getElementById("bulkFeeInput");
+
+const bulkFeeInput
+ = document.getElementById("bulkFeeInput");
+
 const bulkPaidInput = document.getElementById("bulkPaidInput");
 
 /* Bulk Levels Modal */
+
 const bulkLevelsModal = document.getElementById("bulkLevelsModal");
+
 const bulkLevelsInput = document.getElementById("bulkLevelsInput");
 
 /* Migrate Single Modal */
+
 const migrateSingleModal = document.getElementById("migrateSingleModal");
-const migNameEl   = document.getElementById("migName");
+
+const migNameEl   = document.getElementById("migName");
+
 const migLevelsIn = document.getElementById("migLevels");
-const migFeeIn    = document.getElementById("migFee");
-const migPaidIn   = document.getElementById("migPaid");
+
+const migFeeIn    = document.getElementById("migFee");
+
+const migPaidIn   = document.getElementById("migPaid");
+
 const migRemainIn = document.getElementById("migRemain");
 
 /* ================= GLOBALS ================= */
+
 let ROWS = [];
+
 let FILTERED = [];
+
 let SELECTED = [];
 
 let TARGET_COURSES = [];
+
 let DUP_MODE = false;
+
 let DUP_MAP = {};
+
 const UNDO = {};
 
 let CURRENT_FEES_ROW = null;
+
 let CURRENT_LEVELS_ROW = null;
+
 let MIG_SINGLE_ROW = null;
 
-/* ✅ مثل الكود الأول: Override للمستويات قبل الترحيل */
-const LEVELS_OVERRIDE = {}; // key src__id -> totalLevels override
-const LEVELS_CACHE = {};    // iqama -> {found,total,used,remaining}
+/* ✅ مثل الكود الأول:
+Override للمستويات قبل الترحيل */
+
+const LEVELS_OVERRIDE = {};
+// key src__id -> totalLevels
+override
+
+const LEVELS_CACHE = {};
+   // iqama -> {found,total,used,remaining}
 
 /* ================= HELPERS ================= */
+
 const onlyDigits = v => String(v||"").replace(/\D/g,"");
+
 const uniq = a => [...new Set(a.filter(Boolean))];
 
 function n2(v){ const x = Number(v); return isNaN(x) ? 0 : x; }
+
 function clamp0(v){ v=n2(v); return v<0?0:v; }
 
 function statusLabel(s){
-  return s==="pass" ? "ناجح" : s==="fail" ? "راسب" : "جديد";
+
+  return s==="pass" ? "ناجح" : s==="fail" ? "راسب" : "جديد";
+
 }
+
 function statusClass(s){
-  return s==="pass" ? "ok" : s==="fail" ? "bad" : "new";
+
+  return s==="pass" ? "ok" : s==="fail" ? "bad" : "new";
+
 }
+
 function displayNameEN(r){
-  return (String(r.name_en||r.name||"").trim()) || "—";
+
+  return (String(r.name_en||r.name||"").trim()) || "—";
+
 }
+
 function undoKey(src,id){ return src+"__"+id; }
 
 function toDate(v){
-  try{
-    if(!v) return "";
-    if(v.toDate) return v.toDate().toISOString().slice(0,10);
-    if(v instanceof Date) return v.toISOString().slice(0,10);
-    if(typeof v === "number") return new Date(v).toISOString().slice(0,10);
-    const s = String(v);
-    return s.length>=10 ? s.slice(0,10) : "";
-  }catch(e){ return ""; }
+
+  try{
+
+    if(!v) return "";
+
+    if(v.toDate) return v.toDate().toISOString().slice(0,10);
+
+    if(v instanceof Date) return v.toISOString().slice(0,10);
+
+    if(typeof v === "number") return new Date(v).toISOString().slice(0,10);
+
+    const s = String(v);
+
+    return s.length>=10 ? s.slice(0,10) : "";
+
+  }catch(e){ return ""; }
+
 }
+
 function normalizePeriod(x){
-  const p =
-    (x && (x.Period ?? x.period ?? x.PeriodName ?? x.periodName)) ??
-    (x && x.course && (x.course.Period ?? x.course.period ?? x.course.periodName ?? x.course.PeriodName)) ??
-    "";
-  return String(p||"").trim();
+
+  const p =
+
+    (x && (x.Period ?? x.period ?? x.PeriodName ?? x.periodName)) ??
+
+    (x && x.course && (x.course.Period ?? x.course.period ?? x.course.periodName ?? x.course.PeriodName)) ??
+
+    "";
+
+  return String(p||"").trim();
+
 }
+
 function targetText(){
-  const opt = targetCourse.selectedOptions[0];
-  return opt ? (opt.textContent || "—").trim() : "—";
+
+  const opt = targetCourse.selectedOptions[0];
+
+  return opt ? (opt.textContent || "—").trim() : "—";
+
 }
+
 function remColorHTML(rem){
-  const rr = clamp0(rem);
-  return rr>0 ? `<span class="rem-red">${rr}</span>` : `<span class="rem-green">0</span>`;
+
+  const rr = clamp0(rem);
+
+  return rr>0 ? `<span
+class="rem-red">${rr}</span>` : `<span class="rem-green">0</span>`;
+
 }
+
 function endSubHTML(total, used){
 
-  const t = n2(total);
-  const u = n2(used);
+  const t = n2(total);
 
-  // إذا انتهت المستويات
-  if(t > 0 && u >= t){
-    return `
-      <div style="margin-top:6px">
-        <span class="end-sub-alert">
-          ⚠️ انتهى الاشتراك
-        </span>
-      </div>
-    `;
-  }
+  const u = n2(used);
 
-  return "";
+  // إذا انتهت المستويات
+
+  if(t > 0 && u >= t){
+
+    return `
+
+      <div
+style="margin-top:6px">
+
+        <span class="end-sub-alert">
+
+          ⚠️ انتهى الاشتراك
+
+        </span>
+
+      </div>
+
+    `;
+
+  }
+
+  return "";
+
 }function hasAnyFilter(){
   return !!(
+    fBranch.value || fSection.value || fType.value || fProgram.value ||
     fStatus.value || fName.value || fAge.value ||
-    fIqama.value || fPhone.value ||
-    fCourse.value || fPeriod.value || fRoom.value || fDate.value
+    fIqama.value || fPhone.value || fEmail.value ||
+    fCourse.value || fDate.value
   );
 }
 
-/* ================= SAFE QUERY (Fallback) ================= */
+/* ================= SAFE QUERY (Fallback)
+================= */
+
 async function queryWithFallback(col, filtersA, filtersB){
-  const run = async filters=>{
-    let q = db.collection(col);
-    for(const f of filters) q = q.where(f[0], f[1], f[2]);
-    return await q.get();
-  };
-  try{
-    const a = await run(filtersA);
-    if(!a.empty) return a;
-  }catch(e){}
-  try{
-    return await run(filtersB);
-  }catch(e){
-    return await db.collection(col).limit(3000).get();
-  }
+
+  const run = async filters=>{
+
+    let q = db.collection(col);
+
+    for(const f of filters) q = q.where(f[0], f[1], f[2]);
+
+    return await q.get();
+
+  };
+
+  try{
+
+    const a = await run(filtersA);
+
+    if(!a.empty) return a;
+
+  }catch(e){}
+
+  try{
+
+    return await run(filtersB);
+
+  }catch(e){
+
+    return await db.collection(col).limit(3000).get();
+
+  }
+
 }
 
-/* ================= LEVELS (students) — مثل آلية الكود الأول ================= */
+/* ================= LEVELS (students) — مثل آلية الكود الأول
+================= */
+
 async function fetchLastLevelsByIqama(iqamaDigits){
-  const iq = onlyDigits(iqamaDigits);
-  if(!iq) return {found:false};
-  if(LEVELS_CACHE[iq]) return LEVELS_CACHE[iq];
 
-  const normalize = d => ({
-    found:true,
-    total: Number(d.totalLevels||0),
-    used: Number(d.usedLevels||0),
-    remaining: Number(d.remainingLevels||0)
-  });
+  const iq = onlyDigits(iqamaDigits);
 
-  // محاولة 1: promotedAt desc
-  try{
-    const snap = await db.collection("students")
-      .where("iqama","==",iq)
-      .orderBy("promotedAt","desc")
-      .limit(1).get();
-    if(!snap.empty){
-      const out = normalize(snap.docs[0].data()||{});
-      LEVELS_CACHE[iq]=out;
-      return out;
-    }
-  }catch(e){}
+  if(!iq) return {found:false};
 
-  // محاولة 2: createdAt desc
-  try{
-    const snap2 = await db.collection("students")
-      .where("iqama","==",iq)
-      .orderBy("createdAt","desc")
-      .limit(1).get();
-    if(!snap2.empty){
-      const out2 = normalize(snap2.docs[0].data()||{});
-      LEVELS_CACHE[iq]=out2;
-      return out2;
-    }
-  }catch(e){}
+  if(LEVELS_CACHE[iq]) return LEVELS_CACHE[iq];
 
-  // محاولة 3: بدون orderBy (أكثر تحملًا)
-  try{
-    const snap3 = await db.collection("students")
-      .where("iqama","==",iq)
-      .limit(20).get();
-    if(!snap3.empty){
-      const arr = snap3.docs.map(d=>d.data()||{});
-      const score = x=>{
-        const p = x.promotedAt?.toDate ? x.promotedAt.toDate().getTime() : 0;
-        const c = x.createdAt?.toDate ? x.createdAt.toDate().getTime() :
-                  (x.createdAt ? new Date(x.createdAt).getTime() : 0);
-        return Math.max(p,c,0);
-      };
-      arr.sort((a,b)=>score(b)-score(a));
-      const out3 = normalize(arr[0]||{});
-      LEVELS_CACHE[iq]=out3;
-      return out3;
-    }
-  }catch(e){}
+  const normalize = d => ({
 
-  LEVELS_CACHE[iq]={found:false};
-  return LEVELS_CACHE[iq];
+    found:true,
+
+    total: Number(d.totalLevels||0),
+
+    used: Number(d.usedLevels||0),
+
+    remaining: Number(d.remainingLevels||0)
+
+  });
+
+  // محاولة 1: promotedAt desc
+
+  try{
+
+    const snap = await db.collection("students")
+
+      .where("iqama","==",iq)
+
+      .orderBy("promotedAt","desc")
+
+      .limit(1).get();
+
+    if(!snap.empty){
+
+      const out = normalize(snap.docs[0].data()||{});
+
+      LEVELS_CACHE[iq]=out;
+
+      return out;
+
+    }
+
+  }catch(e){}
+
+  // محاولة 2: createdAt desc
+
+  try{
+
+    const snap2 = await db.collection("students")
+
+      .where("iqama","==",iq)
+
+      .orderBy("createdAt","desc")
+
+      .limit(1).get();
+
+    if(!snap2.empty){
+
+      const out2 = normalize(snap2.docs[0].data()||{});
+
+      LEVELS_CACHE[iq]=out2;
+
+      return out2;
+
+    }
+
+  }catch(e){}
+
+  // محاولة 3: بدون orderBy (أكثر تحملًا)
+
+  try{
+
+    const snap3 = await db.collection("students")
+
+      .where("iqama","==",iq)
+
+      .limit(20).get();
+
+    if(!snap3.empty){
+
+      const arr = snap3.docs.map(d=>d.data()||{});
+
+      const score = x=>{
+
+        const p = x.promotedAt?.toDate ? x.promotedAt.toDate().getTime() : 0;
+
+        const c = x.createdAt?.toDate ? x.createdAt.toDate().getTime() :
+
+               
+  (x.createdAt
+? new Date(x.createdAt).getTime() : 0);
+
+        return Math.max(p,c,0);
+
+      };
+
+      arr.sort((a,b)=>score(b)-score(a));
+
+      const out3 = normalize(arr[0]||{});
+
+      LEVELS_CACHE[iq]=out3;
+
+      return out3;
+
+    }
+
+  }catch(e){}
+
+  LEVELS_CACHE[iq]={found:false};
+
+  return LEVELS_CACHE[iq];
+
 }
 
 /* Prefetch لتحسين السرعة */
+
 async function prefetchLevelsForRows(rows, concurrency){
-  const uniqIq = uniq(rows.map(r=>onlyDigits(r.iqama)).filter(Boolean));
-  if(!uniqIq.length) return;
-  let idx = 0;
-  const limit = Math.max(1, Number(concurrency||10));
-  const worker = async ()=>{
-    while(idx < uniqIq.length){
-      const my = uniqIq[idx++];
-      try{ await fetchLastLevelsByIqama(my); }catch(_){}
-    }
-  };
-  const workers = [];
-  for(let i=0;i<limit;i++) workers.push(worker());
-  await Promise.all(workers);
+
+  const uniqIq = uniq(rows.map(r=>onlyDigits(r.iqama)).filter(Boolean));
+
+  if(!uniqIq.length) return;
+
+  let idx = 0;
+
+  const limit = Math.max(1, Number(concurrency||10));
+
+  const worker = async ()=>{
+
+    while(idx < uniqIq.length){
+
+      const my = uniqIq[idx++];
+
+      try{ await fetchLastLevelsByIqama(my); }catch(_){}
+
+    }
+
+  };
+
+  const workers = [];
+
+  for(let i=0;i<limit;i++) workers.push(worker());
+
+  await Promise.all(workers);
+
 }
 
 /* ================= TARGET COURSES (OPEN ONLY) ================= */
 db.collection("Courses")
 .where("status","==","open")
-.where("Branch","==","Al-Hamdaniya")
-.where("Section","==","Men")
-.where("CourseType","==","حضوري")
 .onSnapshot(s=>{
   TARGET_COURSES = s.docs.map(d=>({id:d.id, ...d.data()}));
-  targetCourse.innerHTML = "<option value=''>□ الدورة الهدف (المفتوحة فقط)</option>";
-  TARGET_COURSES.forEach(c=>{
+  refreshTargetCourses();
+});
+
+function refreshTargetCourses(){
+  const current = targetCourse.value;
+
+  const list = TARGET_COURSES.filter(c=>{
+    const br = String(c.Branch || c.branch || "");
+    const sec = String(c.Section || c.section || "");
+    const typ = String(c.CourseType || c.mode || "");
+    const prog = String(c.Program || c.program || "");
+
+    if(fBranch.value && br !== fBranch.value) return false;
+    if(fSection.value && sec !== fSection.value) return false;
+    if(fType.value && typ !== fType.value) return false;
+    if(fProgram.value && prog !== fProgram.value) return false;
+    return true;
+  });
+
+  targetCourse.innerHTML =
+    "<option value=''>□ الدورة الهدف (المفتوحة والمتوافقة مع الفلاتر)</option>";
+
+  list.forEach(c=>{
     const p = String(c.Period||c.period||"").trim();
+    const br = String(c.Branch||c.branch||"—");
+    const sec = String(c.Section||c.section||"—");
     targetCourse.innerHTML += `
       <option value="${c.id}">
-        ${c.TrainingCourse||"—"} — ${p||"—"} — ${c.Trainer||"—"} — ${c.Room||"—"}
+        ${c.TrainingCourse||"—"} — ${p||"—"} — ${c.Trainer||"—"} — ${c.Room||"—"} — ${br} — ${sec}
       </option>
     `;
   });
+
+  if(current && list.some(c=>c.id===current)) targetCourse.value = current;
   if(FILTERED.length) render();
-});
+}
+
 function getCourseName(x){
-  return (
-    x.TrainingCourse ||
-    x.course?.name ||
-    x.courseName ||
-    x.fromLevel ||
-    x.currentCourse ||
-    ""
-  );
+
+  return (
+
+    x.TrainingCourse ||
+
+    x.course?.name ||
+
+    x.courseName ||
+
+    x.fromLevel ||
+
+    x.currentCourse ||
+
+    ""
+
+  );
+
 }
 
 function getPeriod(x){
-  return (
-    x.Period ||
-    x.period ||
-    x.PeriodName ||
-    x.course?.Period ||
-    x.course?.period ||
-    ""
-  );
+
+  return (
+
+    x.Period ||
+
+    x.period ||
+
+    x.PeriodName ||
+
+    x.course?.Period ||
+
+    x.course?.period ||
+
+    ""
+
+  );
+
 }
 
 function getRoom(x){
-  return (
-    x.Room ||
-    x.room ||
-    x.course?.Room ||
-    x.course?.room ||
-    ""
-  );
+
+  return (
+
+    x.Room ||
+
+    x.room ||
+
+    x.course?.Room ||
+
+    x.course?.room ||
+
+    ""
+
+  );
+
 }
 
 function getTrainer(x){
-  return (
-    x.Trainer ||
-    x.trainer ||
-    x.course?.Trainer ||
-    x.course?.trainer ||
-    ""
-  );
+
+  return (
+
+    x.Trainer ||
+
+    x.trainer ||
+
+    x.course?.Trainer ||
+
+    x.course?.trainer ||
+
+    ""
+
+  );
+
 }
+
 /* ================= LOAD DATA ================= */
+
 async function loadData(){
-  ROWS=[]; FILTERED=[]; SELECTED=[];
-  hint.textContent="";
-  tbody.innerHTML = `<tr><td colspan="25" class="notice">جاري التحميل...</td></tr>`;
 
-  const baseA = [["Branch","==","Al-Hamdaniya"],["Section","==","Men"],["CourseType","==","حضوري"]];
-  const baseB = [["branch","==","Al-Hamdaniya"],["section","==","Men"],["mode","==","حضوري"]];
+  ROWS=[]; FILTERED=[]; SELECTED=[];
 
-  const [frSnap, fpSnap] = await Promise.all([
-    queryWithFallback("FakeRegistrations", baseA, baseB),
-    queryWithFallback("FakePromotions", baseA, baseB)
+  hint.textContent="";
+
+  tbody.innerHTML = `<tr><td
+colspan="36" class="notice">جاري التحميل...</td></tr>`;
+
+  const [frSnap, fpSnap] = await Promise.all([
+    db.collection("FakeRegistrations").limit(5000).get(),
+    db.collection("FakePromotions").limit(5000).get()
   ]);
 
-  /* FakeRegistrations (NEW) */
-  frSnap.forEach(d=>{
-    const x=d.data()||{};
-    const br = x.Branch || x.branch || "";
-    const sec= x.Section || x.section || "";
-    const typ= x.CourseType || x.mode || "";
-    if(br!=="Al-Hamdaniya" || sec!=="Men" || typ!=="حضوري") return;
+  /* FakeRegistrations
+(NEW) */
+
+  frSnap.forEach(d=>{
+
+    const x=d.data()||{};
+
+    const br = x.Branch || x.branch || "";
+
+    const sec= x.Section || x.section || "";
+
+    const typ= x.CourseType || x.mode || "";
+
+    
 
 const courseName = getCourseName(x);
+
 const period = getPeriod(x);
+
 const room = getRoom(x);
+
 const trainer = getTrainer(x);
-    const fee = n2(x.CourseFee || x.courseFee || 0);
-    const paid= n2(x.PaidAmount || x.paidAmount || 0);
-    const rem = clamp0(x.RemainingAmount || x.remainingAmount || (fee - paid));
 
-    ROWS.push({
+    const fee = n2(x.CourseFee || x.courseFee || 0);
+
+    const paid= n2(x.PaidAmount || x.paidAmount || 0);
+
+    const rem = clamp0(x.RemainingAmount || x.remainingAmount || (fee - paid));
+
+    ROWS.push({
+
 PaymentType: x.PaymentType || x.paymentType || x.PaymentMethod || x.paymentMethod || "",
+
 course: courseName,
+
 period,
+
 room,
+
 trainer,
+
 previousCourse: "",
-      src:"FakeRegistrations",
-      id:d.id,
-      raw:x,
 
-      name_en:x.name_en||x.name||"",
-      name:x.name||"",
-      name_ar:x.name_ar||"",
+      src:"FakeRegistrations",
 
-      age:onlyDigits(x.age),
-      iqama:onlyDigits(x.iqama),
-      phone:onlyDigits(x.phone),
-      email: String(x.email || "").trim(),
+      id:d.id,
 
-      course:(x.course && x.course.name) ? x.course.name : (x.TrainingCourse||x.courseName||""),
-      period,
-      room,
+      raw:x,
 
-      // سيتم تعبئتها من students لاحقاً
-      totalLevels:"—",
-      usedLevels:"—",
-      remainingLevels:"—",
-      _lastLevels:null,
+      name_en:x.name_en||x.name||"",
 
-      CourseFee: fee,
-      PaidAmount: paid,
-      RemainingAmount: rem,
+      name:x.name||"",
 
-      grade:"—",
-      status:"new",
-      date: toDate(x.createdAt || x.date || x.Date || x.created_at)
-    });
-  });
+      name_ar:x.name_ar||"",
+
+      age:onlyDigits(x.age),
+
+      iqama:onlyDigits(x.iqama),
+
+      phone:onlyDigits(x.phone),
+
+      email: String(x.email || "").trim(),
+      birthdate: String(x.Birthdate || x.birthdate || x.DateOfBirth || "").trim(),
+      nationality: String(x.Nationality || x.nationality || "").trim(),
+      healthStatus: String(x.HealthStatus || x.healthStatus || "").trim(),
+      educationLevel: String(x.EducationLevel || x.educationLevel || "").trim(),
+      heardAbout: String(x.HeardAbout || x.heardAbout || x.HowDidYouHear || "").trim(),
+      branch: String(x.Branch || x.branch || "").trim(),
+      section: String(x.Section || x.section || "").trim(),
+      courseType: String(x.CourseType || x.mode || "").trim(),
+      program: String(x.Program || x.program || "").trim(),
+      termsAccepted: !!(x.TermsAccepted || x.termsAccepted),
+
+      course:(x.course && x.course.name) ? x.course.name : (x.TrainingCourse||x.courseName||""),
+
+      period,
+
+      room,
+
+      // سيتم تعبئتها من students لاحقاً
+
+      totalLevels:"—",
+
+      usedLevels:"—",
+
+      remainingLevels:"—",
+
+      _lastLevels:null,
+
+      CourseFee: fee,
+
+      PaidAmount: paid,
+
+      RemainingAmount: rem,
+
+      grade:"—",
+
+      status:"new",
+
+      date: toDate(x.createdAt || x.date || x.Date || x.created_at)
+
+    });
+
+  });
 
 /* FakePromotions (PASS/FAIL) */
+
 fpSnap.forEach(d=>{
-  const x=d.data()||{};
-  const br = x.Branch || x.branch || "";
-  const sec= x.Section || x.section || "";
-  const typ= x.CourseType || x.mode || "";
-  if(br!=="Al-Hamdaniya" || sec!=="Men" || typ!=="حضوري") return;
 
-  const gRaw = (x.grade ?? x.finalGrade ?? x.final ?? x.totalGrade);
-  const g = Number(gRaw);
-  const isNum = !(gRaw===undefined || gRaw===null || gRaw==="" || isNaN(g));
+  const x=d.data()||{};
 
-  // ===== الحالية =====
-  const courseName = getCourseName(x);
-  const period = getPeriod(x);
-  const room = getRoom(x);
-  const trainer = getTrainer(x);
+  const br = x.Branch || x.branch || "";
 
-  // ===== السابقة =====
-  const previousCourse =
-    x.previousCourse?.name ||
-    x.fromCourse?.name ||
-    x.fromLevel ||
-    "";
+  const sec= x.Section || x.section || "";
 
-  const fee = n2(x.CourseFee || x.courseFee || 0);
-  const paid= n2(x.PaidAmount || x.paidAmount || 0);
-  const rem = clamp0(x.RemainingAmount || x.remainingAmount || (fee - paid));
+  const typ= x.CourseType || x.mode || "";
 
-  ROWS.push({
+  
+
+  const gRaw = (x.grade ?? x.finalGrade ?? x.final ?? x.totalGrade);
+
+  const g = Number(gRaw);
+
+  const isNum = !(gRaw===undefined || gRaw===null || gRaw==="" || isNaN(g));
+
+  // ===== الحالية =====
+
+  const courseName = getCourseName(x);
+
+  const period = getPeriod(x);
+
+  const room = getRoom(x);
+
+  const trainer = getTrainer(x);
+
+  // ===== السابقة =====
+
+  const previousCourse =
+
+    x.previousCourse?.name ||
+
+    x.fromCourse?.name ||
+
+    x.fromLevel ||
+
+    "";
+
+  const fee = n2(x.CourseFee || x.courseFee || 0);
+
+  const paid= n2(x.PaidAmount || x.paidAmount || 0);
+
+  const rem = clamp0(x.RemainingAmount || x.remainingAmount || (fee - paid));
+
+  ROWS.push({
+
 PaymentType: x.PaymentType || x.paymentType || x.PaymentMethod || x.paymentMethod || "",
-    src:"FakePromotions",
-    id:d.id,
-    raw:x,
 
-    name_en:x.name_en||x.name||"",
-    name:x.name||"",
-    name_ar:x.name_ar||"",
+    src:"FakePromotions",
 
-    age:onlyDigits(x.age),
-    iqama:onlyDigits(x.iqama),
-    phone:onlyDigits(x.phone),
+    id:d.id,
+
+    raw:x,
+
+    name_en:x.name_en||x.name||"",
+
+    name:x.name||"",
+
+    name_ar:x.name_ar||"",
+
+    age:onlyDigits(x.age),
+
+    iqama:onlyDigits(x.iqama),
+
+    phone:onlyDigits(x.phone),
+
 email: String(x.email || "").trim(),
-    // ✅ الحالية
-    course: courseName,
+      birthdate: String(x.Birthdate || x.birthdate || x.DateOfBirth || "").trim(),
+      nationality: String(x.Nationality || x.nationality || "").trim(),
+      healthStatus: String(x.HealthStatus || x.healthStatus || "").trim(),
+      educationLevel: String(x.EducationLevel || x.educationLevel || "").trim(),
+      heardAbout: String(x.HeardAbout || x.heardAbout || x.HowDidYouHear || "").trim(),
+      branch: String(x.Branch || x.branch || "").trim(),
+      section: String(x.Section || x.section || "").trim(),
+      courseType: String(x.CourseType || x.mode || "").trim(),
+      program: String(x.Program || x.program || "").trim(),
+      termsAccepted: !!(x.TermsAccepted || x.termsAccepted),
 
-    // ✅ السابقة
-    previousCourse: previousCourse,
+    // ✅ الحالية
 
-    // ✅ الآن ستظهر
-    period: period,
-    room: room,
-    trainer: trainer,
+    course: courseName,
 
-    totalLevels:"—",
-    usedLevels:"—",
-    remainingLevels:"—",
-    _lastLevels:null,
+    // ✅ السابقة
 
-    CourseFee: fee,
-    PaidAmount: paid,
-    RemainingAmount: rem,
+    previousCourse: previousCourse,
 
-    grade: isNum ? g : "—",
-    status: isNum ? (g>=65 ? "pass" : "fail") : "new",
-    date: toDate(x.createdAt || x.date || x.Date || x.created_at)
-  });
+    // ✅ الآن ستظهر
+
+    period: period,
+
+    room: room,
+
+    trainer: trainer,
+
+    totalLevels:"—",
+
+    usedLevels:"—",
+
+    remainingLevels:"—",
+
+    _lastLevels:null,
+
+    CourseFee: fee,
+
+    PaidAmount: paid,
+
+    RemainingAmount: rem,
+
+    grade: isNum ? g : "—",
+
+    status: isNum ? (g>=65 ? "pass" : "fail") : "new",
+
+    date: toDate(x.createdAt || x.date || x.Date || x.created_at)
+
+  });
+
 });
-  // ✅ تحميل مستويات آخر سجل لكل هوية من students (آلية الكود الأول)
-  await prefetchLevelsForRows(ROWS, 10);
-  for(const r of ROWS){
-    const iq = onlyDigits(r.iqama);
-    if(!iq) continue;
-    const lv = LEVELS_CACHE[iq] || {found:false};
-    if(lv && lv.found){
+
+  // ✅ تحميل مستويات آخر سجل لكل هوية من
+students (آلية الكود الأول)
+
+  await prefetchLevelsForRows(ROWS, 10);
+
+  for(const r of ROWS){
+
+    const iq = onlyDigits(r.iqama);
+
+    if(!iq) continue;
+
+    const lv = LEVELS_CACHE[iq] || {found:false};
+
+    if(lv && lv.found){
+
 const x = r.raw || {};
 
 r.totalLevels =
-  (x.totalLevels ?? x.TotalLevels ?? lv.total ?? "—");
+
+  (x.totalLevels ?? x.TotalLevels ?? lv.total ?? "—");
 
 r.usedLevels =
-  (x.usedLevels ?? x.UsedLevels ?? lv.used ?? "—");
+
+  (x.usedLevels ?? x.UsedLevels ?? lv.used ?? "—");
 
 r.remainingLevels =
-  (x.remainingLevels ?? x.RemainingLevels ?? lv.remaining ?? "—");      r._lastLevels = {total:lv.total||0, used:lv.used||0, remaining:lv.remaining||0};
-    }
-  }
 
-  fillFilters();
-  applyFilters(); // يعرض الجديد فقط افتراضيًا + يخفي ناجح/راسب إلا عند الفلترة/الحالة
+  (x.remainingLevels ?? x.RemainingLevels ?? lv.remaining ?? "—");      r._lastLevels = {total:lv.total||0, used:lv.used||0, remaining:lv.remaining||0};
+
+    }
+
+  }
+
+  fillFilters();
+
+  applyFilters(); // يعرض الجديد فقط افتراضيًا + يخفي ناجح/راسب إلا عند الفلترة/الحالة
+
 }
 
 /* ================= FILL FILTERS ================= */
+
 function fillFilters(){
-  const courses = uniq(ROWS.map(r=>r.course));
+  const keep = (sel)=>sel.value;
 
-  const dates   = uniq(ROWS.map(r=>r.date).filter(Boolean)).sort();
+  const oldBranch = keep(fBranch);
+  const oldSection = keep(fSection);
+  const oldType = keep(fType);
+  const oldProgram = keep(fProgram);
 
-  fCourse.innerHTML = '<option value="">الدورة</option>' + courses.map(v=>`<option value="${v}">${v}</option>`).join("");
-  fDate.innerHTML   = '<option value="">□ التاريخ</option>' + dates.map(v=>`<option value="${v}">${v}</option>`).join("");
+  const branches = uniq(ROWS.map(r=>r.branch)).sort();
+  const sections = uniq(ROWS.map(r=>r.section)).sort();
+  const types = uniq(ROWS.map(r=>r.courseType)).sort();
+  const programs = uniq(ROWS.map(r=>r.program)).sort();
+  const courses = uniq(ROWS.map(r=>r.course)).sort();
+  const dates = uniq(ROWS.map(r=>r.date).filter(Boolean)).sort();
+
+  fBranch.innerHTML = '<option value="">كل الفروع</option>' +
+    branches.map(v=>`<option value="${v}">${v}</option>`).join("");
+
+  fSection.innerHTML = '<option value="">كل الأقسام</option>' +
+    sections.map(v=>`<option value="${v}">${v}</option>`).join("");
+
+  fType.innerHTML = '<option value="">كل أنواع الدورات</option>' +
+    types.map(v=>`<option value="${v}">${v}</option>`).join("");
+
+  fProgram.innerHTML = '<option value="">كل البرامج</option>' +
+    programs.map(v=>`<option value="${v}">${v}</option>`).join("");
+
+  fCourse.innerHTML = '<option value="">الدورة</option>' +
+    courses.map(v=>`<option value="${v}">${v}</option>`).join("");
+
+  fDate.innerHTML = '<option value="">□ التاريخ</option>' +
+    dates.map(v=>`<option value="${v}">${v}</option>`).join("");
+
+  if(branches.includes(oldBranch)) fBranch.value = oldBranch;
+  if(sections.includes(oldSection)) fSection.value = oldSection;
+  if(types.includes(oldType)) fType.value = oldType;
+  if(programs.includes(oldProgram)) fProgram.value = oldProgram;
+
+  refreshTargetCourses();
 }
 
 /* ================= DUPLICATES ================= */
+
 function computeDupMap(list){
-  const m = {};
-  for(const r of list){
-    const iq = onlyDigits(r.iqama);
-    if(iq) m["iq:"+iq] = (m["iq:"+iq]||0) + 1;
-    const nm = String(r.name_en||"").trim().toLowerCase();
-    if(nm) m["nm:"+nm] = (m["nm:"+nm]||0) + 1;
-  }
-  return m;
+
+  const m = {};
+
+  for(const r of list){
+
+    const iq = onlyDigits(r.iqama);
+
+    if(iq) m["iq:"+iq] = (m["iq:"+iq]||0) + 1;
+
+    const nm = String(r.name_en||"").trim().toLowerCase();
+
+    if(nm) m["nm:"+nm] = (m["nm:"+nm]||0) + 1;
+
+  }
+
+  return m;
+
 }
+
 function isDupRow(r){
-  const iq = onlyDigits(r.iqama);
-  const nm = String(r.name_en||"").trim().toLowerCase();
-  const a = iq ? (DUP_MAP["iq:"+iq]||0) : 0;
-  const b = nm ? (DUP_MAP["nm:"+nm]||0) : 0;
-  return (a>1) || (b>1);
+
+  const iq = onlyDigits(r.iqama);
+
+  const nm = String(r.name_en||"").trim().toLowerCase();
+
+  const a = iq ? (DUP_MAP["iq:"+iq]||0) : 0;
+
+  const b = nm ? (DUP_MAP["nm:"+nm]||0) : 0;
+
+  return (a>1) || (b>1);
+
 }
 
 function applyFilters(){
 
-  SELECTED = [];
+  SELECTED = [];
 
-  FILTERED = ROWS.filter(r=>{
+  FILTERED = ROWS.filter(r=>{
 
-    if(!fStatus.value){
-      if(r.status==="pass" || r.status==="fail") return false;
-    }else{
-      if(r.status !== fStatus.value) return false;
-    }
+    if(fBranch.value && r.branch !== fBranch.value) return false;
+    if(fSection.value && r.section !== fSection.value) return false;
+    if(fType.value && r.courseType !== fType.value) return false;
+    if(fProgram.value && r.program !== fProgram.value) return false;
 
-    if(fName.value){
-      const s = (String(r.name_en||"")+" "+String(r.name||"")+" "+String(r.name_ar||"")).toLowerCase();
-      if(!s.includes(fName.value.toLowerCase())) return false;
-    }
+    if(!fStatus.value){
 
-    if(fAge.value && r.age !== onlyDigits(fAge.value)) return false;
-    if(fIqama.value && !String(r.iqama||"").includes(onlyDigits(fIqama.value))) return false;
-    if(fPhone.value && !String(r.phone||"").includes(onlyDigits(fPhone.value))) return false;
+      if(r.status==="pass" || r.status==="fail") return false;
+
+    }else{
+
+      if(r.status !== fStatus.value) return false;
+
+    }
+
+    if(fName.value){
+
+      const s = (String(r.name_en||"")+" "+String(r.name||"")+" "+String(r.name_ar||"")).toLowerCase();
+
+      if(!s.includes(fName.value.toLowerCase())) return false;
+
+    }
+
+    if(fAge.value && r.age !== onlyDigits(fAge.value)) return false;
+
+    if(fIqama.value && !String(r.iqama||"").includes(onlyDigits(fIqama.value))) return false;
+
+    if(fPhone.value && !String(r.phone||"").includes(onlyDigits(fPhone.value))) return false;
+
 if(fEmail.value){
-  if(!String(r.email || "").toLowerCase().includes(fEmail.value.toLowerCase())){
-    return false;
-  }
+
+  if(!String(r.email || "").toLowerCase().includes(fEmail.value.toLowerCase())){
+
+    return false;
+
+  }
+
 }
-    if(fCourse.value && r.course !== fCourse.value) return false;
-    if(fDate.value && r.date !== fDate.value) return false;
 
-    return true;
-  });
+    if(fCourse.value && r.course !== fCourse.value) return false;
 
-  DUP_MAP = computeDupMap(FILTERED);
+    if(fDate.value && r.date !== fDate.value) return false;
 
-  if(DUP_MODE) FILTERED = FILTERED.filter(r => isDupRow(r));
+    return true;
 
-  hint.textContent = FILTERED.length
-    ? `عدد النتائج: ${FILTERED.length}${DUP_MODE ? " — (المكررين فقط)" : ""}`
-    : "لا توجد نتائج";
+  });
+
+  DUP_MAP = computeDupMap(FILTERED);
+
+  if(DUP_MODE) FILTERED = FILTERED.filter(r => isDupRow(r));
+
+  hint.textContent = FILTERED.length
+
+    ? `عدد النتائج: ${FILTERED.length}${DUP_MODE ? " — (المكررين فقط)" : ""}`
+
+    : "لا توجد نتائج";
 
 
-  render();
+  render();
+
 }
 
 /* ================= DUP BUTTON ================= */
+
 btnDup.onclick = ()=>{
-  DUP_MODE = !DUP_MODE;
-  btnDup.textContent = DUP_MODE ? "✅ المكررين (مفعل)" : "⚠️ المكررين";
-  applyFilters();
+
+  DUP_MODE = !DUP_MODE;
+
+  btnDup.textContent = DUP_MODE ? "✅ المكررين (مفعل)" : "⚠️ المكررين";
+
+  applyFilters();
+
 };
 
 /* ================= INLINE EDIT ================= */
+
 function startInline(el){
-  el.classList.add("editing");
-  const input = el.querySelector("input");
-  if(input){ input.focus(); input.select(); }
+
+  el.classList.add("editing");
+
+  const input = el.querySelector("input");
+
+  if(input){ input.focus(); input.select(); }
+
 }
+
 function cancelInline(el){
-  el.classList.remove("editing");
+
+  el.classList.remove("editing");
+
 }
+
 async function saveInline(el, r, field){
-  const input = el.querySelector("input");
-  const newVal = (input?.value ?? "").trim();
 
-  let val = newVal;
-  if(field==="age" || field==="iqama" || field==="phone") val = onlyDigits(newVal);
+  const input = el.querySelector("input");
 
-  await db.collection(r.src).doc(r.id).set({ [field]: val }, { merge:true });
-  r[field] = val;
+  const newVal = (input?.value ?? "").trim();
 
-  // لو تغيرت الهوية: نحدث كاش المستويات لهذا السجل
-  if(field==="iqama"){
-    const lv = await fetchLastLevelsByIqama(val);
-    if(lv && lv.found){
-      r.totalLevels = lv.total || "—";
-      r.usedLevels  = (lv.used===0 || lv.used) ? lv.used : "—";
-      r.remainingLevels = (typeof lv.remaining==="number") ? lv.remaining : "—";
-      r._lastLevels = {total:lv.total||0, used:lv.used||0, remaining:lv.remaining||0};
-    }else{
-      r.totalLevels = "—"; r.usedLevels="—"; r.remainingLevels="—"; r._lastLevels=null;
-    }
-    render();
-    return;
-  }
+  let val = newVal;
 
-  const v = el.querySelector(".val");
-  if(v) v.textContent = val || "—";
+  if(field==="age" || field==="iqama" || field==="phone") val = onlyDigits(newVal);
 
-  el.classList.remove("editing");
+  await db.collection(r.src).doc(r.id).set({ [field]: val }, { merge:true });
+
+  r[field] = val;
+
+  // لو تغيرت الهوية: نحدث كاش المستويات لهذا السجل
+
+  if(field==="iqama"){
+
+    const lv = await fetchLastLevelsByIqama(val);
+
+    if(lv && lv.found){
+
+      r.totalLevels = lv.total || "—";
+
+      r.usedLevels  = (lv.used===0 || lv.used) ? lv.used : "—";
+
+      r.remainingLevels = (typeof lv.remaining==="number") ? lv.remaining : "—";
+
+      r._lastLevels = {total:lv.total||0, used:lv.used||0, remaining:lv.remaining||0};
+
+    }else{
+
+      r.totalLevels = "—"; r.usedLevels="—"; r.remainingLevels="—"; r._lastLevels=null;
+
+    }
+
+    render();
+
+    return;
+
+  }
+
+  const v = el.querySelector(".val");
+
+  if(v) v.textContent = val || "—";
+
+  el.classList.remove("editing");
+
 }
 
 /* ================= MODALS: FEES ================= */
+
 function openFees(r){
-  CURRENT_FEES_ROW = r;
-  feesNameEl.textContent = `${displayNameEN(r)} — ${r.iqama||"—"}`;
-  feeInput.value  = String(n2(r.CourseFee||0));
-  paidInput.value = String(n2(r.PaidAmount||0));
-  remainInput.value = String(Math.max(n2(feeInput.value)-n2(paidInput.value),0));
+
+  CURRENT_FEES_ROW = r;
+
+  feesNameEl.textContent = `${displayNameEN(r)} — ${r.iqama||"—"}`;
+
+  feeInput.value  = String(n2(r.CourseFee||0));
+
+  paidInput.value = String(n2(r.PaidAmount||0));
+
+  remainInput.value = String(Math.max(n2(feeInput.value)-n2(paidInput.value),0));
+
 methodInput.value = r.PaymentType || "";
-  feesModal.style.display="flex";
+
+  feesModal.style.display="flex";
+
 }
+
 function closeFees(){
-  feesModal.style.display="none";
+
+  feesModal.style.display="none";
+
 }
 
 async function saveFees() {
-  if (!CURRENT_FEES_ROW) return;
+
+  if (!CURRENT_FEES_ROW) return;
 
 const fee = n2(feeInput.value);
+
 const paid = n2(paidInput.value);
+
 const rem = Math.max(fee - paid, 0);
+
 const method = (methodInput.value || "").trim();
-try {    // 2. تحديث البيانات في قاعدة بيانات Firebase
-    await db.collection(CURRENT_FEES_ROW.src).doc(CURRENT_FEES_ROW.id).set({
-      CourseFee: fee,
-      PaidAmount: paid,
-      RemainingAmount: rem, // سيتم حفظ القيمة التي أدخلتها يدوياً
-      PaymentType: method
-    }, { merge: true });
 
-    // 3. تحديث الكائن (Object) في الذاكرة المحلية (Local State)
-    CURRENT_FEES_ROW.CourseFee = fee;
-    CURRENT_FEES_ROW.PaidAmount = paid;
-    CURRENT_FEES_ROW.RemainingAmount = rem;
-    CURRENT_FEES_ROW.PaymentType = method;
+try {    // 2. تحديث البيانات في قاعدة بيانات Firebase
 
-    // 4. تحديث عرض الجدول (UI) فورياً دون الحاجة لإعادة تحميل الصفحة
-    const rid = `${CURRENT_FEES_ROW.src}-${CURRENT_FEES_ROW.id}`;
-    const feeTd = document.getElementById("fee-" + rid);
-    const paidTd = document.getElementById("paid-" + rid);
-    const remTd = document.getElementById("rem-" + rid);
-    const methodTd = document.getElementById("method-" + rid);
+    await db.collection(CURRENT_FEES_ROW.src).doc(CURRENT_FEES_ROW.id).set({
 
-    if (feeTd) feeTd.textContent = fee;
-    if (paidTd) paidTd.textContent = paid;
-    if (remTd) remTd.innerHTML = remColorHTML(rem); // سيظهر اللون بناءً على القيمة اليدوية
-    if (methodTd) methodTd.textContent = method || "—";
+      CourseFee: fee,
 
-    // 5. إغلاق النافذة المنبثقة
-    closeFees();
+      PaidAmount: paid,
 
-  } catch (error) {
-    console.error("Error updating fees: ", error);
-    alert("حدث خطأ أثناء حفظ البيانات، يرجى المحاولة مرة أخرى.");
-  }
+      RemainingAmount: rem, // سيتم حفظ القيمة التي أدخلتها يدوياً
+
+      PaymentType: method
+
+    }, { merge: true });
+
+    // 3. تحديث الكائن (Object) في الذاكرة المحلية (Local State)
+
+    CURRENT_FEES_ROW.CourseFee = fee;
+
+    CURRENT_FEES_ROW.PaidAmount = paid;
+
+    CURRENT_FEES_ROW.RemainingAmount = rem;
+
+    CURRENT_FEES_ROW.PaymentType = method;
+
+    // 4. تحديث عرض الجدول (UI) فورياً دون الحاجة لإعادة تحميل الصفحة
+
+    const rid = `${CURRENT_FEES_ROW.src}-${CURRENT_FEES_ROW.id}`;
+
+    const feeTd = document.getElementById("fee-" + rid);
+
+    const paidTd = document.getElementById("paid-" + rid);
+
+    const remTd = document.getElementById("rem-" + rid);
+
+    const methodTd = document.getElementById("method-" + rid);
+
+    if (feeTd) feeTd.textContent = fee;
+
+    if (paidTd) paidTd.textContent = paid;
+
+    if (remTd) remTd.innerHTML = remColorHTML(rem); // سيظهر اللون بناءً على القيمة اليدوية
+
+    if (methodTd) methodTd.textContent = method || "—";
+
+    // 5. إغلاق النافذة المنبثقة
+
+    closeFees();
+
+  } catch (error) {
+
+    console.error("Error updating
+fees: ", error);
+
+    alert("حدث خطأ أثناء حفظ البيانات، يرجى المحاولة مرة أخرى.");
+
+  }
+
 }
-/* ================= MODALS: LEVELS (Override TotalLevels فقط) ================= */
+
+/* ================= MODALS: LEVELS (Override TotalLevels فقط)
+================= */
+
 function openLevels(r){
 
-  CURRENT_LEVELS_ROW = r;
+  CURRENT_LEVELS_ROW = r;
 
-  levelsNameEl.textContent = `${displayNameEN(r)} — ${r.iqama||"—"}`;
+  levelsNameEl.textContent = `${displayNameEN(r)} — ${r.iqama||"—"}`;
 
-  const last = r._lastLevels || {total:0, used:0, remaining:0};
+  const last = r._lastLevels || {total:0, used:0, remaining:0};
 
-  // ✅ الأولوية للتعديل
-  const total = (r.totalLevels !== "—" ? r.totalLevels : last.total);
-  const used  = (r.usedLevels !== "—" ? r.usedLevels : last.used);
-  const remain = (r.remainingLevels !== "—" ? r.remainingLevels : last.remaining);
+  // ✅ الأولوية للتعديل
 
-  lvTotalIn.value  = total || 0;
-  lvUsedIn.value   = used || 0;
-  lvRemainIn.value = remain || 0;
+  const total = (r.totalLevels !== "—" ? r.totalLevels : last.total);
 
-  levelsModal.style.display="flex";
+  const used  = (r.usedLevels !== "—" ? r.usedLevels : last.used);
+
+  const remain = (r.remainingLevels !== "—" ? r.remainingLevels : last.remaining);
+
+  lvTotalIn.value  = total || 0;
+
+  lvUsedIn.value   = used || 0;
+
+  lvRemainIn.value = remain || 0;
+
+  levelsModal.style.display="flex";
+
 }function closeLevels(){
-  levelsModal.style.display="none";
-  CURRENT_LEVELS_ROW=null;
+
+  levelsModal.style.display="none";
+
+  CURRENT_LEVELS_ROW=null;
+
 }
 
 async function saveLevelsOverride(){
 
-  if(!CURRENT_LEVELS_ROW) return;
+  if(!CURRENT_LEVELS_ROW) return;
 
-  const total = Math.max(1, Math.floor(n2(lvTotalIn.value)));
-  const used  = Math.max(0, Math.floor(n2(lvUsedIn.value)));
-  const remain = Math.max(total - used, 0);
+  const total = Math.max(1, Math.floor(n2(lvTotalIn.value)));
 
-  const key = undoKey(CURRENT_LEVELS_ROW.src, CURRENT_LEVELS_ROW.id);
+  const used  = Math.max(0, Math.floor(n2(lvUsedIn.value)));
 
-  // حفظ override
-  LEVELS_OVERRIDE[key] = total;
+  const remain = Math.max(total - used, 0);
 
-  try{
+  const key = undoKey(CURRENT_LEVELS_ROW.src, CURRENT_LEVELS_ROW.id);
 
-    // ✅ حفظ التعديل في Firestore
-    await db.collection(CURRENT_LEVELS_ROW.src)
-      .doc(CURRENT_LEVELS_ROW.id)
-      .set({
-        totalLevels: total,
-        usedLevels: used,
-        remainingLevels: remain
-      },{merge:true});
+  // حفظ override
 
-    // تحديث الكائن المحلي
-    CURRENT_LEVELS_ROW.totalLevels = total;
-    CURRENT_LEVELS_ROW.usedLevels = used;
-    CURRENT_LEVELS_ROW.remainingLevels = remain;
+  LEVELS_OVERRIDE[key] = total;
 
-    const rid = `${CURRENT_LEVELS_ROW.src}-${CURRENT_LEVELS_ROW.id}`;
+  try{
 
-    const tl = document.getElementById("tl-"+rid);
-    const ul = document.getElementById("ul-"+rid);
-    const rl = document.getElementById("rl-"+rid);
+    // ✅ حفظ التعديل في Firestore
 
-    if(tl) tl.textContent = total;
-    if(ul) ul.textContent = used;
-    if(rl) rl.textContent = remain;
+    await db.collection(CURRENT_LEVELS_ROW.src)
 
-    closeLevels();
+      .doc(CURRENT_LEVELS_ROW.id)
 
-  }catch(e){
-    console.error(e);
-    alert("حدث خطأ أثناء حفظ المستويات");
-  }
-}/* ================= BULK FEES MODAL ================= */
+      .set({
+
+        totalLevels: total,
+
+        usedLevels: used,
+
+        remainingLevels: remain
+
+      },{merge:true});
+
+    // تحديث الكائن المحلي
+
+    CURRENT_LEVELS_ROW.totalLevels = total;
+
+    CURRENT_LEVELS_ROW.usedLevels = used;
+
+    CURRENT_LEVELS_ROW.remainingLevels = remain;
+
+    const rid = `${CURRENT_LEVELS_ROW.src}-${CURRENT_LEVELS_ROW.id}`;
+
+    const tl = document.getElementById("tl-"+rid);
+
+    const ul = document.getElementById("ul-"+rid);
+
+    const rl = document.getElementById("rl-"+rid);
+
+    if(tl) tl.textContent = total;
+
+    if(ul) ul.textContent = used;
+
+    if(rl) rl.textContent = remain;
+
+    closeLevels();
+
+  }catch(e){
+
+    console.error(e);
+
+    alert("حدث خطأ أثناء حفظ المستويات");
+
+  }
+
+}/* =================
+BULK FEES MODAL ================= */
+
 btnBulkFees.onclick = ()=>{
-  if(!SELECTED.length) return alert("اختر سجلات");
-  bulkFeeInput.value="";
-  bulkPaidInput.value="";
-  bulkFeesModal.style.display="flex";
+
+  if(!SELECTED.length) return alert("اختر سجلات");
+
+  bulkFeeInput.value="";
+
+  bulkPaidInput.value="";
+
+  bulkFeesModal.style.display="flex";
+
 };
+
 function closeBulkFees(){
-  bulkFeesModal.style.display="none";
-  bulkFeeInput.value="";
-  bulkPaidInput.value="";
+
+  bulkFeesModal.style.display="none";
+
+  bulkFeeInput.value="";
+
+  bulkPaidInput.value="";
+
 }
+
 async function confirmBulkFees(){
-  const fee = (bulkFeeInput.value==="" ? null : n2(bulkFeeInput.value));
-  const paid= (bulkPaidInput.value==="" ? null : n2(bulkPaidInput.value));
-  if(fee===null && paid===null) return alert("أدخل الرسوم أو المدفوع");
 
-  for(const r of SELECTED){
-    const oldFee = n2(r.CourseFee||0);
-    const oldPaid= n2(r.PaidAmount||0);
+  const fee = (bulkFeeInput.value==="" ? null : n2(bulkFeeInput.value));
 
-    const newFee = (fee===null ? oldFee : fee);
-    const newPaid= (paid===null? oldPaid: paid);
-    const newRem = Math.max(newFee-newPaid,0);
+  const paid= (bulkPaidInput.value==="" ? null : n2(bulkPaidInput.value));
 
-    await db.collection(r.src).doc(r.id).set({
-      CourseFee:newFee,
-      PaidAmount:newPaid,
-      RemainingAmount:newRem
-    }, {merge:true});
+  if(fee===null && paid===null) return alert("أدخل الرسوم أو المدفوع");
 
-    r.CourseFee = newFee;
-    r.PaidAmount = newPaid;
-    r.RemainingAmount = newRem;
+  for(const r of SELECTED){
 
-    const rid = `${r.src}-${r.id}`;
-    const feeTd = document.getElementById("fee-"+rid);
-    const paidTd= document.getElementById("paid-"+rid);
-    const remTd = document.getElementById("rem-"+rid);
-    if(feeTd) feeTd.textContent = newFee;
-    if(paidTd) paidTd.textContent = newPaid;
-    if(remTd) remTd.innerHTML = remColorHTML(newRem);
-  }
+    const oldFee = n2(r.CourseFee||0);
 
-  closeBulkFees();
-  render();
-  SELECTED=[];
+    const oldPaid= n2(r.PaidAmount||0);
+
+    const newFee = (fee===null ? oldFee : fee);
+
+    const newPaid= (paid===null? oldPaid: paid);
+
+    const newRem = Math.max(newFee-newPaid,0);
+
+    await db.collection(r.src).doc(r.id).set({
+
+      CourseFee:newFee,
+
+      PaidAmount:newPaid,
+
+      RemainingAmount:newRem
+
+    }, {merge:true});
+
+    r.CourseFee = newFee;
+
+    r.PaidAmount = newPaid;
+
+    r.RemainingAmount = newRem;
+
+    const rid = `${r.src}-${r.id}`;
+
+    const feeTd = document.getElementById("fee-"+rid);
+
+    const paidTd= document.getElementById("paid-"+rid);
+
+    const remTd = document.getElementById("rem-"+rid);
+
+    if(feeTd) feeTd.textContent = newFee;
+
+    if(paidTd) paidTd.textContent = newPaid;
+
+    if(remTd) remTd.innerHTML = remColorHTML(newRem);
+
+  }
+
+  closeBulkFees();
+
+  render();
+
+  SELECTED=[];
+
 }
 
-/* ================= BULK LEVELS (Override) ================= */
+/* ================= BULK LEVELS (Override)
+================= */
+
 btnBulkLevels.onclick = ()=>{
-  if(!SELECTED.length) return alert("اختر سجلات أولاً");
-  bulkLevelsInput.value="";
-  bulkLevelsModal.style.display="flex";
+
+  if(!SELECTED.length) return alert("اختر سجلات أولاً");
+
+  bulkLevelsInput.value="";
+
+  bulkLevelsModal.style.display="flex";
+
 };
+
 function closeBulkLevels(){
-  bulkLevelsModal.style.display="none";
+
+  bulkLevelsModal.style.display="none";
+
 }
+
 function applyBulkLevels(){
-  const v = Math.floor(n2(bulkLevelsInput.value));
-  if(!v || v<1) return alert("أدخل رقم صحيح");
 
-  for(const r of SELECTED){
-    const key = undoKey(r.src,r.id);
-    LEVELS_OVERRIDE[key] = v;
-    const rid = `${r.src}-${r.id}`;
-    const tl = document.getElementById("tl-"+rid);
-    if(tl) tl.textContent = v;
-  }
+  const v = Math.floor(n2(bulkLevelsInput.value));
 
-  closeBulkLevels();
-  SELECTED=[];
+  if(!v || v<1) return alert("أدخل رقم صحيح");
+
+  for(const r of SELECTED){
+
+    const key = undoKey(r.src,r.id);
+
+    LEVELS_OVERRIDE[key] = v;
+
+    const rid = `${r.src}-${r.id}`;
+
+    const tl = document.getElementById("tl-"+rid);
+
+    if(tl) tl.textContent = v;
+
+  }
+
+  closeBulkLevels();
+
+  SELECTED=[];
+
 }
 
 /* ================= RENDER TABLE ================= */
+
 function render(){
-  tbody.innerHTML = "";
 
-  if(!FILTERED.length){
-    tbody.innerHTML = `<tr><td colspan="25" class="notice">لا توجد نتائج</td></tr>`;
-    return;
-  }
+  tbody.innerHTML = "";
 
-  const tgtTxt = targetText();
+  if(!FILTERED.length){
 
-  FILTERED.forEach((r,i)=>{
-    const key = undoKey(r.src, r.id);
-    const done = !!UNDO[key];
-    const dup = isDupRow(r);
-    const rid = `${r.src}-${r.id}`;
+    tbody.innerHTML = `<tr><td
+colspan="36" class="notice">لا توجد نتائج</td></tr>`;
 
-    const overrideTotal = LEVELS_OVERRIDE[key];
-    const totalShow = (overrideTotal ? overrideTotal : r.totalLevels);
-    const usedShow  = (r.usedLevels===0 || r.usedLevels) ? r.usedLevels : "—";
-    const remLvShow = (r.remainingLevels===0 || r.remainingLevels) ? r.remainingLevels : "—";
+    return;
 
-    tbody.innerHTML += `
+  }
+
+  const tgtTxt = targetText();
+
+  FILTERED.forEach((r,i)=>{
+
+    const key = undoKey(r.src, r.id);
+
+    const done = !!UNDO[key];
+
+    const dup = isDupRow(r);
+
+    const rid = `${r.src}-${r.id}`;
+
+    const overrideTotal = LEVELS_OVERRIDE[key];
+
+    const totalShow = (overrideTotal ? overrideTotal : r.totalLevels);
+
+    const usedShow  = (r.usedLevels===0 || r.usedLevels) ? r.usedLevels : "—";
+
+    const remLvShow = (r.remainingLevels===0 || r.remainingLevels) ? r.remainingLevels : "—";
+
+    tbody.innerHTML += `
+
 <tr id="row-${rid}" class="${done?'row-done':''} ${dup?'dup-row':''}">
-  <td><input type="checkbox" data-i="${i}" ${done?'disabled':''}></td>
-  <td>${i+1}</td>
 
-  <td class="name-cell">
-    <div class="inline">
-      <span class="val" onclick="startInline(this.parentNode)">
-        <div class="name-en">${displayNameEN(r)}</div>
-        <div class="name-ar">${r.name_ar||""}</div>
-        ${dup?'<div class="dup-tag">مكرر</div>':''}
-      </span>
-      <input value="${(r.name_en||"").replace(/"/g,'&quot;')}">
-      <button class="save" onclick="saveInline(this.parentNode, FILTERED[${i}], 'name_en')">✔</button>
-      <button class="cancel" onclick="cancelInline(this.parentNode)">✖</button>
-    </div>
-  </td>
+  <td><input type="checkbox"
+data-i="${i}" ${done?'disabled':''}></td>
 
-  <td>
-    <div class="inline">
-      <span class="val" onclick="startInline(this.parentNode)">${r.age||"—"}</span>
-      <input value="${(r.age||"").replace(/"/g,'&quot;')}">
-      <button class="save" onclick="saveInline(this.parentNode, FILTERED[${i}], 'age')">✔</button>
-      <button class="cancel" onclick="cancelInline(this.parentNode)">✖</button>
-    </div>
-  </td>
+  <td>${i+1}</td>
 
-  <td>
-    <div class="inline">
-      <span class="val" onclick="startInline(this.parentNode)">${r.iqama||"—"}</span>
-      <input value="${(r.iqama||"").replace(/"/g,'&quot;')}">
-      <button class="save" onclick="saveInline(this.parentNode, FILTERED[${i}], 'iqama')">✔</button>
-      <button class="cancel" onclick="cancelInline(this.parentNode)">✖</button>
-    </div>
-  </td>
+  <td class="name-cell">
 
-  <td>
-    <div class="inline">
-      <span class="val" onclick="startInline(this.parentNode)">${r.phone||"—"}</span>
-      <input value="${(r.phone||"").replace(/"/g,'&quot;')}">
-      <button class="save" onclick="saveInline(this.parentNode, FILTERED[${i}], 'phone')">✔</button>
-      <button class="cancel" onclick="cancelInline(this.parentNode)">✖</button>
-    </div>
-  </td>
-  <td>${r.email || "—"}</td>
+    <div class="inline">
+
+      <span class="val"
+onclick="startInline(this.parentNode)">
+
+        <div
+class="name-en">${displayNameEN(r)}</div>
+
+        <div
+class="name-ar">${r.name_ar||""}</div>
+
+        ${dup?'<div class="dup-tag">مكرر</div>':''}
+
+      </span>
+
+      <input value="${(r.name_en||"").replace(/"/g,'&quot;')}">
+
+      <button class="save"
+onclick="saveInline(this.parentNode, FILTERED[${i}], 'name_en')">✔</button>
+
+      <button class="cancel" onclick="cancelInline(this.parentNode)">✖</button>
+
+    </div>
+
+  </td>
+
+  <td>
+
+    <div class="inline">
+
+      <span class="val"
+onclick="startInline(this.parentNode)">${r.age||"—"}</span>
+
+      <input value="${(r.age||"").replace(/"/g,'&quot;')}">
+
+      <button class="save"
+onclick="saveInline(this.parentNode, FILTERED[${i}], 'age')">✔</button>
+
+      <button class="cancel"
+onclick="cancelInline(this.parentNode)">✖</button>
+
+    </div>
+
+  </td>
+
+  <td>
+
+    <div class="inline">
+
+      <span class="val" onclick="startInline(this.parentNode)">${r.iqama||"—"}</span>
+
+      <input value="${(r.iqama||"").replace(/"/g,'&quot;')}">
+
+      <button class="save"
+onclick="saveInline(this.parentNode, FILTERED[${i}], 'iqama')">✔</button>
+
+      <button class="cancel"
+onclick="cancelInline(this.parentNode)">✖</button>
+
+    </div>
+
+  </td>
+
+  <td>
+
+    <div class="inline">
+
+      <span class="val"
+onclick="startInline(this.parentNode)">${r.phone||"—"}</span>
+
+      <input value="${(r.phone||"").replace(/"/g,'&quot;')}">
+
+      <button class="save"
+onclick="saveInline(this.parentNode, FILTERED[${i}], 'phone')">✔</button>
+
+      <button class="cancel"
+onclick="cancelInline(this.parentNode)">✖</button>
+
+    </div>
+
+  </td>
+
+  <td>${r.email || "—"}</td>
+  <td class="detail-cell">${r.birthdate || "—"}</td>
+  <td class="detail-cell"><span class="detail-chip">${r.nationality || "—"}</span></td>
+  <td class="detail-cell">${r.healthStatus || "—"}</td>
+  <td class="detail-cell">${r.educationLevel || "—"}</td>
+  <td class="detail-cell">${r.heardAbout || "—"}</td>
+  <td class="detail-cell"><span class="detail-chip">${r.branch || "—"}</span></td>
+  <td class="detail-cell">${r.section || "—"}</td>
+  <td class="detail-cell">${r.program || "—"}</td>
+  <td class="detail-cell">${r.courseType || "—"}</td>
+  <td class="detail-cell">${r.termsAccepted ? "✅ موافق" : "—"}</td>
+
 <td>${r.status!=="new" ? (r.previousCourse||"—") : "—"}</td>
+
 <td class="col-course">${r.course || "—"}</td>
 
 <td title="${tgtTxt.replace(/"/g,'&quot;')}">${tgtTxt}</td>
 
 <td id="tl-${rid}">${totalShow}</td>
+
 <td id="ul-${rid}">
-  ${usedShow}
-  ${endSubHTML(totalShow, usedShow)}
+
+  ${usedShow}
+
+  ${endSubHTML(totalShow, usedShow)}
+
 </td>
+
 <td id="rl-${rid}">${remLvShow}</td>
 
 <td id="fee-${rid}">${n2(r.CourseFee||0)}</td>
+
 <td id="paid-${rid}">${n2(r.PaidAmount||0)}</td>
+
 <td id="rem-${rid}">${remColorHTML(r.RemainingAmount||0)}</td>
+
 <td id="method-${rid}">${(r.PaymentType||"—")}</td>
+
 <td>${(r.grade===0||r.grade)?r.grade:"—"}</td>
+
 <td class="${statusClass(r.status)}">${statusLabel(r.status)}</td>
+
 <td>${r.date||"—"}</td>
-  <td class="mini-actions">
-    <button class="mini mini-pay" type="button" onclick="openFees(FILTERED[${i}])"><i class="fa-solid fa-credit-card"></i> الدفعات</button>
-    <button class="mini mini-lv" type="button" onclick="openLevels(FILTERED[${i}])"><i class="fa-solid fa-layer-group"></i> المستويات</button>
-  </td>
 
-  <td id="res-${rid}">—</td>
+  <td class="mini-actions">
+
+    <button class="mini mini-pay" type="button"
+onclick="openFees(FILTERED[${i}])"><i class="fa-solid
+fa-credit-card"></i> الدفعات</button>
+
+    <button class="mini mini-lv"
+type="button" onclick="openLevels(FILTERED[${i}])"><i
+class="fa-solid fa-layer-group"></i> المستويات</button>
+
+  </td>
+
+  <td id="res-${rid}">—</td>
+
 </tr>`;
-  });
 
-  // checkbox events
-  tbody.querySelectorAll('input[type="checkbox"]').forEach(ch=>{
-    ch.onchange = ()=>{
-      const r = FILTERED[Number(ch.dataset.i)];
-      if(!r) return;
-      const key = undoKey(r.src, r.id);
-      if(UNDO[key]){ ch.checked=false; return; }
-      if(ch.checked) SELECTED.push(r);
-      else SELECTED = SELECTED.filter(x=>!(x.src===r.src && x.id===r.id));
-    };
-  });
+  });
+
+  // checkbox events
+
+  tbody.querySelectorAll('input[type="checkbox"]').forEach(ch=>{
+
+    ch.onchange = ()=>{
+
+      const r = FILTERED[Number(ch.dataset.i)];
+
+      if(!r) return;
+
+      const key = undoKey(r.src, r.id);
+
+      if(UNDO[key]){ ch.checked=false; return; }
+
+      if(ch.checked) SELECTED.push(r);
+
+      else SELECTED = SELECTED.filter(x=>!(x.src===r.src && x.id===r.id));
+
+    };
+
+  });
+
 }
 
 /* ================= FILTER EVENTS ================= */
-[fStatus,fName,fAge,fIqama,fPhone,fEmail,fCourse,fDate].forEach(el=>{
-  el.addEventListener("change", applyFilters);
-  el.addEventListener("input", applyFilters);
+
+[fBranch,fSection,fType,fProgram,fStatus,fName,fAge,fIqama,fPhone,fEmail,fCourse,fDate].forEach(el=>{
+
+  el.addEventListener("change", applyFilters);
+
+  el.addEventListener("input", applyFilters);
+
+});
+
+[fBranch,fSection,fType,fProgram].forEach(el=>{
+  el.addEventListener("change", refreshTargetCourses);
 });
 targetCourse.addEventListener("change", ()=> render());
 
 /* ================= SELECT ALL / NONE ================= */
+
 btnAll.onclick = ()=>{
-  SELECTED=[];
-  tbody.querySelectorAll('input[type="checkbox"]').forEach(c=>{
-    if(!c.disabled){
-      c.checked=true;
-      const r = FILTERED[Number(c.dataset.i)];
-      if(r) SELECTED.push(r);
-    }
-  });
+
+  SELECTED=[];
+
+  tbody.querySelectorAll('input[type="checkbox"]').forEach(c=>{
+
+    if(!c.disabled){
+
+      c.checked=true;
+
+      const r = FILTERED[Number(c.dataset.i)];
+
+      if(r) SELECTED.push(r);
+
+    }
+
+  });
+
 };
+
 btnNone.onclick = ()=>{
-  SELECTED=[];
-  tbody.querySelectorAll('input[type="checkbox"]').forEach(c=>c.checked=false);
+
+  SELECTED=[];
+
+  tbody.querySelectorAll('input[type="checkbox"]').forEach(c=>c.checked=false);
+
 };
 
 /* ================= UI MARK DONE ================= */
+
 function markRowDone(r, htmlResult){
-  const rid = `${r.src}-${r.id}`;
-  const row = document.getElementById(`row-${rid}`);
-  if(row) row.classList.add("row-done");
 
-  const res = document.getElementById(`res-${rid}`);
-  if(res) res.innerHTML = htmlResult;
+  const rid = `${r.src}-${r.id}`;
 
-  const cb = row ? row.querySelector('input[type="checkbox"]') : null;
-  if(cb){
-    cb.checked = false;
-    cb.disabled = true;
-  }
+  const row = document.getElementById(`row-${rid}`);
+
+  if(row) row.classList.add("row-done");
+
+  const res = document.getElementById(`res-${rid}`);
+
+  if(res) res.innerHTML = htmlResult;
+
+  const cb = row ? row.querySelector('input[type="checkbox"]') : null;
+
+  if(cb){
+
+    cb.checked = false;
+
+    cb.disabled = true;
+
+  }
+
 }
 
 /* ================= DELETE + UNDO ================= */
+
 btnDelete.onclick = async ()=>{
-  if(!SELECTED.length) return alert("اختر سجلات");
 
-  for(const r of SELECTED){
-    const key = undoKey(r.src,r.id);
-    if(UNDO[key]) continue;
+  if(!SELECTED.length) return alert("اختر سجلات");
 
-    UNDO[key] = { type:"delete", src:r.src, id:r.id, raw:r.raw };
-    await db.collection(r.src).doc(r.id).delete();
+  for(const r of SELECTED){
 
-    markRowDone(r, `
-      <span class="badge-del">تم الحذف</span>
-      <span class="undo" onclick="undoAction(event,'${key}')">تراجع</span>
-    `);
-  }
-  SELECTED=[];
+    const key = undoKey(r.src,r.id);
+
+    if(UNDO[key]) continue;
+
+    UNDO[key] = { type:"delete", src:r.src, id:r.id, raw:r.raw };
+
+    await db.collection(r.src).doc(r.id).delete();
+
+    markRowDone(r, `
+
+      <span
+class="badge-del">تم الحذف</span>
+
+      <span class="undo"
+onclick="undoAction(event,'${key}')">تراجع</span>
+
+    `);
+
+  }
+
+  SELECTED=[];
+
 };
 
 function undoAction(e,key){
-  if(e){ try{e.preventDefault();}catch(_){ } try{e.stopPropagation();}catch(_){ } }
-  undo(key);
+
+  if(e){ try{e.preventDefault();}catch(_){ } try{e.stopPropagation();}catch(_){ } }
+
+  undo(key);
+
 }
+
 async function undo(key){
-  const u = UNDO[key];
-  if(!u) return alert("لا يوجد سجل للتراجع");
 
-  // إن كان ترحيل نحذف studentId
-  if(u.type==="migrate" && u.studentId){
-    try{ await db.collection("students").doc(u.studentId).delete(); }catch(e){}
-  }
+  const u = UNDO[key];
 
-  await db.collection(u.src).doc(u.id).set(u.raw);
+  if(!u) return alert("لا يوجد سجل للتراجع");
 
-  // إعادة تفعيل الصف
-  const rid = `${u.src}-${u.id}`;
-  const row = document.getElementById(`row-${rid}`);
-  if(row){
-    row.classList.remove("row-done");
-    const cb = row.querySelector('input[type="checkbox"]');
-    if(cb){ cb.disabled=false; cb.checked=false; }
-  }
-  const res = document.getElementById(`res-${rid}`);
-  if(res) res.textContent="—";
+  // إن كان ترحيل نحذف studentId
 
-  delete UNDO[key];
+  if(u.type==="migrate" && u.studentId){
+
+    try{ await db.collection("students").doc(u.studentId).delete(); }catch(e){}
+
+  }
+
+  await db.collection(u.src).doc(u.id).set(u.raw);
+
+  // إعادة تفعيل الصف
+
+  const rid = `${u.src}-${u.id}`;
+
+  const row = document.getElementById(`row-${rid}`);
+
+  if(row){
+
+    row.classList.remove("row-done");
+
+    const cb = row.querySelector('input[type="checkbox"]');
+
+    if(cb){ cb.disabled=false; cb.checked=false; }
+
+  }
+
+  const res = document.getElementById(`res-${rid}`);
+
+  if(res) res.textContent="—";
+
+  delete UNDO[key];
+
 }
 
-/* ================= MIGRATE (SINGLE MODAL) ================= */
+/* ================= MIGRATE (SINGLE MODAL)
+================= */
+
 function openMigrateSingle(r){
-  MIG_SINGLE_ROW = r;
-  migNameEl.textContent = `${displayNameEN(r)} — ${r.iqama||"—"}`;
 
-  const key = undoKey(r.src,r.id);
+  MIG_SINGLE_ROW = r;
 
-  // ✅ total: من Override أو students cache أو 12
-  const lv = r._lastLevels || {total:0, used:0, remaining:0};
-  const totalDefault = LEVELS_OVERRIDE[key] || lv.total || 12;
-  migLevelsIn.value = String(totalDefault);
+  migNameEl.textContent = `${displayNameEN(r)} — ${r.iqama||"—"}`;
 
-  // ✅ fee: من السجل (آلية الكود الأول) وإن كان صفر خذ من الهدف
-  const tgt = TARGET_COURSES.find(c=>c.id===targetCourse.value);
-  const fee = n2(r.CourseFee||0) || n2(tgt?.CourseFee||0);
-  migFeeIn.value = String(fee);
+  const key = undoKey(r.src,r.id);
 
-  migPaidIn.value = String(n2(r.PaidAmount||0));
-  migRemainIn.value = String(Math.max(n2(migFeeIn.value)-n2(migPaidIn.value),0));
+  // ✅
+total: من Override أو students cache أو 12
 
-  migrateSingleModal.style.display="flex";
+  const lv = r._lastLevels || {total:0, used:0, remaining:0};
+
+  const totalDefault = LEVELS_OVERRIDE[key] || lv.total || 12;
+
+  migLevelsIn.value = String(totalDefault);
+
+  // ✅ fee: من السجل (آلية الكود الأول) وإن كان صفر خذ من الهدف
+
+  const tgt = TARGET_COURSES.find(c=>c.id===targetCourse.value);
+
+  const fee = n2(r.CourseFee||0) || n2(tgt?.CourseFee||0);
+
+  migFeeIn.value = String(fee);
+
+  migPaidIn.value = String(n2(r.PaidAmount||0));
+
+  migRemainIn.value = String(Math.max(n2(migFeeIn.value)-n2(migPaidIn.value),0));
+
+  migrateSingleModal.style.display="flex";
+
 }
+
 function closeMigrateSingle(){
-  migrateSingleModal.style.display="none";
-  MIG_SINGLE_ROW=null;
+
+  migrateSingleModal.style.display="none";
+
+  MIG_SINGLE_ROW=null;
+
 }
+
 function recalcMigRemain(){
-  migRemainIn.value = String(Math.max(n2(migFeeIn.value)-n2(migPaidIn.value),0));
+
+  migRemainIn.value = String(Math.max(n2(migFeeIn.value)-n2(migPaidIn.value),0));
+
 }
+
 migFeeIn.addEventListener("input", recalcMigRemain);
+
 migPaidIn.addEventListener("input", recalcMigRemain);
 
 async function confirmMigrateSingle(){
-  const row = MIG_SINGLE_ROW;
-  if(!row) return alert("لم يتم تحديد سجل");
 
-  const totalLevels = Math.max(1, Math.floor(n2(migLevelsIn.value)));
-  const fee  = n2(migFeeIn.value);
-  const paid = n2(migPaidIn.value);
-  const rem  = Math.max(fee-paid,0);
+  const row = MIG_SINGLE_ROW;
 
-  // حفظ override لهذا السجل
-  const key = undoKey(row.src,row.id);
-  LEVELS_OVERRIDE[key] = totalLevels;
+  if(!row) return alert("لم يتم تحديد سجل");
 
-  migrateSingleModal.style.display="none";
-  await migrateOne(row, totalLevels, fee, paid, rem);
+  const totalLevels = Math.max(1, Math.floor(n2(migLevelsIn.value)));
 
-  MIG_SINGLE_ROW=null;
-  SELECTED=[];
+  const fee  = n2(migFeeIn.value);
+
+  const paid = n2(migPaidIn.value);
+
+  const rem  = Math.max(fee-paid,0);
+
+  // حفظ override لهذا السجل
+
+  const key = undoKey(row.src,row.id);
+
+  LEVELS_OVERRIDE[key] = totalLevels;
+
+  migrateSingleModal.style.display="none";
+
+  await migrateOne(row, totalLevels, fee, paid, rem);
+
+  MIG_SINGLE_ROW=null;
+
+  SELECTED=[];
+
 }
 
 /* ================= MIGRATE ONE — آلية الكود الأول (levels from students + override) ================= */
-async function migrateOne(r, totalLevels, courseFee, paidAmount, remainingAmount){
-  const tgt = TARGET_COURSES.find(c=>c.id===targetCourse.value);
-  if(!tgt) return alert("الدورة الهدف غير متاحة (تأكد أنها مفتوحة)");
 
-  const key = undoKey(r.src,r.id);
-  if(UNDO[key]) return;
+async function migrateOne(r, totalLevels, courseFee, paidAmount, remainingAmount){
+
+  const tgt = TARGET_COURSES.find(c=>c.id===targetCourse.value);
+
+  if(!tgt) return alert("الدورة الهدف غير متاحة
+(تأكد أنها مفتوحة)");
+
+  const key = undoKey(r.src,r.id);
+
+  if(UNDO[key]) return;
 
 const usedLevels = n2(r.usedLevels || 0);
+
 const remainingLevels = n2(r.remainingLevels || 0);
 
-const fee  = n2(courseFee || 0);
+const fee  = n2(courseFee || 0);
+
 const paid = n2(paidAmount || 0);
-const rem  = n2(remainingAmount || 0);
- // ✅ الاسم الإنجليزي أساسي + حقول الرسوم المتوافقة (كما طلبت)
-  const st = await db.collection("students").add({
-    name: (r.name_en||r.name||""),
-    StudentName: (r.name_en||r.name||""),
-    name_en: (r.name_en||r.name||""),
-    name_ar: (r.name_ar||""),
 
-    iqama: (r.iqama||""),
-    phone: (r.phone||""),
-    age: (r.age||""),
+const rem  = n2(remainingAmount || 0);
+
+ // ✅ الاسم الإنجليزي أساسي + حقول الرسوم المتوافقة (كما طلبت)
+
+  const st = await db.collection("students").add({
+
+    name: (r.name_en||r.name||""),
+
+    StudentName: (r.name_en||r.name||""),
+
+    name_en: (r.name_en||r.name||""),
+
+    name_ar: (r.name_ar||""),
+
+    iqama: (r.iqama||""),
+
+    phone: (r.phone||""),
+
+    age: (r.age||""),
+
 email: r.email || "",
-    courseId: tgt.id,
-    TrainingCourse: tgt.TrainingCourse,
-    Period: (tgt.Period||tgt.period||r.period||""),
-    period: (tgt.Period||tgt.period||r.period||""),
-    Trainer: tgt.Trainer||"",
-    Room: tgt.Room||"",
+    Birthdate: r.birthdate || "",
+    Nationality: r.nationality || "",
+    HealthStatus: r.healthStatus || "",
+    EducationLevel: r.educationLevel || "",
+    HeardAbout: r.heardAbout || "",
+    Program: r.program || tgt.Program || tgt.program || "",
+    TermsAccepted: !!r.termsAccepted,
 
-    Branch: tgt.Branch,
-    Section: tgt.Section,
-    CourseType: tgt.CourseType,
+    courseId: tgt.id,
 
-    totalLevels: totalLevels,
-    usedLevels: usedLevels,
-    remainingLevels: remainingLevels,
+    TrainingCourse: tgt.TrainingCourse,
 
-    CourseFee: fee,
-    PaidAmount: paid,
-    RemainingAmount: rem,
+    Period: (tgt.Period||tgt.period||r.period||""),
+
+    period: (tgt.Period||tgt.period||r.period||""),
+
+    Trainer: tgt.Trainer||"",
+
+    Room: tgt.Room||"",
+
+    Branch: tgt.Branch,
+
+    Section: tgt.Section,
+
+    CourseType: tgt.CourseType,
+
+    totalLevels: totalLevels,
+
+    usedLevels: usedLevels,
+
+    remainingLevels: remainingLevels,
+
+    CourseFee: fee,
+
+    PaidAmount: paid,
+
+    RemainingAmount: rem,
+
 PaymentType: r.PaymentType || "",
 
-    // ✅ توافق مع صفحة إدارة الطلاب
-    StudentFee: fee,
-    AmountPaid: paid,
-    Remaining: rem,
+    // ✅ توافق مع صفحة إدارة الطلاب
+
+    StudentFee: fee,
+
+    AmountPaid: paid,
+
+    Remaining: rem,
+
 PaymentMethod: r.PaymentType || "",
 
-    promotedAt: firebase.firestore.Timestamp.now()
-  });
+    promotedAt: firebase.firestore.Timestamp.now()
 
-  // حذف السجل المصدر
-  await db.collection(r.src).doc(r.id).delete();
+  });
 
-  UNDO[key] = { type:"migrate", src:r.src, id:r.id, raw:r.raw, studentId: st.id };
+  // حذف السجل المصدر
 
-  // تحديث العرض
-  const rid = `${r.src}-${r.id}`;
-  const tl = document.getElementById("tl-"+rid);
-  const ul = document.getElementById("ul-"+rid);
-  const rl = document.getElementById("rl-"+rid);
-  if(tl) tl.textContent = totalLevels;
-  if(ul) ul.textContent = usedLevels;
-  if(rl) rl.textContent = remainingLevels;
+  await db.collection(r.src).doc(r.id).delete();
 
-  const feeTd = document.getElementById("fee-"+rid);
-  const paidTd= document.getElementById("paid-"+rid);
-  const remTd = document.getElementById("rem-"+rid);
-  if(feeTd) feeTd.textContent = fee;
-  if(paidTd) paidTd.textContent = paid;
-  if(remTd) remTd.innerHTML = remColorHTML(rem);
+  UNDO[key] = { type:"migrate", src:r.src, id:r.id, raw:r.raw, studentId: st.id };
 
-  markRowDone(r, `
-    <span class="badge-move">تم الترحيل</span>
-    <span class="undo" onclick="undoAction(event,'${key}')">تراجع</span>
-  `);
+  // تحديث العرض
+
+  const rid = `${r.src}-${r.id}`;
+
+  const tl = document.getElementById("tl-"+rid);
+
+  const ul = document.getElementById("ul-"+rid);
+
+  const rl = document.getElementById("rl-"+rid);
+
+  if(tl) tl.textContent = totalLevels;
+
+  if(ul) ul.textContent = usedLevels;
+
+  if(rl) rl.textContent = remainingLevels;
+
+  const feeTd = document.getElementById("fee-"+rid);
+
+  const paidTd= document.getElementById("paid-"+rid);
+
+  const remTd = document.getElementById("rem-"+rid);
+
+  if(feeTd) feeTd.textContent = fee;
+
+  if(paidTd) paidTd.textContent = paid;
+
+  if(remTd) remTd.innerHTML = remColorHTML(rem);
+
+  markRowDone(r, `
+
+    <span class="badge-move">تم الترحيل</span>
+
+    <span class="undo"
+onclick="undoAction(event,'${key}')">تراجع</span>
+
+  `);
+
 }
 
 /* ================= MIGRATE (BULK) ================= */
+
 btnMigrate.onclick = async ()=>{
-  if(!SELECTED.length) return alert("اختر سجل واحد على الأقل");
-  if(!targetCourse.value) return alert("اختر الدورة الهدف (المفتوحة فقط)");
 
-  // سجل واحد -> مودال
-  if(SELECTED.length === 1){
-    openMigrateSingle(SELECTED[0]);
-    return;
-  }
+  if(!SELECTED.length) return alert("اختر سجل واحد على الأقل");
 
-  // دفعة: يرحل مباشرة (مع Override لو موجود)
-  const tgt = TARGET_COURSES.find(c=>c.id===targetCourse.value);
-  if(!tgt) return alert("الدورة الهدف غير متاحة");
+  if(!targetCourse.value)
+return alert("اختر الدورة الهدف (المفتوحة فقط)");
 
-  for(const r of SELECTED){
-    const key = undoKey(r.src,r.id);
+  // سجل واحد -> مودال
 
-    // totalLevels: من Override أو students cache أو 12
+  if(SELECTED.length === 1){
+
+    openMigrateSingle(SELECTED[0]);
+
+    return;
+
+  }
+
+  // دفعة: يرحل مباشرة (مع Override لو موجود)
+
+  const tgt = TARGET_COURSES.find(c=>c.id===targetCourse.value);
+
+  if(!tgt) return alert("الدورة الهدف غير متاحة");
+
+  for(const r of SELECTED){
+
+    const key = undoKey(r.src,r.id);
+
+    //
+totalLevels: من Override أو students cache أو 12
+
 const totalLevels = n2(r.totalLevels || 0);
-    // fees: من السجل (إن كان صفر خذ من الهدف)
-    const fee  = n2(r.CourseFee||0);
-    const paid = n2(r.PaidAmount || 0);
-    const rem  = Math.max(fee-paid,0);
 
-    await migrateOne(r, totalLevels, fee, paid, rem);
-  }
+    //
+fees: من السجل (إن كان صفر خذ من الهدف)
 
-  SELECTED=[];
+    const fee  = n2(r.CourseFee||0);
+
+    const paid = n2(r.PaidAmount || 0);
+
+    const rem  = Math.max(fee-paid,0);
+
+    await migrateOne(r, totalLevels, fee, paid, rem);
+
+  }
+
+  SELECTED=[];
+
 };
 
 /* ================= EXCEL EXPORT ================= */
+
 btnExcel.onclick = ()=>{
-  if(!FILTERED.length) return alert("لا توجد بيانات");
 
-  const data = FILTERED.map((r,i)=>({
-    "#": i+1,
-    "الاسم EN": displayNameEN(r),
-    "الاسم AR": r.name_ar||"",
-    "العمر": r.age||"",
-    "الهوية": r.iqama||"",
-    "الجوال": r.phone||"",
-    "الإيميل": r.email || "",
-    "الدورة الحالية": r.course||"",
-    "الفترة": r.period||"",
-    "القاعة": r.room||"",
-    "الدورة الهدف": targetText(),
-    "TotalLevels (students)": r.totalLevels,
-    "UsedLevels (students)": r.usedLevels,
-    "RemainingLevels (students)": r.remainingLevels,
-    "TotalLevels Override": LEVELS_OVERRIDE[undoKey(r.src,r.id)] || "",
-    "CourseFee": n2(r.CourseFee||0),
-    "PaidAmount": n2(r.PaidAmount||0),
-    "RemainingAmount": n2(r.RemainingAmount||0),
-    "الدرجة": (r.grade===0||r.grade)?r.grade:"",
-    "الحالة": statusLabel(r.status),
-    "التاريخ": r.date||""
-  }));
+  if(!FILTERED.length) return alert("لا توجد بيانات");
 
-  const ws = XLSX.utils.json_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Report");
-  XLSX.writeFile(wb, "Promotion_Report.xlsx");
+  const data = FILTERED.map((r,i)=>({
+
+    "#": i+1,
+
+    "الاسم EN": displayNameEN(r),
+
+    "الاسم AR": r.name_ar||"",
+
+    "العمر": r.age||"",
+
+    "الهوية": r.iqama||"",
+
+    "الجوال": r.phone||"",
+
+    "الإيميل": r.email || "",
+    "تاريخ الميلاد": r.birthdate || "",
+    "الجنسية": r.nationality || "",
+    "الحالة الصحية": r.healthStatus || "",
+    "المؤهل العلمي": r.educationLevel || "",
+    "كيف تعرفت على برودل": r.heardAbout || "",
+    "الفرع": r.branch || "",
+    "القسم": r.section || "",
+    "البرنامج": r.program || "",
+    "نوع الدورة": r.courseType || "",
+    "موافقة الشروط": r.termsAccepted ? "نعم" : "",
+
+    "الدورة الحالية": r.course||"",
+
+    "الفترة": r.period||"",
+
+    "القاعة": r.room||"",
+
+    "الدورة الهدف": targetText(),
+
+    "TotalLevels
+(students)": r.totalLevels,
+
+    "UsedLevels
+(students)": r.usedLevels,
+
+    "RemainingLevels
+(students)": r.remainingLevels,
+
+    "TotalLevels
+Override": LEVELS_OVERRIDE[undoKey(r.src,r.id)] || "",
+
+    "CourseFee": n2(r.CourseFee||0),
+
+    "PaidAmount": n2(r.PaidAmount||0),
+
+    "RemainingAmount": n2(r.RemainingAmount||0),
+
+    "الدرجة": (r.grade===0||r.grade)?r.grade:"",
+
+    "الحالة": statusLabel(r.status),
+
+    "التاريخ": r.date||""
+
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(data);
+
+  const wb = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(wb, ws, "Report");
+
+  XLSX.writeFile(wb, "Promotion_Report.xlsx");
+
 };
 
-/* ================= IMPORT (Excel -> FakeRegistrations) ================= */
+/* ================= IMPORT (Excel -> FakeRegistrations)
+================= */
+
 btnImport.onclick = async ()=>{
-  const file = excelFile.files[0];
-  if(!file) return alert("اختر ملف Excel");
 
-  const buf = await file.arrayBuffer();
-  const wb = XLSX.read(buf);
-  const sheet = wb.Sheets[wb.SheetNames[0]];
-  const rows = XLSX.utils.sheet_to_json(sheet);
+  const file = excelFile.files[0];
 
-  let count=0;
-  for(const rr of rows){
-    const nm = String(rr.name_en||rr["الاسم EN"]||rr.name||rr["الاسم"]||"").trim();
-    if(!nm) continue;
+  if(!file) return alert("اختر ملف Excel");
 
-    const ar = String(rr.name_ar||rr["الاسم AR"]||"").trim();
-    const age = String(rr.age||rr["العمر"]||"").trim();
-    const iq  = String(rr.iqama||rr["الهوية"]||"").trim();
-    const ph  = String(rr.phone||rr["الجوال"]||"").trim();
+  const buf = await file.arrayBuffer();
+
+  const wb = XLSX.read(buf);
+
+  const sheet = wb.Sheets[wb.SheetNames[0]];
+
+  const rows = XLSX.utils.sheet_to_json(sheet);
+
+  let count=0;
+
+  for(const rr of rows){
+
+    const nm = String(rr.name_en||rr["الاسم EN"]||rr.name||rr["الاسم"]||"").trim();
+
+    if(!nm) continue;
+
+    const ar = String(rr.name_ar||rr["الاسم AR"]||"").trim();
+
+    const age = String(rr.age||rr["العمر"]||"").trim();
+
+    const iq  = String(rr.iqama||rr["الهوية"]||"").trim();
+
+    const ph  = String(rr.phone||rr["الجوال"]||"").trim();
+
 const em  = String(rr.email || rr.Email || rr["الإيميل"] || rr["البريد الإلكتروني"] || "").trim();
-    const fee = n2(rr.CourseFee || rr["CourseFee"] || rr["الرسوم"] || 0);
-    const paid= n2(rr.PaidAmount || rr["PaidAmount"] || rr["المدفوع"] || 0);
-    const rem = Math.max(fee-paid,0);
+    const br = String(rr.Branch || rr.branch || rr["الفرع"] || fBranch.value || "").trim();
+    const sec = String(rr.Section || rr.section || rr["القسم"] || fSection.value || "").trim();
+    const typ = String(rr.CourseType || rr.mode || rr["نوع الدورة"] || fType.value || "حضوري").trim();
+    const prog = String(rr.Program || rr.program || rr["البرنامج"] || fProgram.value || "").trim();
+    const birth = String(rr.Birthdate || rr.birthdate || rr["تاريخ الميلاد"] || "").trim();
+    const nat = String(rr.Nationality || rr.nationality || rr["الجنسية"] || "").trim();
+    const health = String(rr.HealthStatus || rr.healthStatus || rr["الحالة الصحية"] || "").trim();
+    const edu = String(rr.EducationLevel || rr.educationLevel || rr["المؤهل العلمي"] || "").trim();
+    const heard = String(rr.HeardAbout || rr.heardAbout || rr["كيف تعرفت على برودل"] || "").trim();
 
-    await db.collection("FakeRegistrations").add({
-      name_en: nm,
-      name: nm,
-      name_ar: ar,
-      age,
-      iqama: iq,
-      phone: ph,
+    const fee = n2(rr.CourseFee || rr["CourseFee"] || rr["الرسوم"] || 0);
+
+    const paid= n2(rr.PaidAmount || rr["PaidAmount"] || rr["المدفوع"] || 0);
+
+    const rem = Math.max(fee-paid,0);
+
+    await db.collection("FakeRegistrations").add({
+
+      name_en: nm,
+
+      name: nm,
+
+      name_ar: ar,
+
+      age,
+
+      iqama: iq,
+
+      phone: ph,
+
 email: em,
-      Branch:"Al-Hamdaniya",
-      Section:"Men",
-      CourseType:"حضوري",
 
-      CourseFee: fee,
-      PaidAmount: paid,
-      RemainingAmount: rem,
+      Branch: br,
+      Section: sec,
+      CourseType: typ,
+      Program: prog,
+      Birthdate: birth,
+      Nationality: nat,
+      HealthStatus: health,
+      EducationLevel: edu,
+      HeardAbout: heard,
 
-      createdAt: firebase.firestore.Timestamp.now()
-    });
+      CourseFee: fee,
 
-    count++;
-  }
+      PaidAmount: paid,
 
-  excelFile.value="";
-  alert("✅ تم استيراد "+count+" سجل");
-  loadData();
+      RemainingAmount: rem,
+
+      createdAt:
+firebase.firestore.Timestamp.now()
+
+    });
+
+    count++;
+
+  }
+
+  excelFile.value="";
+
+  alert("✅ تم استيراد "+count+" سجل");
+
+  loadData();
+
 };
 
 /* ================= INIT ================= */
+
 loadData();
+
 </script>
 
 </body>
+
 </html>
-
-
-
-
