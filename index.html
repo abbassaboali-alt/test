@@ -628,43 +628,230 @@ tr.dup-row{background:#ffebee !important}
 }
 
 
-/* ===== Prudle enhanced filters ===== */
-.filters{
-  border:1px solid #dbe7f5;
-  background:linear-gradient(180deg,#ffffff,#f8fbff);
+/* ===== Professional 2026 Prudle redesign ===== */
+body{
+  background:
+    radial-gradient(circle at 10% 0%, rgba(31,111,209,.08), transparent 26%),
+    linear-gradient(180deg,#f4f7fb 0%,#eef3f9 100%) !important;
+  color:#1f2937;
 }
-.filters select{
-  min-width:150px;
+.header{
+  background:linear-gradient(135deg,#0f3159 0%,#164478 55%,#1f6fd1 100%) !important;
+  padding:26px 18px 22px !important;
+  box-shadow:0 12px 30px rgba(22,68,120,.22);
+  border-bottom:4px solid rgba(255,255,255,.18);
+}
+.header img{
+  margin-top:10px;
   background:#fff;
+  border-radius:18px;
+  padding:6px;
+  box-shadow:0 8px 18px rgba(0,0,0,.14);
 }
-.filters select:focus,.filters input:focus{
-  border-color:#164478;
-  box-shadow:0 0 0 3px rgba(22,68,120,.10);
+.note{
+  width:min(1750px,96%);
+  margin:14px auto 0;
+  border-radius:14px;
+  background:#eef6ff !important;
+  color:#164478 !important;
+  border:1px solid #cfe0f7;
+  box-shadow:0 4px 14px rgba(22,68,120,.07);
+}
+.prudle-filter-panel{
+  display:block !important;
+  padding:16px 18px !important;
+  border:1px solid #d9e6f5;
+  background:rgba(255,255,255,.96) !important;
+}
+.filter-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+  color:#164478;
+}
+.filter-head strong{font-size:16px}
+.filter-head small{
+  display:block;
+  color:#6b7280;
+  margin-top:2px;
+  font-weight:700;
+}
+.filter-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(150px,1fr));
+  gap:9px;
+}
+.filter-grid select,.filter-grid input,
+.filter-actions select,.filter-actions input{
+  width:100%;
+  min-width:0;
+  background:#fbfdff;
+  border:1px solid #cfdbea !important;
+  transition:.2s;
+}
+.filter-grid select:focus,.filter-grid input:focus,
+.filter-actions select:focus,.filter-actions input:focus{
+  border-color:#1f6fd1 !important;
+  box-shadow:0 0 0 3px rgba(31,111,209,.10);
+}
+.filter-actions{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px;
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid #e8eef6;
+}
+.filter-actions #targetCourse{flex:1 1 360px}
+.filter-actions #excelFile{flex:1 1 190px;max-width:260px}
+.filter-actions button{
+  border-radius:10px;
+  padding:9px 12px;
+  box-shadow:0 3px 8px rgba(22,68,120,.10);
 }
 .table-wrap{
+  width:min(1750px,96%) !important;
   overflow-x:auto !important;
-  border-radius:16px;
+  border-radius:18px;
+  box-shadow:0 10px 24px rgba(22,68,120,.09);
+  border:1px solid #dce7f4;
+  background:#fff;
 }
 #mainTable{
-  min-width:2600px;
+  min-width:1650px;
+  box-shadow:none !important;
+  border-radius:0 !important;
 }
-.detail-cell{
-  line-height:1.45;
-  white-space:normal !important;
-  min-width:125px;
+#mainTable thead th{
+  position:sticky;
+  top:0;
+  z-index:2;
+  background:linear-gradient(180deg,#164478,#11375f) !important;
+  padding:10px 8px !important;
+  font-size:11.5px !important;
 }
-.detail-chip{
-  display:inline-block;
-  background:#eef5ff;
-  color:#164478;
-  border:1px solid #d6e6fb;
-  border-radius:999px;
-  padding:3px 8px;
-  font-weight:900;
+#mainTable tbody td{
+  padding:7px 7px !important;
+  font-size:11.5px !important;
 }
-.meta-muted{
-  color:#667085;
-  font-size:11px;
+.student-card{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  min-width:220px;
+}
+.student-avatar{
+  width:34px;height:34px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  background:#eaf2ff;color:#164478;font-weight:900;
+  flex:0 0 34px;
+}
+.student-main{min-width:0;flex:1}
+.student-main .name-en{
+  font-size:12px !important;
+  white-space:normal;
+}
+.student-main .name-ar{
+  font-size:10.5px !important;
+  white-space:normal;
+}
+.info-btn{
+  width:30px;height:30px;padding:0 !important;
+  border-radius:9px !important;
+  background:#eef5ff !important;
+  color:#164478 !important;
+  border:1px solid #cfe0f7 !important;
+  box-shadow:none !important;
+}
+.compact-stack{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  line-height:1.25;
+}
+.compact-stack b{color:#163b66}
+.compact-stack small{color:#6b7280;font-size:10px}
+.branch-pill,.status-pill,.course-pill{
+  display:inline-flex;align-items:center;justify-content:center;
+  border-radius:999px;padding:3px 8px;font-weight:900;
+}
+.branch-pill{background:#eef5ff;color:#164478;border:1px solid #d6e5f8}
+.course-pill{background:#edf8f1;color:#1b6f3c;border:1px solid #cdebd8}
+.status-pill.new{background:#eaf2ff;color:#0b5ed7}
+.status-pill.ok{background:#e9f8ef;color:#1e8e3e}
+.status-pill.bad{background:#fff0ef;color:#d93025}
+.summary-box{
+  background:#f8fafc;
+  border:1px solid #e5eaf0;
+  border-radius:10px;
+  padding:5px 7px;
+  min-width:105px;
+}
+.summary-box .rowx{
+  display:flex;justify-content:space-between;gap:7px;
+  font-size:10px;line-height:1.5;
+}
+.summary-box .rowx b{font-size:10.5px}
+.mini-actions{
+  gap:5px !important;
+}
+.mini{
+  padding:5px 7px !important;
+  font-size:10px !important;
+  border-radius:8px !important;
+  box-shadow:none !important;
+}
+.info-modal-box{
+  width:min(760px,94%) !important;
+  border:none !important;
+  border-radius:22px !important;
+  padding:0 !important;
+  overflow:hidden;
+}
+.info-modal-head{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+  background:linear-gradient(135deg,#123a67,#1f6fd1);
+  color:#fff;padding:18px 20px;
+}
+.info-modal-head h3{
+  color:#fff !important;text-align:right !important;margin:0 !important;
+}
+.info-modal-head .sub{color:#dceaff !important;text-align:right !important;margin:5px 0 0 !important}
+.modal-close-x{
+  width:34px;height:34px;border-radius:10px;padding:0 !important;
+  background:rgba(255,255,255,.15) !important;
+  font-size:22px;
+}
+.info-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  padding:18px;
+}
+.info-item{
+  background:#f8fbff;border:1px solid #e1eaf5;
+  border-radius:12px;padding:11px 12px;
+  min-width:0;
+}
+.info-item.wide{grid-column:1/-1}
+.info-item span{
+  display:block;color:#6b7280;font-size:10.5px;font-weight:800;margin-bottom:4px;
+}
+.info-item b{
+  display:block;color:#163b66;font-size:12.5px;word-break:break-word;
+}
+@media(max-width:900px){
+  .filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:600px){
+  .filter-grid{grid-template-columns:1fr}
+  .info-grid{grid-template-columns:1fr}
+  .info-item.wide{grid-column:auto}
+  .filter-actions>*{flex:1 1 100% !important;max-width:none !important}
+  .logout-badge{position:static !important;margin:8px auto 0}
 }
 
 </style>
@@ -689,168 +876,114 @@ tr.dup-row{background:#ffebee !important}
 
 </div>
 
-<div class="note">جميع الفروع والأقسام — استخدم الفلاتر لعرض السجلات المطلوبة</div>
+<div class="note">جميع الفروع والأقسام — اختر الفلاتر لعرض السجلات المطلوبة</div>
 
 <!-- FILTERS -->
+<div class="filters prudle-filter-panel">
+  <div class="filter-head">
+    <div>
+      <strong><i class="fa-solid fa-filter"></i> فلترة السجلات</strong>
+      <small>الفرع والقسم والبرنامج والدورة</small>
+    </div>
+    <span class="small" id="hint"></span>
+  </div>
 
-<div class="filters">
+  <div class="filter-grid">
+    <select id="fBranch"><option value="">كل الفروع</option></select>
+    <select id="fSection"><option value="">كل الأقسام</option></select>
+    <select id="fType"><option value="">كل أنواع الدورات</option></select>
+    <select id="fProgram"><option value="">كل البرامج</option></select>
+    <select id="fStatus">
+      <option value="">كل الحالات</option>
+      <option value="new">جديد</option>
+      <option value="pass">ناجح</option>
+      <option value="fail">راسب</option>
+    </select>
+    <select id="fCourse"><option value="">كل الدورات</option></select>
+    <select id="fDate"><option value="">كل التواريخ</option></select>
+    <input id="fSearch" placeholder="بحث: الاسم / الهوية / الجوال / البريد" />
+  </div>
 
-  <select id="fBranch">
-    <option value="">كل الفروع</option>
-  </select>
+  <div class="filter-actions">
+    <select id="targetCourse">
+      <option value="">الدورة الهدف (المفتوحة والمتوافقة)</option>
+    </select>
 
-  <select id="fSection">
-    <option value="">كل الأقسام</option>
-  </select>
-
-  <select id="fType">
-    <option value="">كل أنواع الدورات</option>
-  </select>
-
-  <select id="fProgram">
-    <option value="">كل البرامج</option>
-  </select>
-
-  <select id="fStatus">
-
-    <option value="">الحالة (إخفاء ناجح/راسب افتراضيًا)</option>
-
-    <option value="new">جديد</option>
-
-    <option value="pass">ناجح</option>
-
-    <option value="fail">راسب</option>
-
-  </select>
-
-  <input id="fName" placeholder="الاسم (عربي / إنجليزي)" />
-
-  <input id="fAge" placeholder="العمر" />
-
-  <input id="fIqama" placeholder="رقم الهوية" />
-
-  <input id="fPhone" placeholder="رقم الجوال" />
-
-<input id="fEmail" placeholder="البريد الإلكتروني" />
-
-  <select id="fCourse"><option value="">الدورة</option></select>
-
-  <select id="fDate"><option value="">□ التاريخ</option></select>
-
-  <select id="targetCourse">
-
-    <option value="">□ الدورة الهدف (المفتوحة فقط)</option>
-
-  </select>
-
-  <input id="excelFile" type="file" accept=".xlsx,.xls" />
-
-  <button class="btn-blue" id="btnImport" type="button">استيراد</button>
-
-  <button class="btn-orange" id="btnDup" type="button">⚠️ المكررين</button>
-
-  <button id="btnAll" type="button">✔ تحديد الكل</button>
-
-  <button class="btn-gray" id="btnNone" type="button">✖ إلغاء</button>
-
-  <button id="btnMigrate" type="button">⬆️ ترحيل</button>
-
-  <button class="btn-red" id="btnDelete" type="button">□ حذف</button>
-
-  <!-- ✅ ميزات الكود الثاني (خطط الدفع + تعديل جماعي) -->
-
-  <button class="btn-blue" id="btnBulkFees" type="button">✏️ تعديل جماعي (الرسوم/المدفوع)</button>
-
-  <!-- ✅ ميزة الكود الأول (تعديل المستويات قبل الترحيل) -->
-
-  <button class="btn-blue" id="btnBulkLevels" type="button">□ تعديل المستويات قبل الترحيل</button>
-
-  <button class="btn-green" id="btnExcel" type="button">□ Excel</button>
-
-  <span class="small" id="hint"></span>
-
+    <input id="excelFile" type="file" accept=".xlsx,.xls" />
+    <button class="btn-blue" id="btnImport" type="button"><i class="fa-solid fa-file-import"></i> استيراد</button>
+    <button class="btn-orange" id="btnDup" type="button"><i class="fa-solid fa-copy"></i> المكررين</button>
+    <button id="btnAll" type="button"><i class="fa-solid fa-check-double"></i> تحديد الكل</button>
+    <button class="btn-gray" id="btnNone" type="button"><i class="fa-solid fa-xmark"></i> إلغاء</button>
+    <button id="btnMigrate" type="button"><i class="fa-solid fa-arrow-up"></i> ترحيل</button>
+    <button class="btn-red" id="btnDelete" type="button"><i class="fa-solid fa-trash"></i> حذف</button>
+    <button class="btn-blue" id="btnBulkFees" type="button"><i class="fa-solid fa-money-bill-wave"></i> الرسوم الجماعية</button>
+    <button class="btn-blue" id="btnBulkLevels" type="button"><i class="fa-solid fa-layer-group"></i> المستويات الجماعية</button>
+    <button class="btn-green" id="btnExcel" type="button"><i class="fa-solid fa-file-excel"></i> Excel</button>
+  </div>
 </div>
 
 <div class="table-wrap">
 
-<table id="mainTable" class="hide-private-cols">
-
-  <thead>
-
-    <tr>
-
-      <th style="width:44px"></th>
-
-      <th style="width:55px">#</th>
-
-      <th style="width:270px">الاسم</th>
-
-      <th style="width:90px">العمر</th>
-
-      <th style="width:160px">الهوية</th>
-
-      <th style="width:160px">الجوال</th>
-
-      <th style="width:220px">الإيميل</th>
-      <th>تاريخ الميلاد</th>
-      <th>الجنسية</th>
-      <th>الحالة الصحية</th>
-      <th>المؤهل العلمي</th>
-      <th>كيف تعرفت على برودل؟</th>
-      <th>الفرع</th>
-      <th>القسم</th>
-      <th>البرنامج</th>
-      <th>نوع الدورة</th>
-      <th>موافقة الشروط</th>
-
-<th style="width:220px">الدورة السابقة</th>
-
-<th class="col-course">الدورة الحالية</th>
-
-      <th style="width:320px">الدورة الهدف</th>
-
-      <!--
-(مخفية افتراضيًا عبر CSS) -->
-
-      <th style="width:90px">إجمالي</th>
-
-      <th style="width:90px">مستخدم</th>
-
-      <th style="width:90px">متبقي</th>
-
-      <th style="width:90px">الرسوم</th>
-
-      <th style="width:90px">المدفوع</th>
-
-      <th style="width:90px">المتبقي</th>
-
-<th style="width:120px">طريقة الدفع</th>
-
-      <!--
-مرئية -->
-
-      <th style="width:80px">الدرجة</th>
-
-      <th style="width:90px">الحالة</th>
-
-      <th style="width:120px">التاريخ</th>
-
-      <th style="width:250px">إجراءات</th>
-
-      <th style="width:250px">النتيجة</th>
-
-    </tr>
-
-  </thead>
+<table id="mainTable">
+<thead>
+<tr>
+  <th style="width:42px"></th>
+  <th style="width:48px">#</th>
+  <th style="min-width:230px">الطالب</th>
+  <th style="min-width:145px">الفرع / القسم</th>
+  <th style="min-width:160px">البرنامج / المستوى</th>
+  <th style="min-width:180px">الدورة الحالية</th>
+  <th style="min-width:230px">الدورة الهدف</th>
+  <th style="min-width:115px">المستويات</th>
+  <th style="min-width:145px">الدفعات</th>
+  <th style="min-width:90px">الدرجة</th>
+  <th style="min-width:90px">الحالة</th>
+  <th style="min-width:110px">التاريخ</th>
+  <th style="min-width:210px">الإجراءات</th>
+  <th style="min-width:170px">النتيجة</th>
+</tr>
+</thead>
 
   <tbody id="tbody">
 
-    <tr><td class="notice" colspan="36">جاري التحميل...</td></tr>
+    <tr><td class="notice" colspan="14">جاري التحميل...</td></tr>
 
   </tbody>
 
 </table>
 
+</div>
+
+
+<!-- ================= MODAL: بيانات الطالب ================= -->
+<div class="modal" id="studentInfoModal">
+  <div class="modal-box info-modal-box">
+    <div class="info-modal-head">
+      <div>
+        <h3><i class="fa-solid fa-address-card"></i> بيانات الطالب</h3>
+        <div class="sub" id="infoStudentName">—</div>
+      </div>
+      <button class="modal-close-x" type="button" onclick="closeStudentInfo()">×</button>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-item"><span>العمر</span><b id="infoAge">—</b></div>
+      <div class="info-item"><span>تاريخ الميلاد</span><b id="infoBirthdate">—</b></div>
+      <div class="info-item"><span>رقم الهوية / الإقامة</span><b id="infoIqama">—</b></div>
+      <div class="info-item"><span>رقم الجوال</span><b id="infoPhone">—</b></div>
+      <div class="info-item wide"><span>البريد الإلكتروني</span><b id="infoEmail">—</b></div>
+      <div class="info-item"><span>الجنسية</span><b id="infoNationality">—</b></div>
+      <div class="info-item"><span>الحالة الصحية</span><b id="infoHealth">—</b></div>
+      <div class="info-item"><span>المؤهل العلمي</span><b id="infoEducation">—</b></div>
+      <div class="info-item wide"><span>من أين تعرف على برودل؟</span><b id="infoHeard">—</b></div>
+      <div class="info-item"><span>الشروط والأحكام</span><b id="infoTerms">—</b></div>
+      <div class="info-item"><span>نوع الدورة</span><b id="infoType">—</b></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-gray" type="button" onclick="closeStudentInfo()">إغلاق</button>
+    </div>
+  </div>
 </div>
 
 <!-- ================= MODAL: الدفعات ================= -->
@@ -1105,52 +1238,42 @@ firebase.initializeApp({
 const db = firebase.firestore();
 
 /* ================= DOM ================= */
-
 const fBranch = document.getElementById("fBranch");
 const fSection = document.getElementById("fSection");
 const fType = document.getElementById("fType");
 const fProgram = document.getElementById("fProgram");
 const fStatus = document.getElementById("fStatus");
-
-const fName   = document.getElementById("fName");
-
-const fAge    = document.getElementById("fAge");
-
-const fIqama  = document.getElementById("fIqama");
-
-const fPhone  = document.getElementById("fPhone");
-
-const fEmail  = document.getElementById("fEmail");
-
 const fCourse = document.getElementById("fCourse");
-
-const fDate   = document.getElementById("fDate");
-
+const fDate = document.getElementById("fDate");
+const fSearch = document.getElementById("fSearch");
 const targetCourse = document.getElementById("targetCourse");
-
 const excelFile = document.getElementById("excelFile");
-
 const btnImport = document.getElementById("btnImport");
-
-const btnDup   = document.getElementById("btnDup");
-
-const btnAll   = document.getElementById("btnAll");
-
-const btnNone  = document.getElementById("btnNone");
-
+const btnDup = document.getElementById("btnDup");
+const btnAll = document.getElementById("btnAll");
+const btnNone = document.getElementById("btnNone");
 const btnMigrate = document.getElementById("btnMigrate");
-
-const btnDelete  = document.getElementById("btnDelete");
-
+const btnDelete = document.getElementById("btnDelete");
 const btnBulkFees = document.getElementById("btnBulkFees");
-
 const btnBulkLevels = document.getElementById("btnBulkLevels");
-
-const btnExcel    = document.getElementById("btnExcel");
-
+const btnExcel = document.getElementById("btnExcel");
 const tbody = document.getElementById("tbody");
+const hint = document.getElementById("hint");
 
-const hint  = document.getElementById("hint");
+// Student info modal
+const studentInfoModal = document.getElementById("studentInfoModal");
+const infoStudentName = document.getElementById("infoStudentName");
+const infoAge = document.getElementById("infoAge");
+const infoBirthdate = document.getElementById("infoBirthdate");
+const infoIqama = document.getElementById("infoIqama");
+const infoPhone = document.getElementById("infoPhone");
+const infoEmail = document.getElementById("infoEmail");
+const infoNationality = document.getElementById("infoNationality");
+const infoHealth = document.getElementById("infoHealth");
+const infoEducation = document.getElementById("infoEducation");
+const infoHeard = document.getElementById("infoHeard");
+const infoTerms = document.getElementById("infoTerms");
+const infoType = document.getElementById("infoType");
 
 /* Fees Modal */
 
@@ -1261,6 +1384,33 @@ function statusClass(s){
 
 }
 
+function sectionLabel(v){
+  const x = String(v||"").trim();
+  return x==="Men" ? "رجال" : x==="Women" ? "نساء" : x==="Kids" ? "أطفال" : (x||"—");
+}
+function boolLabel(v){ return v ? "موافق ✅" : "—"; }
+function safeText(v){ return String(v===undefined || v===null || v==="" ? "—" : v); }
+
+function openStudentInfo(r){
+  infoStudentName.textContent = `${displayNameEN(r)}${r.name_ar ? " — "+r.name_ar : ""}`;
+  infoAge.textContent = safeText(r.age);
+  infoBirthdate.textContent = safeText(r.birthdate);
+  infoIqama.textContent = safeText(r.iqama);
+  infoPhone.textContent = safeText(r.phone);
+  infoEmail.textContent = safeText(r.email);
+  infoNationality.textContent = safeText(r.nationality);
+  infoHealth.textContent = safeText(r.healthStatus);
+  infoEducation.textContent = safeText(r.educationLevel);
+  infoHeard.textContent = safeText(r.heardAbout);
+  infoTerms.textContent = boolLabel(r.termsAccepted);
+  infoType.textContent = safeText(r.courseType);
+  studentInfoModal.style.display = "flex";
+}
+function closeStudentInfo(){
+  studentInfoModal.style.display = "none";
+}
+
+
 function displayNameEN(r){
 
   return (String(r.name_en||r.name||"").trim()) || "—";
@@ -1352,9 +1502,7 @@ style="margin-top:6px">
 }function hasAnyFilter(){
   return !!(
     fBranch.value || fSection.value || fType.value || fProgram.value ||
-    fStatus.value || fName.value || fAge.value ||
-    fIqama.value || fPhone.value || fEmail.value ||
-    fCourse.value || fDate.value
+    fStatus.value || fCourse.value || fDate.value || fSearch.value
   );
 }
 
@@ -1542,45 +1690,60 @@ async function prefetchLevelsForRows(rows, concurrency){
 
 }
 
-/* ================= TARGET COURSES (OPEN ONLY) ================= */
-db.collection("Courses")
-.where("status","==","open")
-.onSnapshot(s=>{
-  TARGET_COURSES = s.docs.map(d=>({id:d.id, ...d.data()}));
-  refreshTargetCourses();
-});
+/* ================= TARGET COURSES ================= */
+async function loadTargetCourses(){
+  try{
+    const snap = await db.collection("Courses").limit(5000).get();
+    TARGET_COURSES = snap.docs.map(d=>({id:d.id,...d.data()})).filter(c=>{
+      const st = String(c.status ?? c.Status ?? "").trim().toLowerCase();
+      const openFlag = c.isOpen ?? c.IsOpen;
+      // متوافق مع الدورات القديمة التي لم يكن فيها status
+      return st==="" || st==="open" || st==="مفتوح" || openFlag===true;
+    });
+    refreshTargetCourses();
+  }catch(e){
+    console.error("Courses load error",e);
+    TARGET_COURSES=[];
+    refreshTargetCourses();
+  }
+}
 
 function refreshTargetCourses(){
-  const current = targetCourse.value;
-
+  const keep = targetCourse.value;
   const list = TARGET_COURSES.filter(c=>{
-    const br = String(c.Branch || c.branch || "");
-    const sec = String(c.Section || c.section || "");
-    const typ = String(c.CourseType || c.mode || "");
-    const prog = String(c.Program || c.program || "");
+    const br = String(c.Branch||c.branch||"").trim();
+    const sec = String(c.Section||c.section||"").trim();
+    const typ = String(c.CourseType||c.mode||"").trim();
+    const prog = String(c.Program||c.program||"").trim();
 
-    if(fBranch.value && br !== fBranch.value) return false;
-    if(fSection.value && sec !== fSection.value) return false;
-    if(fType.value && typ !== fType.value) return false;
-    if(fProgram.value && prog !== fProgram.value) return false;
+    if(fBranch.value && br && br!==fBranch.value) return false;
+    if(fSection.value && sec && sec!==fSection.value) return false;
+    if(fType.value && typ && typ!==fType.value) return false;
+    if(fProgram.value && prog && prog!==fProgram.value) return false;
     return true;
   });
 
   targetCourse.innerHTML =
-    "<option value=''>□ الدورة الهدف (المفتوحة والمتوافقة مع الفلاتر)</option>";
+    "<option value=''>الدورة الهدف (المفتوحة والمتوافقة)</option>";
+
+  list.sort((a,b)=>{
+    const ba=String(a.Branch||a.branch||"");
+    const bb=String(b.Branch||b.branch||"");
+    if(ba!==bb) return ba.localeCompare(bb,"en");
+    return String(a.TrainingCourse||"").localeCompare(String(b.TrainingCourse||""),"en",{numeric:true});
+  });
 
   list.forEach(c=>{
     const p = String(c.Period||c.period||"").trim();
     const br = String(c.Branch||c.branch||"—");
-    const sec = String(c.Section||c.section||"—");
-    targetCourse.innerHTML += `
-      <option value="${c.id}">
-        ${c.TrainingCourse||"—"} — ${p||"—"} — ${c.Trainer||"—"} — ${c.Room||"—"} — ${br} — ${sec}
-      </option>
-    `;
+    const sec = sectionLabel(c.Section||c.section);
+    const trainer = String(c.Trainer||c.trainer||"—");
+    const room = String(c.Room||c.room||"—");
+    targetCourse.innerHTML +=
+      `<option value="${c.id}">${c.TrainingCourse||"—"} — ${p||"—"} — ${br} / ${sec} — ${trainer} — ${room}</option>`;
   });
 
-  if(current && list.some(c=>c.id===current)) targetCourse.value = current;
+  if(keep && list.some(c=>c.id===keep)) targetCourse.value=keep;
   if(FILTERED.length) render();
 }
 
@@ -1663,324 +1826,154 @@ function getTrainer(x){
 /* ================= LOAD DATA ================= */
 
 async function loadData(){
-
-  ROWS=[]; FILTERED=[]; SELECTED=[];
-
-  hint.textContent="";
-
-  tbody.innerHTML = `<tr><td
-colspan="36" class="notice">جاري التحميل...</td></tr>`;
-
-  const [frSnap, fpSnap] = await Promise.all([
-    db.collection("FakeRegistrations").limit(5000).get(),
-    db.collection("FakePromotions").limit(5000).get()
-  ]);
-
-  /* FakeRegistrations
-(NEW) */
-
-  frSnap.forEach(d=>{
-
-    const x=d.data()||{};
-
-    const br = x.Branch || x.branch || "";
-
-    const sec= x.Section || x.section || "";
-
-    const typ= x.CourseType || x.mode || "";
-
-    
-
-const courseName = getCourseName(x);
-
-const period = getPeriod(x);
-
-const room = getRoom(x);
-
-const trainer = getTrainer(x);
-
-    const fee = n2(x.CourseFee || x.courseFee || 0);
-
-    const paid= n2(x.PaidAmount || x.paidAmount || 0);
-
-    const rem = clamp0(x.RemainingAmount || x.remainingAmount || (fee - paid));
-
-    ROWS.push({
-
-PaymentType: x.PaymentType || x.paymentType || x.PaymentMethod || x.paymentMethod || "",
-
-course: courseName,
-
-period,
-
-room,
-
-trainer,
-
-previousCourse: "",
-
-      src:"FakeRegistrations",
-
-      id:d.id,
-
-      raw:x,
-
-      name_en:x.name_en||x.name||"",
-
-      name:x.name||"",
-
-      name_ar:x.name_ar||"",
-
-      age:onlyDigits(x.age),
-
-      iqama:onlyDigits(x.iqama),
-
-      phone:onlyDigits(x.phone),
-
-      email: String(x.email || "").trim(),
-      birthdate: String(x.Birthdate || x.birthdate || x.DateOfBirth || "").trim(),
-      nationality: String(x.Nationality || x.nationality || "").trim(),
-      healthStatus: String(x.HealthStatus || x.healthStatus || "").trim(),
-      educationLevel: String(x.EducationLevel || x.educationLevel || "").trim(),
-      heardAbout: String(x.HeardAbout || x.heardAbout || x.HowDidYouHear || "").trim(),
-      branch: String(x.Branch || x.branch || "").trim(),
-      section: String(x.Section || x.section || "").trim(),
-      courseType: String(x.CourseType || x.mode || "").trim(),
-      program: String(x.Program || x.program || "").trim(),
-      termsAccepted: !!(x.TermsAccepted || x.termsAccepted),
-
-      course:(x.course && x.course.name) ? x.course.name : (x.TrainingCourse||x.courseName||""),
-
-      period,
-
-      room,
-
-      // سيتم تعبئتها من students لاحقاً
-
-      totalLevels:"—",
-
-      usedLevels:"—",
-
-      remainingLevels:"—",
-
-      _lastLevels:null,
-
-      CourseFee: fee,
-
-      PaidAmount: paid,
-
-      RemainingAmount: rem,
-
-      grade:"—",
-
-      status:"new",
-
-      date: toDate(x.createdAt || x.date || x.Date || x.created_at)
-
-    });
-
-  });
-
-/* FakePromotions (PASS/FAIL) */
-
-fpSnap.forEach(d=>{
-
-  const x=d.data()||{};
-
-  const br = x.Branch || x.branch || "";
-
-  const sec= x.Section || x.section || "";
-
-  const typ= x.CourseType || x.mode || "";
-
-  
-
-  const gRaw = (x.grade ?? x.finalGrade ?? x.final ?? x.totalGrade);
-
-  const g = Number(gRaw);
-
-  const isNum = !(gRaw===undefined || gRaw===null || gRaw==="" || isNaN(g));
-
-  // ===== الحالية =====
-
-  const courseName = getCourseName(x);
-
-  const period = getPeriod(x);
-
-  const room = getRoom(x);
-
-  const trainer = getTrainer(x);
-
-  // ===== السابقة =====
-
-  const previousCourse =
-
-    x.previousCourse?.name ||
-
-    x.fromCourse?.name ||
-
-    x.fromLevel ||
-
-    "";
-
-  const fee = n2(x.CourseFee || x.courseFee || 0);
-
-  const paid= n2(x.PaidAmount || x.paidAmount || 0);
-
-  const rem = clamp0(x.RemainingAmount || x.remainingAmount || (fee - paid));
-
-  ROWS.push({
-
-PaymentType: x.PaymentType || x.paymentType || x.PaymentMethod || x.paymentMethod || "",
-
-    src:"FakePromotions",
-
-    id:d.id,
-
-    raw:x,
-
-    name_en:x.name_en||x.name||"",
-
-    name:x.name||"",
-
-    name_ar:x.name_ar||"",
-
-    age:onlyDigits(x.age),
-
-    iqama:onlyDigits(x.iqama),
-
-    phone:onlyDigits(x.phone),
-
-email: String(x.email || "").trim(),
-      birthdate: String(x.Birthdate || x.birthdate || x.DateOfBirth || "").trim(),
-      nationality: String(x.Nationality || x.nationality || "").trim(),
-      healthStatus: String(x.HealthStatus || x.healthStatus || "").trim(),
-      educationLevel: String(x.EducationLevel || x.educationLevel || "").trim(),
-      heardAbout: String(x.HeardAbout || x.heardAbout || x.HowDidYouHear || "").trim(),
-      branch: String(x.Branch || x.branch || "").trim(),
-      section: String(x.Section || x.section || "").trim(),
-      courseType: String(x.CourseType || x.mode || "").trim(),
-      program: String(x.Program || x.program || "").trim(),
-      termsAccepted: !!(x.TermsAccepted || x.termsAccepted),
-
-    // ✅ الحالية
-
-    course: courseName,
-
-    // ✅ السابقة
-
-    previousCourse: previousCourse,
-
-    // ✅ الآن ستظهر
-
-    period: period,
-
-    room: room,
-
-    trainer: trainer,
-
-    totalLevels:"—",
-
-    usedLevels:"—",
-
-    remainingLevels:"—",
-
-    _lastLevels:null,
-
-    CourseFee: fee,
-
-    PaidAmount: paid,
-
-    RemainingAmount: rem,
-
-    grade: isNum ? g : "—",
-
-    status: isNum ? (g>=65 ? "pass" : "fail") : "new",
-
-    date: toDate(x.createdAt || x.date || x.Date || x.created_at)
-
-  });
-
-});
-
-  // ✅ تحميل مستويات آخر سجل لكل هوية من
-students (آلية الكود الأول)
-
-  await prefetchLevelsForRows(ROWS, 10);
-
-  for(const r of ROWS){
-
-    const iq = onlyDigits(r.iqama);
-
-    if(!iq) continue;
-
-    const lv = LEVELS_CACHE[iq] || {found:false};
-
-    if(lv && lv.found){
-
-const x = r.raw || {};
-
-r.totalLevels =
-
-  (x.totalLevels ?? x.TotalLevels ?? lv.total ?? "—");
-
-r.usedLevels =
-
-  (x.usedLevels ?? x.UsedLevels ?? lv.used ?? "—");
-
-r.remainingLevels =
-
-  (x.remainingLevels ?? x.RemainingLevels ?? lv.remaining ?? "—");      r._lastLevels = {total:lv.total||0, used:lv.used||0, remaining:lv.remaining||0};
-
-    }
-
-  }
-
-  fillFilters();
-
-  applyFilters(); // يعرض الجديد فقط افتراضيًا + يخفي ناجح/راسب إلا عند الفلترة/الحالة
-
+  ROWS=[]; FILTERED=[]; SELECTED=[];
+  hint.textContent="جاري التحميل...";
+  tbody.innerHTML = `<tr><td colspan="14" class="notice">جاري تحميل جميع الفروع والأقسام...</td></tr>`;
+
+  try{
+    const [frSnap, fpSnap] = await Promise.all([
+      db.collection("FakeRegistrations").limit(5000).get(),
+      db.collection("FakePromotions").limit(5000).get()
+    ]);
+
+    const pushCommon = (d,x,src,status,grade,previousCourse)=>{
+      const fee = n2(x.CourseFee || x.courseFee || 0);
+      const paid = n2(x.PaidAmount || x.paidAmount || 0);
+      const rem = clamp0(
+        x.RemainingAmount ?? x.remainingAmount ?? (fee-paid)
+      );
+
+      const nested = x.course || {};
+      const courseName = getCourseName(x);
+      const period = getPeriod(x);
+      const room = getRoom(x);
+      const trainer = getTrainer(x);
+
+      ROWS.push({
+        src,
+        id:d.id,
+        raw:x,
+
+        name_en:x.name_en||x.nameEn||x.name||"",
+        name:x.name||"",
+        name_ar:x.name_ar||x.nameAr||"",
+        age:onlyDigits(x.age),
+        birthdate:String(x.Birthdate||x.birthdate||x.DateOfBirth||"").trim(),
+        iqama:onlyDigits(x.iqama||x.Iqama||x.IDNumber),
+        phone:onlyDigits(x.phone||x.Phone||x.ContactNumber),
+        email:String(x.email||x.Email||"").trim(),
+
+        nationality:String(x.Nationality||x.nationality||"").trim(),
+        healthStatus:String(x.HealthStatus||x.healthStatus||"").trim(),
+        educationLevel:String(x.EducationLevel||x.educationLevel||"").trim(),
+        heardAbout:String(x.HeardAbout||x.heardAbout||x.HowDidYouHear||"").trim(),
+        termsAccepted:Boolean(x.TermsAccepted||x.termsAccepted),
+
+        branch:String(x.Branch||x.branch||nested.branch||nested.Branch||"").trim(),
+        section:String(x.Section||x.section||nested.section||nested.Section||"").trim(),
+        courseType:String(x.CourseType||x.mode||x.courseType||"").trim(),
+        program:String(x.Program||x.program||nested.program||nested.Program||"").trim(),
+
+        course:courseName,
+        previousCourse:previousCourse||"",
+        period,
+        room,
+        trainer,
+
+        totalLevels:(x.totalLevels ?? x.TotalLevels ?? "—"),
+        usedLevels:(x.usedLevels ?? x.UsedLevels ?? "—"),
+        remainingLevels:(x.remainingLevels ?? x.RemainingLevels ?? "—"),
+        _lastLevels:null,
+
+        CourseFee:fee,
+        PaidAmount:paid,
+        RemainingAmount:rem,
+        PaymentType:x.PaymentType||x.paymentType||x.PaymentMethod||x.paymentMethod||"",
+
+        grade,
+        status,
+        date:toDate(x.createdAt||x.date||x.Date||x.created_at)
+      });
+    };
+
+    frSnap.forEach(d=>{
+      const x=d.data()||{};
+      pushCommon(d,x,"FakeRegistrations","new","—","");
+    });
+
+    fpSnap.forEach(d=>{
+      const x=d.data()||{};
+      const gRaw=(x.grade ?? x.finalGrade ?? x.final ?? x.totalGrade);
+      const g=Number(gRaw);
+      const isNum=!(gRaw===undefined||gRaw===null||gRaw===""||isNaN(g));
+      const previousCourse =
+        x.previousCourse?.name || x.fromCourse?.name || x.fromLevel || "";
+      pushCommon(
+        d,x,"FakePromotions",
+        isNum ? (g>=65 ? "pass":"fail") : "new",
+        isNum ? g : "—",
+        previousCourse
+      );
+    });
+
+    await prefetchLevelsForRows(ROWS,10);
+
+    for(const r of ROWS){
+      const iq=onlyDigits(r.iqama);
+      if(!iq) continue;
+      const lv=LEVELS_CACHE[iq]||{found:false};
+      if(lv && lv.found){
+        const x=r.raw||{};
+        r.totalLevels=(x.totalLevels ?? x.TotalLevels ?? lv.total ?? "—");
+        r.usedLevels=(x.usedLevels ?? x.UsedLevels ?? lv.used ?? "—");
+        r.remainingLevels=(x.remainingLevels ?? x.RemainingLevels ?? lv.remaining ?? "—");
+        r._lastLevels={total:lv.total||0,used:lv.used||0,remaining:lv.remaining||0};
+      }
+    }
+
+    fillFilters();
+    applyFilters();
+
+  }catch(e){
+    console.error("loadData error",e);
+    hint.textContent="تعذر تحميل السجلات";
+    tbody.innerHTML =
+      `<tr><td colspan="14" class="notice">حدث خطأ أثناء تحميل السجلات. افتح Console لمعرفة التفاصيل.</td></tr>`;
+  }
 }
 
 /* ================= FILL FILTERS ================= */
 
 function fillFilters(){
-  const keep = (sel)=>sel.value;
+  const keep={
+    branch:fBranch.value,section:fSection.value,type:fType.value,
+    program:fProgram.value,course:fCourse.value,date:fDate.value
+  };
 
-  const oldBranch = keep(fBranch);
-  const oldSection = keep(fSection);
-  const oldType = keep(fType);
-  const oldProgram = keep(fProgram);
+  const setOptions=(el,label,values)=>{
+    el.innerHTML=`<option value="">${label}</option>`+
+      uniq(values.filter(Boolean)).sort((a,b)=>String(a).localeCompare(String(b),"ar",{numeric:true}))
+      .map(v=>`<option value="${String(v).replace(/"/g,"&quot;")}">${v}</option>`).join("");
+  };
 
-  const branches = uniq(ROWS.map(r=>r.branch)).sort();
-  const sections = uniq(ROWS.map(r=>r.section)).sort();
-  const types = uniq(ROWS.map(r=>r.courseType)).sort();
-  const programs = uniq(ROWS.map(r=>r.program)).sort();
-  const courses = uniq(ROWS.map(r=>r.course)).sort();
-  const dates = uniq(ROWS.map(r=>r.date).filter(Boolean)).sort();
+  setOptions(fBranch,"كل الفروع",ROWS.map(r=>r.branch));
+  setOptions(fSection,"كل الأقسام",ROWS.map(r=>r.section).map(sectionLabel));
+  // section values need raw values:
+  fSection.innerHTML='<option value="">كل الأقسام</option>'+
+    uniq(ROWS.map(r=>r.section).filter(Boolean))
+      .map(v=>`<option value="${v}">${sectionLabel(v)}</option>`).join("");
 
-  fBranch.innerHTML = '<option value="">كل الفروع</option>' +
-    branches.map(v=>`<option value="${v}">${v}</option>`).join("");
+  setOptions(fType,"كل أنواع الدورات",ROWS.map(r=>r.courseType));
+  setOptions(fProgram,"كل البرامج",ROWS.map(r=>r.program));
+  setOptions(fCourse,"كل الدورات",ROWS.map(r=>r.course));
+  setOptions(fDate,"كل التواريخ",ROWS.map(r=>r.date));
 
-  fSection.innerHTML = '<option value="">كل الأقسام</option>' +
-    sections.map(v=>`<option value="${v}">${v}</option>`).join("");
-
-  fType.innerHTML = '<option value="">كل أنواع الدورات</option>' +
-    types.map(v=>`<option value="${v}">${v}</option>`).join("");
-
-  fProgram.innerHTML = '<option value="">كل البرامج</option>' +
-    programs.map(v=>`<option value="${v}">${v}</option>`).join("");
-
-  fCourse.innerHTML = '<option value="">الدورة</option>' +
-    courses.map(v=>`<option value="${v}">${v}</option>`).join("");
-
-  fDate.innerHTML = '<option value="">□ التاريخ</option>' +
-    dates.map(v=>`<option value="${v}">${v}</option>`).join("");
-
-  if(branches.includes(oldBranch)) fBranch.value = oldBranch;
-  if(sections.includes(oldSection)) fSection.value = oldSection;
-  if(types.includes(oldType)) fType.value = oldType;
-  if(programs.includes(oldProgram)) fProgram.value = oldProgram;
+  if([...fBranch.options].some(o=>o.value===keep.branch)) fBranch.value=keep.branch;
+  if([...fSection.options].some(o=>o.value===keep.section)) fSection.value=keep.section;
+  if([...fType.options].some(o=>o.value===keep.type)) fType.value=keep.type;
+  if([...fProgram.options].some(o=>o.value===keep.program)) fProgram.value=keep.program;
+  if([...fCourse.options].some(o=>o.value===keep.course)) fCourse.value=keep.course;
+  if([...fDate.options].some(o=>o.value===keep.date)) fDate.value=keep.date;
 
   refreshTargetCourses();
 }
@@ -2022,71 +2015,33 @@ function isDupRow(r){
 }
 
 function applyFilters(){
+  SELECTED=[];
 
-  SELECTED = [];
+  const q=String(fSearch.value||"").trim().toLowerCase();
+  FILTERED=ROWS.filter(r=>{
+    if(fBranch.value && r.branch!==fBranch.value) return false;
+    if(fSection.value && r.section!==fSection.value) return false;
+    if(fType.value && r.courseType!==fType.value) return false;
+    if(fProgram.value && r.program!==fProgram.value) return false;
+    if(fStatus.value && r.status!==fStatus.value) return false;
+    if(fCourse.value && r.course!==fCourse.value) return false;
+    if(fDate.value && r.date!==fDate.value) return false;
 
-  FILTERED = ROWS.filter(r=>{
+    if(q){
+      const hay=[
+        r.name_en,r.name,r.name_ar,r.iqama,r.phone,r.email,
+        r.nationality,r.educationLevel,r.branch,r.section,r.program,r.course
+      ].join(" ").toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
 
-    if(fBranch.value && r.branch !== fBranch.value) return false;
-    if(fSection.value && r.section !== fSection.value) return false;
-    if(fType.value && r.courseType !== fType.value) return false;
-    if(fProgram.value && r.program !== fProgram.value) return false;
+  DUP_MAP=computeDupMap(FILTERED);
+  if(DUP_MODE) FILTERED=FILTERED.filter(r=>isDupRow(r));
 
-    if(!fStatus.value){
-
-      if(r.status==="pass" || r.status==="fail") return false;
-
-    }else{
-
-      if(r.status !== fStatus.value) return false;
-
-    }
-
-    if(fName.value){
-
-      const s = (String(r.name_en||"")+" "+String(r.name||"")+" "+String(r.name_ar||"")).toLowerCase();
-
-      if(!s.includes(fName.value.toLowerCase())) return false;
-
-    }
-
-    if(fAge.value && r.age !== onlyDigits(fAge.value)) return false;
-
-    if(fIqama.value && !String(r.iqama||"").includes(onlyDigits(fIqama.value))) return false;
-
-    if(fPhone.value && !String(r.phone||"").includes(onlyDigits(fPhone.value))) return false;
-
-if(fEmail.value){
-
-  if(!String(r.email || "").toLowerCase().includes(fEmail.value.toLowerCase())){
-
-    return false;
-
-  }
-
-}
-
-    if(fCourse.value && r.course !== fCourse.value) return false;
-
-    if(fDate.value && r.date !== fDate.value) return false;
-
-    return true;
-
-  });
-
-  DUP_MAP = computeDupMap(FILTERED);
-
-  if(DUP_MODE) FILTERED = FILTERED.filter(r => isDupRow(r));
-
-  hint.textContent = FILTERED.length
-
-    ? `عدد النتائج: ${FILTERED.length}${DUP_MODE ? " — (المكررين فقط)" : ""}`
-
-    : "لا توجد نتائج";
-
-
-  render();
-
+  hint.textContent=`${FILTERED.length} سجل`;
+  render();
 }
 
 /* ================= DUP BUTTON ================= */
@@ -2257,8 +2212,7 @@ try {    // 2. تحديث البيانات في قاعدة بيانات Fireba
 
   } catch (error) {
 
-    console.error("Error updating
-fees: ", error);
+    console.error("Error updating fees: ", error);
 
     alert("حدث خطأ أثناء حفظ البيانات، يرجى المحاولة مرة أخرى.");
 
@@ -2500,231 +2454,137 @@ function applyBulkLevels(){
 /* ================= RENDER TABLE ================= */
 
 function render(){
+  tbody.innerHTML="";
 
-  tbody.innerHTML = "";
+  if(!FILTERED.length){
+    tbody.innerHTML=`<tr><td colspan="14" class="notice">لا توجد نتائج مطابقة للفلاتر</td></tr>`;
+    return;
+  }
 
-  if(!FILTERED.length){
+  const tgtTxt=targetText();
 
-    tbody.innerHTML = `<tr><td
-colspan="36" class="notice">لا توجد نتائج</td></tr>`;
+  FILTERED.forEach((r,i)=>{
+    const key=undoKey(r.src,r.id);
+    const done=!!UNDO[key];
+    const dup=isDupRow(r);
+    const rid=`${r.src}-${r.id}`;
 
-    return;
+    const overrideTotal=LEVELS_OVERRIDE[key];
+    const totalShow=(overrideTotal ? overrideTotal : r.totalLevels);
+    const usedShow=(r.usedLevels===0 || r.usedLevels) ? r.usedLevels : "—";
+    const remLvShow=(r.remainingLevels===0 || r.remainingLevels) ? r.remainingLevels : "—";
+    const initials=(displayNameEN(r).replace("—","").trim().charAt(0)||"P").toUpperCase();
 
-  }
-
-  const tgtTxt = targetText();
-
-  FILTERED.forEach((r,i)=>{
-
-    const key = undoKey(r.src, r.id);
-
-    const done = !!UNDO[key];
-
-    const dup = isDupRow(r);
-
-    const rid = `${r.src}-${r.id}`;
-
-    const overrideTotal = LEVELS_OVERRIDE[key];
-
-    const totalShow = (overrideTotal ? overrideTotal : r.totalLevels);
-
-    const usedShow  = (r.usedLevels===0 || r.usedLevels) ? r.usedLevels : "—";
-
-    const remLvShow = (r.remainingLevels===0 || r.remainingLevels) ? r.remainingLevels : "—";
-
-    tbody.innerHTML += `
-
+    tbody.innerHTML+=`
 <tr id="row-${rid}" class="${done?'row-done':''} ${dup?'dup-row':''}">
+  <td><input type="checkbox" data-i="${i}" ${done?'disabled':''}></td>
+  <td>${i+1}</td>
 
-  <td><input type="checkbox"
-data-i="${i}" ${done?'disabled':''}></td>
+  <td>
+    <div class="student-card">
+      <div class="student-avatar">${initials}</div>
+      <div class="student-main">
+        <div class="name-en">${displayNameEN(r)}</div>
+        <div class="name-ar">${r.name_ar||""}</div>
+        ${dup?'<div class="dup-tag">مكرر</div>':''}
+      </div>
+      <button class="info-btn" type="button" title="بيانات الطالب"
+        onclick="openStudentInfo(FILTERED[${i}])">
+        <i class="fa-solid fa-eye"></i>
+      </button>
+    </div>
+  </td>
 
-  <td>${i+1}</td>
+  <td>
+    <div class="compact-stack">
+      <span class="branch-pill">${r.branch||"—"}</span>
+      <small>${sectionLabel(r.section)}</small>
+    </div>
+  </td>
 
-  <td class="name-cell">
+  <td>
+    <div class="compact-stack">
+      <b>${r.program||"—"}</b>
+      <small>${r.course||"—"}</small>
+    </div>
+  </td>
 
-    <div class="inline">
+  <td class="col-course">
+    <div class="compact-stack">
+      <span class="course-pill">${r.course||"—"}</span>
+      <small class="period-ltr">${r.period||"—"}</small>
+      <small>${r.trainer||"—"} ${r.room ? "— "+r.room : ""}</small>
+    </div>
+  </td>
 
-      <span class="val"
-onclick="startInline(this.parentNode)">
+  <td title="${tgtTxt.replace(/"/g,'&quot;')}">
+    <div class="compact-stack">
+      <b>${tgtTxt||"—"}</b>
+    </div>
+  </td>
 
-        <div
-class="name-en">${displayNameEN(r)}</div>
+  <td>
+    <div class="summary-box">
+      <div class="rowx"><span>إجمالي</span><b id="tl-${rid}">${totalShow}</b></div>
+      <div class="rowx"><span>مستخدم</span><b id="ul-${rid}">${usedShow}</b></div>
+      <div class="rowx"><span>متبقي</span><b id="rl-${rid}">${remLvShow}</b></div>
+      ${endSubHTML(totalShow,usedShow)}
+    </div>
+  </td>
 
-        <div
-class="name-ar">${r.name_ar||""}</div>
+  <td>
+    <div class="summary-box">
+      <div class="rowx"><span>الرسوم</span><b id="fee-${rid}">${n2(r.CourseFee||0)}</b></div>
+      <div class="rowx"><span>المدفوع</span><b id="paid-${rid}">${n2(r.PaidAmount||0)}</b></div>
+      <div class="rowx"><span>المتبقي</span><b id="rem-${rid}">${remColorHTML(r.RemainingAmount||0)}</b></div>
+      <div class="rowx"><span>الدفع</span><b id="method-${rid}">${r.PaymentType||"—"}</b></div>
+    </div>
+  </td>
 
-        ${dup?'<div class="dup-tag">مكرر</div>':''}
+  <td>${(r.grade===0||r.grade)?r.grade:"—"}</td>
+  <td><span class="status-pill ${statusClass(r.status)}">${statusLabel(r.status)}</span></td>
+  <td>${r.date||"—"}</td>
 
-      </span>
+  <td class="mini-actions">
+    <button class="mini mini-pay" type="button" onclick="openFees(FILTERED[${i}])">
+      <i class="fa-solid fa-credit-card"></i> الدفعات
+    </button>
+    <button class="mini mini-lv" type="button" onclick="openLevels(FILTERED[${i}])">
+      <i class="fa-solid fa-layer-group"></i> المستويات
+    </button>
+    <button class="mini btn-blue" type="button" onclick="openMigrateSingle(FILTERED[${i}])">
+      <i class="fa-solid fa-arrow-up"></i> ترحيل
+    </button>
+  </td>
 
-      <input value="${(r.name_en||"").replace(/"/g,'&quot;')}">
-
-      <button class="save"
-onclick="saveInline(this.parentNode, FILTERED[${i}], 'name_en')">✔</button>
-
-      <button class="cancel" onclick="cancelInline(this.parentNode)">✖</button>
-
-    </div>
-
-  </td>
-
-  <td>
-
-    <div class="inline">
-
-      <span class="val"
-onclick="startInline(this.parentNode)">${r.age||"—"}</span>
-
-      <input value="${(r.age||"").replace(/"/g,'&quot;')}">
-
-      <button class="save"
-onclick="saveInline(this.parentNode, FILTERED[${i}], 'age')">✔</button>
-
-      <button class="cancel"
-onclick="cancelInline(this.parentNode)">✖</button>
-
-    </div>
-
-  </td>
-
-  <td>
-
-    <div class="inline">
-
-      <span class="val" onclick="startInline(this.parentNode)">${r.iqama||"—"}</span>
-
-      <input value="${(r.iqama||"").replace(/"/g,'&quot;')}">
-
-      <button class="save"
-onclick="saveInline(this.parentNode, FILTERED[${i}], 'iqama')">✔</button>
-
-      <button class="cancel"
-onclick="cancelInline(this.parentNode)">✖</button>
-
-    </div>
-
-  </td>
-
-  <td>
-
-    <div class="inline">
-
-      <span class="val"
-onclick="startInline(this.parentNode)">${r.phone||"—"}</span>
-
-      <input value="${(r.phone||"").replace(/"/g,'&quot;')}">
-
-      <button class="save"
-onclick="saveInline(this.parentNode, FILTERED[${i}], 'phone')">✔</button>
-
-      <button class="cancel"
-onclick="cancelInline(this.parentNode)">✖</button>
-
-    </div>
-
-  </td>
-
-  <td>${r.email || "—"}</td>
-  <td class="detail-cell">${r.birthdate || "—"}</td>
-  <td class="detail-cell"><span class="detail-chip">${r.nationality || "—"}</span></td>
-  <td class="detail-cell">${r.healthStatus || "—"}</td>
-  <td class="detail-cell">${r.educationLevel || "—"}</td>
-  <td class="detail-cell">${r.heardAbout || "—"}</td>
-  <td class="detail-cell"><span class="detail-chip">${r.branch || "—"}</span></td>
-  <td class="detail-cell">${r.section || "—"}</td>
-  <td class="detail-cell">${r.program || "—"}</td>
-  <td class="detail-cell">${r.courseType || "—"}</td>
-  <td class="detail-cell">${r.termsAccepted ? "✅ موافق" : "—"}</td>
-
-<td>${r.status!=="new" ? (r.previousCourse||"—") : "—"}</td>
-
-<td class="col-course">${r.course || "—"}</td>
-
-<td title="${tgtTxt.replace(/"/g,'&quot;')}">${tgtTxt}</td>
-
-<td id="tl-${rid}">${totalShow}</td>
-
-<td id="ul-${rid}">
-
-  ${usedShow}
-
-  ${endSubHTML(totalShow, usedShow)}
-
-</td>
-
-<td id="rl-${rid}">${remLvShow}</td>
-
-<td id="fee-${rid}">${n2(r.CourseFee||0)}</td>
-
-<td id="paid-${rid}">${n2(r.PaidAmount||0)}</td>
-
-<td id="rem-${rid}">${remColorHTML(r.RemainingAmount||0)}</td>
-
-<td id="method-${rid}">${(r.PaymentType||"—")}</td>
-
-<td>${(r.grade===0||r.grade)?r.grade:"—"}</td>
-
-<td class="${statusClass(r.status)}">${statusLabel(r.status)}</td>
-
-<td>${r.date||"—"}</td>
-
-  <td class="mini-actions">
-
-    <button class="mini mini-pay" type="button"
-onclick="openFees(FILTERED[${i}])"><i class="fa-solid
-fa-credit-card"></i> الدفعات</button>
-
-    <button class="mini mini-lv"
-type="button" onclick="openLevels(FILTERED[${i}])"><i
-class="fa-solid fa-layer-group"></i> المستويات</button>
-
-  </td>
-
-  <td id="res-${rid}">—</td>
-
+  <td id="res-${rid}">—</td>
 </tr>`;
+  });
 
-  });
-
-  // checkbox events
-
-  tbody.querySelectorAll('input[type="checkbox"]').forEach(ch=>{
-
-    ch.onchange = ()=>{
-
-      const r = FILTERED[Number(ch.dataset.i)];
-
-      if(!r) return;
-
-      const key = undoKey(r.src, r.id);
-
-      if(UNDO[key]){ ch.checked=false; return; }
-
-      if(ch.checked) SELECTED.push(r);
-
-      else SELECTED = SELECTED.filter(x=>!(x.src===r.src && x.id===r.id));
-
-    };
-
-  });
-
+  tbody.querySelectorAll('input[type="checkbox"]').forEach(ch=>{
+    ch.onchange=()=>{
+      const r=FILTERED[Number(ch.dataset.i)];
+      if(!r) return;
+      const key=undoKey(r.src,r.id);
+      if(UNDO[key]){ch.checked=false;return;}
+      if(ch.checked){
+        if(!SELECTED.some(x=>x.src===r.src && x.id===r.id)) SELECTED.push(r);
+      }else{
+        SELECTED=SELECTED.filter(x=>!(x.src===r.src && x.id===r.id));
+      }
+    };
+  });
 }
 
 /* ================= FILTER EVENTS ================= */
-
-[fBranch,fSection,fType,fProgram,fStatus,fName,fAge,fIqama,fPhone,fEmail,fCourse,fDate].forEach(el=>{
-
-  el.addEventListener("change", applyFilters);
-
-  el.addEventListener("input", applyFilters);
-
+[fBranch,fSection,fType,fProgram,fStatus,fCourse,fDate,fSearch].forEach(el=>{
+  el.addEventListener("change",()=>{
+    applyFilters();
+    if([fBranch,fSection,fType,fProgram].includes(el)) refreshTargetCourses();
+  });
+  if(el===fSearch) el.addEventListener("input",applyFilters);
 });
-
-[fBranch,fSection,fType,fProgram].forEach(el=>{
-  el.addEventListener("change", refreshTargetCourses);
-});
-targetCourse.addEventListener("change", ()=> render());
+targetCourse.addEventListener("change",()=>render());
 
 /* ================= SELECT ALL / NONE ================= */
 
@@ -2873,8 +2733,7 @@ function openMigrateSingle(r){
 
   const key = undoKey(r.src,r.id);
 
-  // ✅
-total: من Override أو students cache أو 12
+  // ✅ total: من Override أو students cache أو 12
 
   const lv = r._lastLevels || {total:0, used:0, remaining:0};
 
@@ -2952,8 +2811,7 @@ async function migrateOne(r, totalLevels, courseFee, paidAmount, remainingAmount
 
   const tgt = TARGET_COURSES.find(c=>c.id===targetCourse.value);
 
-  if(!tgt) return alert("الدورة الهدف غير متاحة
-(تأكد أنها مفتوحة)");
+  if(!tgt) return alert("الدورة الهدف غير متاحة (تأكد أنها مفتوحة)");
 
   const key = undoKey(r.src,r.id);
 
@@ -2988,13 +2846,6 @@ const rem  = n2(remainingAmount || 0);
     age: (r.age||""),
 
 email: r.email || "",
-    Birthdate: r.birthdate || "",
-    Nationality: r.nationality || "",
-    HealthStatus: r.healthStatus || "",
-    EducationLevel: r.educationLevel || "",
-    HeardAbout: r.heardAbout || "",
-    Program: r.program || tgt.Program || tgt.program || "",
-    TermsAccepted: !!r.termsAccepted,
 
     courseId: tgt.id,
 
@@ -3116,13 +2967,11 @@ return alert("اختر الدورة الهدف (المفتوحة فقط)");
 
     const key = undoKey(r.src,r.id);
 
-    //
-totalLevels: من Override أو students cache أو 12
+    // totalLevels: من Override أو students cache أو 12
 
 const totalLevels = n2(r.totalLevels || 0);
 
-    //
-fees: من السجل (إن كان صفر خذ من الهدف)
+    // fees: من السجل (إن كان صفر خذ من الهدف)
 
     const fee  = n2(r.CourseFee||0);
 
@@ -3158,19 +3007,20 @@ btnExcel.onclick = ()=>{
 
     "الجوال": r.phone||"",
 
-    "الإيميل": r.email || "",
+    "الإيميل": r.email || "",
+    "العمر": r.age || "",
     "تاريخ الميلاد": r.birthdate || "",
     "الجنسية": r.nationality || "",
     "الحالة الصحية": r.healthStatus || "",
     "المؤهل العلمي": r.educationLevel || "",
     "كيف تعرفت على برودل": r.heardAbout || "",
     "الفرع": r.branch || "",
-    "القسم": r.section || "",
+    "القسم": sectionLabel(r.section),
     "البرنامج": r.program || "",
     "نوع الدورة": r.courseType || "",
     "موافقة الشروط": r.termsAccepted ? "نعم" : "",
 
-    "الدورة الحالية": r.course||"",
+    "الدورة الحالية": r.course||"",
 
     "الفترة": r.period||"",
 
@@ -3178,17 +3028,13 @@ btnExcel.onclick = ()=>{
 
     "الدورة الهدف": targetText(),
 
-    "TotalLevels
-(students)": r.totalLevels,
+    "TotalLevels (students)": r.totalLevels,
 
-    "UsedLevels
-(students)": r.usedLevels,
+    "UsedLevels (students)": r.usedLevels,
 
-    "RemainingLevels
-(students)": r.remainingLevels,
+    "RemainingLevels (students)": r.remainingLevels,
 
-    "TotalLevels
-Override": LEVELS_OVERRIDE[undoKey(r.src,r.id)] || "",
+    "TotalLevels Override": LEVELS_OVERRIDE[undoKey(r.src,r.id)] || "",
 
     "CourseFee": n2(r.CourseFee||0),
 
@@ -3247,16 +3093,7 @@ btnImport.onclick = async ()=>{
 
     const ph  = String(rr.phone||rr["الجوال"]||"").trim();
 
-const em  = String(rr.email || rr.Email || rr["الإيميل"] || rr["البريد الإلكتروني"] || "").trim();
-    const br = String(rr.Branch || rr.branch || rr["الفرع"] || fBranch.value || "").trim();
-    const sec = String(rr.Section || rr.section || rr["القسم"] || fSection.value || "").trim();
-    const typ = String(rr.CourseType || rr.mode || rr["نوع الدورة"] || fType.value || "حضوري").trim();
-    const prog = String(rr.Program || rr.program || rr["البرنامج"] || fProgram.value || "").trim();
-    const birth = String(rr.Birthdate || rr.birthdate || rr["تاريخ الميلاد"] || "").trim();
-    const nat = String(rr.Nationality || rr.nationality || rr["الجنسية"] || "").trim();
-    const health = String(rr.HealthStatus || rr.healthStatus || rr["الحالة الصحية"] || "").trim();
-    const edu = String(rr.EducationLevel || rr.educationLevel || rr["المؤهل العلمي"] || "").trim();
-    const heard = String(rr.HeardAbout || rr.heardAbout || rr["كيف تعرفت على برودل"] || "").trim();
+const em  = String(rr.email || rr.Email || rr["الإيميل"] || rr["البريد الإلكتروني"] || "").trim();
 
     const fee = n2(rr.CourseFee || rr["CourseFee"] || rr["الرسوم"] || 0);
 
@@ -3280,15 +3117,15 @@ const em  = String(rr.email || rr.Email || rr["الإيميل"] || rr["البر�
 
 email: em,
 
-      Branch: br,
-      Section: sec,
-      CourseType: typ,
-      Program: prog,
-      Birthdate: birth,
-      Nationality: nat,
-      HealthStatus: health,
-      EducationLevel: edu,
-      HeardAbout: heard,
+      Branch:String(rr.Branch||rr.branch||rr["الفرع"]||fBranch.value||"").trim(),
+      Section:String(rr.Section||rr.section||rr["القسم"]||fSection.value||"").trim(),
+      CourseType:String(rr.CourseType||rr.mode||rr["نوع الدورة"]||fType.value||"حضوري").trim(),
+      Program:String(rr.Program||rr.program||rr["البرنامج"]||fProgram.value||"").trim(),
+      Birthdate:String(rr.Birthdate||rr.birthdate||rr["تاريخ الميلاد"]||"").trim(),
+      Nationality:String(rr.Nationality||rr.nationality||rr["الجنسية"]||"").trim(),
+      HealthStatus:String(rr.HealthStatus||rr.healthStatus||rr["الحالة الصحية"]||"").trim(),
+      EducationLevel:String(rr.EducationLevel||rr.educationLevel||rr["المؤهل العلمي"]||"").trim(),
+      HeardAbout:String(rr.HeardAbout||rr.heardAbout||rr["كيف تعرفت على برودل"]||"").trim(),
 
       CourseFee: fee,
 
@@ -3315,9 +3152,8 @@ firebase.firestore.Timestamp.now()
 
 /* ================= INIT ================= */
 
-loadData();
-
-</script>
+loadTargetCourses();
+loadData();</script>
 
 </body>
 
