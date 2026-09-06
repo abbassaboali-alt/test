@@ -821,21 +821,12 @@ body{font-family:'Tajawal',Arial,sans-serif!important}
 
 </div>
 
-<div class="note">جميع الفروع والأقسام — استخدم الفلاتر لعرض السجلات المطلوبة</div>
+<div class="note">عرض شامل لجميع الفروع والأقسام — بدون فلترة حسب الفرع أو القسم</div>
 
 <!-- FILTERS -->
 
 <div class="filters">
-
-  <select id="fBranch">
-    <option value="">كل الفروع</option>
-  </select>
-
-  <select id="fSection">
-    <option value="">كل الأقسام</option>
-  </select>
-
-  <select id="fType">
+<select id="fType">
     <option value="">كل أنواع الدورات</option>
   </select>
 
@@ -1189,8 +1180,6 @@ const db = firebase.firestore();
 
 /* ================= DOM ================= */
 
-const fBranch = document.getElementById("fBranch");
-const fSection = document.getElementById("fSection");
 const fType = document.getElementById("fType");
 const fProgram = document.getElementById("fProgram");
 const fStatus = document.getElementById("fStatus");
@@ -1434,7 +1423,7 @@ style="margin-top:6px">
 
 }function hasAnyFilter(){
   return !!(
-    fBranch.value || fSection.value || fType.value || fProgram.value ||
+    fType.value || fProgram.value ||
     fStatus.value || fName.value || fAge.value ||
     fIqama.value || fPhone.value || fEmail.value ||
     fCourse.value || fDate.value
@@ -1637,20 +1626,15 @@ function refreshTargetCourses(){
   const current = targetCourse.value;
 
   const list = TARGET_COURSES.filter(c=>{
-    const br = String(c.Branch || c.branch || "");
-    const sec = String(c.Section || c.section || "");
     const typ = String(c.CourseType || c.mode || "");
     const prog = String(c.Program || c.program || "");
-
-    if(fBranch.value && br !== fBranch.value) return false;
-    if(fSection.value && sec !== fSection.value) return false;
     if(fType.value && typ !== fType.value) return false;
     if(fProgram.value && prog !== fProgram.value) return false;
     return true;
   });
 
   targetCourse.innerHTML =
-    "<option value=''>□ الدورة الهدف (المفتوحة والمتوافقة مع الفلاتر)</option>";
+    "<option value=''>□ الدورة الهدف (جميع الفروع والأقسام)</option>";
 
   list.forEach(c=>{
     const p = String(c.Period||c.period||"").trim();
@@ -2030,25 +2014,14 @@ r.remainingLevels =
 function fillFilters(){
   const keep = (sel)=>sel.value;
 
-  const oldBranch = keep(fBranch);
-  const oldSection = keep(fSection);
   const oldType = keep(fType);
   const oldProgram = keep(fProgram);
 
-  const branches = uniq(ROWS.map(r=>r.branch)).sort();
-  const sections = uniq(ROWS.map(r=>r.section)).sort();
   const types = uniq(ROWS.map(r=>r.courseType)).sort();
   const programs = uniq(ROWS.map(r=>r.program)).sort();
   const courses = uniq(ROWS.map(r=>r.course)).sort();
   const dates = uniq(ROWS.map(r=>r.date).filter(Boolean)).sort();
-
-  fBranch.innerHTML = '<option value="">كل الفروع</option>' +
-    branches.map(v=>`<option value="${v}">${v}</option>`).join("");
-
-  fSection.innerHTML = '<option value="">كل الأقسام</option>' +
-    sections.map(v=>`<option value="${v}">${v}</option>`).join("");
-
-  fType.innerHTML = '<option value="">كل أنواع الدورات</option>' +
+fType.innerHTML = '<option value="">كل أنواع الدورات</option>' +
     types.map(v=>`<option value="${v}">${v}</option>`).join("");
 
   fProgram.innerHTML = '<option value="">كل البرامج</option>' +
@@ -2060,8 +2033,6 @@ function fillFilters(){
   fDate.innerHTML = '<option value="">□ التاريخ</option>' +
     dates.map(v=>`<option value="${v}">${v}</option>`).join("");
 
-  if(branches.includes(oldBranch)) fBranch.value = oldBranch;
-  if(sections.includes(oldSection)) fSection.value = oldSection;
   if(types.includes(oldType)) fType.value = oldType;
   if(programs.includes(oldProgram)) fProgram.value = oldProgram;
 
@@ -2110,8 +2081,6 @@ function applyFilters(){
 
   FILTERED = ROWS.filter(r=>{
 
-    if(fBranch.value && r.branch !== fBranch.value) return false;
-    if(fSection.value && r.section !== fSection.value) return false;
     if(fType.value && r.courseType !== fType.value) return false;
     if(fProgram.value && r.program !== fProgram.value) return false;
 
@@ -2796,7 +2765,7 @@ class="fa-solid fa-layer-group"></i> المستويات</button>
 
 /* ================= FILTER EVENTS ================= */
 
-[fBranch,fSection,fType,fProgram,fStatus,fName,fAge,fIqama,fPhone,fEmail,fCourse,fDate].forEach(el=>{
+[fType,fProgram,fStatus,fName,fAge,fIqama,fPhone,fEmail,fCourse,fDate].forEach(el=>{
 
   el.addEventListener("change", applyFilters);
 
@@ -2804,7 +2773,7 @@ class="fa-solid fa-layer-group"></i> المستويات</button>
 
 });
 
-[fBranch,fSection,fType,fProgram].forEach(el=>{
+[fType,fProgram].forEach(el=>{
   el.addEventListener("change", refreshTargetCourses);
 });
 targetCourse.addEventListener("change", ()=> render());
@@ -3331,8 +3300,8 @@ btnImport.onclick = async ()=>{
     const ph  = String(rr.phone||rr["الجوال"]||"").trim();
 
 const em  = String(rr.email || rr.Email || rr["الإيميل"] || rr["البريد الإلكتروني"] || "").trim();
-    const br = String(rr.Branch || rr.branch || rr["الفرع"] || fBranch.value || "").trim();
-    const sec = String(rr.Section || rr.section || rr["القسم"] || fSection.value || "").trim();
+    const br = String(rr.Branch || rr.branch || rr["الفرع"] || "").trim();
+    const sec = String(rr.Section || rr.section || rr["القسم"] || "").trim();
     const typ = String(rr.CourseType || rr.mode || rr["نوع الدورة"] || fType.value || "حضوري").trim();
     const prog = String(rr.Program || rr.program || rr["البرنامج"] || fProgram.value || "").trim();
     const birth = String(rr.Birthdate || rr.birthdate || rr["تاريخ الميلاد"] || "").trim();
