@@ -197,27 +197,6 @@ table, div, section{ max-width:100% !important; }
 
 body{margin:0;background:#f4f6fb;font-family:'Tajawal',sans-serif}
 
-/* ===== Logout Badge ===== */
-
-.logout-badge{
-
-  background:#164478;color:#fff;
-
-  padding:7px 20px;border-radius:30px;border:none;
-
-  font-size:14px;font-weight:600;cursor:pointer;
-
-  display:flex;align-items:center;gap:8px;
-
-  box-shadow:0 3px 8px rgba(0,0,0,0.18);
-
-  transition:.25s;
-
-}
-
-.logout-badge i{font-size:15px}
-
-.logout-badge:hover{ background:#1e5799; transform:translateY(-2px); }
 
 /* ===== Header ===== */
 
@@ -851,7 +830,7 @@ body{
   .info-grid{grid-template-columns:1fr}
   .info-item.wide{grid-column:auto}
   .filter-actions>*{flex:1 1 100% !important;max-width:none !important}
-  .logout-badge{position:static !important;margin:8px auto 0}
+  
 }
 
 </style>
@@ -859,14 +838,6 @@ body{
 </head>
 
 <body>
-
-<!-- زر تسجيل الخروج -->
-
-<button class="logout-badge" onclick="logout()" style="position:fixed;top:14px;right:14px;z-index:99999999">
-
-  <i class="fa-solid fa-right-from-bracket"></i> Logout
-
-</button>
 
 <div class="header">
 
@@ -1162,55 +1133,6 @@ Override) ================= -->
 </div>
 
 <script>
-
-/* ================= Logout + Protection =================
-*/
-
-function logout(){
-
-  localStorage.removeItem("username");
-
-  localStorage.removeItem("role");
-
-  localStorage.removeItem("loginDate");
-
-  location.href="https://www.prudle-education.com/log-in_out.html";
-
-}
-
-(function(){
-
-  // استثناء محرر Weebly
-
-  if(location.hostname.includes("editmysite") || location.hostname.includes("weebly")) return;
-
-  const user = localStorage.getItem("username");
-
-  const role = localStorage.getItem("role");
-
-  const last = localStorage.getItem("loginDate");
-
-  if(!user || !role){
-
-    location.href="https://www.prudle-education.com/log-in_out.html";
-
-    return;
-
-  }
-
-  const today = new Date().toDateString();
-
-  if(last !== today){
-
-    localStorage.clear();
-
-    location.href="https://www.prudle-education.com/log-in_out.html";
-
-    return;
-
-  }
-
-})();
 
 /* ================= Prevent Submit (Weebly)
 ================= */
