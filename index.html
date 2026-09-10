@@ -396,9 +396,7 @@ value="promotion">مسجل مسبقًا</option>
   <input
 id="addedDate" type="date" title="تاريخ الإضافة">
 
-  <button id="addRecordBtn" class="green"><i class="fa-solid fa-plus"></i> إضافة طالب</button>
-
-<button
+  <button
 id="refresh">تحديث</button>
 
   <button
@@ -408,6 +406,9 @@ id="clearFilters" class="gray">مسح
 </section>
 
 <section class="actions">
+
+  <button
+id="addRecord" class="green"><i class="fa-solid fa-plus"></i> إضافة سجل جديد</button>
 
   <button
 id="selectAll" class="soft">تحديد
@@ -560,47 +561,12 @@ colspan="23" class="muted">اختر
 
 </main>
 
-<div class="modal" id="addRecordModal">
-  <div class="modal-card">
-    <h3><i class="fa-solid fa-user-plus"></i> إضافة طالب جديد</h3>
-    <p>أدخل بيانات الطالب واختر الدورة المفتوحة، ثم اضغط حفظ السجل.</p>
-    <div class="details-grid" id="addRecordGrid">
-      <div class="detail-card"><label>الاسم بالعربي</label><input id="aNameAr" autocomplete="off"></div>
-      <div class="detail-card"><label>الاسم بالإنجليزية</label><input id="aNameEn" autocomplete="off" dir="ltr"></div>
-      <div class="detail-card"><label>رقم الهوية / الإقامة</label><input id="aIqama" autocomplete="off" dir="ltr"></div>
-      <div class="detail-card"><label>الجوال</label><input id="aPhone" autocomplete="off" dir="ltr"></div>
-      <div class="detail-card"><label>العمر</label><input id="aAge" type="number" min="0"></div>
-      <div class="detail-card"><label>الجنسية</label>
-        <select id="aNationality">
-          <option value="">— اختر الجنسية —</option>
-          <option value="Saudi">Saudi</option><option value="Yemeni">Yemeni</option>
-          <option value="Sudanese">Sudanese</option><option value="Egyptian">Egyptian</option>
-          <option value="Pakistani">Pakistani</option><option value="Indian">Indian</option>
-          <option value="Bangladeshi">Bangladeshi</option><option value="Syrian">Syrian</option>
-          <option value="Jordanian">Jordanian</option><option value="Other">Other</option>
-        </select>
-      </div>
-      <div class="detail-card full"><label>الدورة المفتوحة</label><select id="aCourse"><option value="">— اختر الدورة —</option></select></div>
-      <div class="detail-card"><label>الرسوم</label><input id="aFee" type="number" min="0" value="0"></div>
-      <div class="detail-card"><label>المدفوع</label><input id="aPaid" type="number" min="0" value="0"></div>
-      <div class="detail-card"><label>المتبقي</label><input id="aRemaining" type="number" min="0" value="0" readonly></div>
-      <div class="detail-card"><label>طريقة الدفع</label>
-        <select id="aPaymentType"><option value="">—</option><option>Tabby</option><option>Tamara</option><option>Cash</option><option>Visa</option><option>MasterCard</option><option>Mada</option></select>
-      </div>
-    </div>
-    <div class="modal-buttons">
-      <button id="saveAddRecord" class="green"><i class="fa-solid fa-floppy-disk"></i> حفظ السجل</button>
-      <button id="closeAddRecord" class="cancel">إغلاق</button>
-    </div>
-  </div>
-</div>
-
 <div class="modal" id="detailsModal">
 
   <div
 class="modal-card">
 
-    <h3>بيانات الطالب</h3>
+    <h3 id="detailsHeading">بيانات الطالب</h3>
 
     <p
 id="detailsTitle">—</p>
@@ -1442,6 +1408,10 @@ r=rows.find(x=>x.source+"/"+x.id===key);
 
   detailsKey=key;
 
+  $("detailsHeading").textContent="تعديل بيانات الطالب";
+
+  $("saveDetails").innerHTML='<i class="fa-solid fa-floppy-disk"></i> حفظ التعديلات';
+
  
 $("detailsTitle").textContent=`${r.nameAr||r.nameEn||"طالب"} —
 ${r.iqama||"بدون هوية"}`;
@@ -1621,6 +1591,86 @@ $("detailsModal").classList.add("show");
 
 }
 
+
+function openNewRecord(){
+
+  detailsKey="NEW";
+
+  $("detailsHeading").textContent="إضافة سجل جديد";
+
+  $("detailsTitle").textContent="أدخل بيانات الطالب ثم اضغط حفظ";
+
+  $("detailsGrid").innerHTML=
+
+    detailSelect("dRecordType","نوع السجل","registration",[
+      {value:"registration",label:"تسجيل جديد"},
+      {value:"promotion",label:"مسجل مسبقًا"}
+    ])+
+
+    detailInput("dNameAr","الاسم بالعربي","")+
+    detailInput("dNameEn","الاسم بالإنجليزية","")+
+    detailInput("dIqama","رقم الهوية / الإقامة","")+
+    detailInput("dPhone","الجوال","")+
+    detailInput("dEmail","البريد الإلكتروني","","email")+
+    detailInput("dBirthdate","تاريخ الميلاد","","date")+
+    detailInput("dAge","العمر","","number",'min="0"')+
+    detailInput("dNationality","الجنسية","")+
+    detailInput("dHealth","الحالة الصحية","")+
+    detailInput("dEducation","المؤهل العلمي","")+
+    detailInput("dHeard","مصدر المعرفة","")+
+
+    detailSelect("dCourseType","نوع الدورة","",[
+      {value:"",label:"— غير محدد —"},
+      "حضوري","اونلاين"
+    ])+
+
+    detailInput("dBranch","الفرع","")+
+
+    detailSelect("dSection","القسم","",[
+      {value:"",label:"— غير محدد —"},
+      {value:"Men",label:"رجال"},
+      {value:"Women",label:"نساء"},
+      {value:"Kids",label:"أطفال"}
+    ])+
+
+    detailInput("dProgram","البرنامج","")+
+    detailInput("dCourse","المستوى / الدورة","")+
+    detailInput("dPeriod","الفترة","")+
+    detailInput("dTrainer","المدرب","")+
+    detailInput("dRoom","القاعة","")+
+    detailInput("dPreviousCourse","الدورة السابقة","")+
+    detailInput("dPreviousPeriod","الفترة السابقة","")+
+    detailInput("dFee","الرسوم",0,"number",'min="0" step="1"')+
+    detailInput("dPaid","المدفوع",0,"number",'min="0" step="1"')+
+    detailInput("dRemaining","المتبقي",0,"number",'min="0" step="1" readonly')+
+
+    detailSelect("dPaymentType","طريقة الدفع (Payment Method)","",[
+      {value:"",label:"—"},
+      "Tabby","Tamara","Cash","Visa","MasterCard","Mada"
+    ])+
+
+    detailSelect("dStatus","الحالة","new",[
+      {value:"new",label:"جديد"},
+      {value:"pass",label:"ناجح"},
+      {value:"fail",label:"راسب"},
+      {value:"not_recorded",label:"لم يتم الرصد"}
+    ]);
+
+  const recalc=()=>{
+    const fee=num($("dFee").value);
+    const paid=num($("dPaid").value);
+    $("dRemaining").value=Math.max(fee-paid,0);
+  };
+
+  $("dFee").addEventListener("input",recalc);
+  $("dPaid").addEventListener("input",recalc);
+
+  $("saveDetails").innerHTML='<i class="fa-solid fa-plus"></i> إضافة السجل';
+  $("detailsModal").classList.add("show");
+}
+
+$("addRecord").onclick=openNewRecord;
+
 function closeDetails(){
 
  
@@ -1632,381 +1682,161 @@ $("detailsModal").classList.remove("show");
 
 $("saveDetails").onclick=async()=>{
 
-  const
-r=rows.find(x=>x.source+"/"+x.id===detailsKey);
-
-  if(!r) return alert("تعذر العثور على السجل.");
-
-  const
-fee=num($("dFee").value);
-
-  const
-paid=num($("dPaid").value);
-
-  const
-remaining=Math.max(fee-paid,0);
-
-  const
-nameAr=text($("dNameAr").value);
-
-  const
-nameEn=text($("dNameEn").value);
-
-  const
-iqama=text($("dIqama").value);
-
-  const
-phone=text($("dPhone").value);
-
-  const
-email=text($("dEmail").value);
-
-  const
-birthdate=text($("dBirthdate").value);
-
-  const
-age=text($("dAge").value);
-
-  const
-nationality=text($("dNationality").value);
-
-  const
-health=text($("dHealth").value);
-
-  const
-education=text($("dEducation").value);
-
-  const
-heard=text($("dHeard").value);
-
-  const
-courseType=text($("dCourseType").value);
-
-  const
-branch=text($("dBranch").value);
-
-  const
-section=text($("dSection").value);
-
-  const
-program=text($("dProgram").value);
-
-  const
-courseName=text($("dCourse").value);
-
-  const
-period=text($("dPeriod").value);
-
-  const
-trainer=text($("dTrainer").value);
-
-  const
-room=text($("dRoom").value);
-
-  const
-previousCourse=text($("dPreviousCourse").value);
-
-  const
-previousPeriod=text($("dPreviousPeriod").value);
-
-  const
-paymentType=text($("dPaymentType").value);
-
-  const
-status=text($("dStatus").value);
-
-  const oldCourse=r.raw.course||{};
-
-  const
-oldFrom=r.raw.fromCourse||{};
-
-  const updateData={
-
-    name_ar:nameAr,
-
-    name:nameEn,
-
-    name_en:nameEn,
-
-    iqama,
-
-    phone,
-
-    email,
-
-    Birthdate:birthdate,
-
-    birthdate,
-
-    age,
-
-    Nationality:nationality,
-
-    nationality,
-
-    HealthStatus:health,
-
-    healthStatus:health,
-
-    EducationLevel:education,
-
-    educationLevel:education,
-
-    HeardAbout:heard,
-
-    heardAbout:heard,
-
-    CourseType:courseType,
-
-    courseType,
-
-    Branch:branch,
-
-    branch,
-
-    Section:section,
-
-    section,
-
-    Program:program,
-
-    program,
-
-    TrainingCourse:courseName,
-
-    courseName,
-
-    Period:period,
-
-    period,
-
-    Trainer:trainer,
-
-    trainer,
-
-    Room:room,
-
-    room,
-
-    previousCourse,
-
-    previousPeriod,
-
-    CourseFee:fee,
-
-    PaidAmount:paid,
-
-    RemainingAmount:remaining,
-
-    PaymentType:paymentType,
-
-    paymentType,
-
-    status,
-
-    course:{
-
-      ...oldCourse,
-
-      name:courseName,
-
-      TrainingCourse:courseName,
-
-      period,
-
-      Period:period,
-
-      trainer,
-
-      Trainer:trainer,
-
-      room,
-
-      Room:room,
-
-      branch,
-
-      Branch:branch,
-
-      section,
-
-      Section:section,
-
-      courseType,
-
-      CourseType:courseType,
-
-      program,
-
-      Program:program
-
-    },
-
-    fromCourse:{
-
-      ...oldFrom,
-
-      name:previousCourse,
-
-     
-TrainingCourse:previousCourse,
-
-      period:previousPeriod,
-
-      Period:previousPeriod
-
-    },
-
-   
-updatedAt:firebase.firestore.Timestamp.now()
-
-  };
-
-  try{
-
-   
-$("saveDetails").disabled=true;
-
-   
-$("saveDetails").innerHTML='<i class="fa-solid
-fa-spinner fa-spin"></i> جاري
-الحفظ...';
-
-    await
-db.collection(r.source).doc(r.id).set(updateData,{merge:true});
-
-    closeDetails();
-
-    await load();
-
-    alert("تم حفظ تعديلات بيانات الطالب بنجاح.");
-
-  }catch(e){
-
-    console.error(e);
-
-    alert("تعذر حفظ التعديلات. راجع صلاحيات Firestore.");
-
-  }finally{
-
-   
-$("saveDetails").disabled=false;
-
-   
-$("saveDetails").innerHTML='<i class="fa-solid
-fa-floppy-disk"></i> حفظ التعديلات';
-
-  }
+  const isNew=detailsKey==="NEW";
+  const r=isNew?null:rows.find(x=>x.source+"/"+x.id===detailsKey);
+
+  if(!isNew && !r) return alert("تعذر العثور على السجل.");
+
+  const fee=num($("dFee").value);
+  const paid=num($("dPaid").value);
+  const remaining=Math.max(fee-paid,0);
+
+  const nameAr=text($("dNameAr").value);
+  const nameEn=text($("dNameEn").value);
+  const iqama=text($("dIqama").value);
+  const phone=text($("dPhone").value);
+  const email=text($("dEmail").value);
+  const birthdate=text($("dBirthdate").value);
+  const age=text($("dAge").value);
+  const nationality=text($("dNationality").value);
+  const health=text($("dHealth").value);
+  const education=text($("dEducation").value);
+  const heard=text($("dHeard").value);
+  const courseType=text($("dCourseType").value);
+  const branch=text($("dBranch").value);
+  const section=text($("dSection").value);
+  const program=text($("dProgram").value);
+  const courseName=text($("dCourse").value);
+  const period=text($("dPeriod").value);
+  const trainer=text($("dTrainer").value);
+  const room=text($("dRoom").value);
+  const previousCourse=text($("dPreviousCourse").value);
+  const previousPeriod=text($("dPreviousPeriod").value);
+  const paymentType=text($("dPaymentType").value);
+  const status=text($("dStatus").value);
+
+  if(isNew){
+    if(!nameAr && !nameEn) return alert("أدخل اسم الطالب.");
+    if(!iqama) return alert("أدخل رقم الهوية / الإقامة.");
+    if(email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert("البريد الإلكتروني غير صحيح.");
+    if(age && (+age<1 || +age>120)) return alert("العمر غير صحيح.");
+  }
+
+  const oldCourse=r?.raw?.course||{};
+  const oldFrom=r?.raw?.fromCourse||{};
+  const now=firebase.firestore.Timestamp.now();
+
+  const updateData={
+    name_ar:nameAr,
+    name:nameEn||nameAr,
+    name_en:nameEn,
+    iqama,
+    phone,
+    email,
+    Email:email,
+    Birthdate:birthdate,
+    birthdate,
+    age:age===""?"":+age,
+    Nationality:nationality,
+    nationality,
+    HealthStatus:health,
+    healthStatus:health,
+    EducationLevel:education,
+    educationLevel:education,
+    HeardAbout:heard,
+    heardAbout:heard,
+    CourseType:courseType,
+    courseType,
+    Branch:branch,
+    branch,
+    Section:section,
+    section,
+    Program:program,
+    program,
+    TrainingCourse:courseName,
+    courseName,
+    Period:period,
+    period,
+    Trainer:trainer,
+    trainer,
+    Room:room,
+    room,
+    previousCourse,
+    previousPeriod,
+    CourseFee:fee,
+    courseFee:fee,
+    PaidAmount:paid,
+    paidAmount:paid,
+    RemainingAmount:remaining,
+    remainingAmount:remaining,
+    PaymentType:paymentType,
+    paymentType,
+    status,
+    Status:status,
+    course:{
+      ...oldCourse,
+      name:courseName,
+      TrainingCourse:courseName,
+      period,
+      Period:period,
+      trainer,
+      Trainer:trainer,
+      room,
+      Room:room,
+      branch,
+      Branch:branch,
+      section,
+      Section:section,
+      courseType,
+      CourseType:courseType,
+      program,
+      Program:program
+    },
+    fromCourse:{
+      ...oldFrom,
+      name:previousCourse,
+      TrainingCourse:previousCourse,
+      period:previousPeriod,
+      Period:previousPeriod
+    },
+    updatedAt:now
+  };
+
+  if(isNew) updateData.createdAt=now;
+
+  const collection=isNew
+    ? ($("dRecordType").value==="promotion" ? "FakePromotions" : "FakeRegistrations")
+    : r.source;
+
+  try{
+    $("saveDetails").disabled=true;
+    $("saveDetails").innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> جاري الحفظ...';
+
+    if(isNew){
+      await db.collection(collection).add(updateData);
+    }else{
+      await db.collection(collection).doc(r.id).set(updateData,{merge:true});
+    }
+
+    if(isNew) $("search").value=iqama || nameAr || nameEn;
+
+    closeDetails();
+    await load();
+    alert(isNew ? "تمت إضافة السجل بنجاح." : "تم حفظ تعديلات بيانات الطالب بنجاح.");
+
+  }catch(e){
+    console.error(e);
+    alert(isNew ? "تعذر إضافة السجل. راجع صلاحيات Firestore." : "تعذر حفظ التعديلات. راجع صلاحيات Firestore.");
+  }finally{
+    $("saveDetails").disabled=false;
+    $("saveDetails").innerHTML='<i class="fa-solid fa-floppy-disk"></i> حفظ التعديلات';
+  }
 
 };
 
 $("closeDetails").onclick=closeDetails;
 
 $("detailsModal").onclick=e=>{if(e.target===$("detailsModal"))closeDetails()};
-
-/* ===========================
-   ADD NEW STUDENT / RECORD
-=========================== */
-function openAddRecordModal(){
-  const courseEl=$("aCourse");
-  courseEl.innerHTML='<option value="">— اختر الدورة —</option>';
-  courses.forEach(c=>{
-    const name=text(val(c,"TrainingCourse","CourseName","courseName","name"))||"دورة";
-    const br=text(val(c,"Branch","branch"))||"—";
-    const sec=sectionLabel(val(c,"Section","section"));
-    const per=text(val(c,"Period","period"))||"—";
-    const trainer=text(val(c,"Trainer","trainer"))||"بدون مدرب";
-    courseEl.add(new Option(`${name} — ${br} — ${sec} — ${per} — ${trainer}`,c.id));
-  });
-
-  ["aNameAr","aNameEn","aIqama","aPhone","aAge"].forEach(id=>$(id).value="");
-  $("aNationality").value="";
-  $("aCourse").value="";
-  $("aFee").value=0;
-  $("aPaid").value=0;
-  $("aRemaining").value=0;
-  $("aPaymentType").value="";
-  $("addRecordModal").classList.add("show");
-}
-
-function closeAddRecordModal(){
-  $("addRecordModal").classList.remove("show");
-}
-
-function recalcAddPayment(){
-  $("aRemaining").value=Math.max(num($("aFee").value)-num($("aPaid").value),0);
-}
-
-$("addRecordBtn").onclick=openAddRecordModal;
-$("closeAddRecord").onclick=closeAddRecordModal;
-$("addRecordModal").onclick=e=>{if(e.target===$("addRecordModal"))closeAddRecordModal()};
-$("aFee").addEventListener("input",recalcAddPayment);
-$("aPaid").addEventListener("input",recalcAddPayment);
-
-$("saveAddRecord").onclick=async()=>{
-  const nameAr=text($("aNameAr").value);
-  const nameEn=text($("aNameEn").value);
-  const iqama=text($("aIqama").value);
-  const phone=text($("aPhone").value);
-  const age=text($("aAge").value);
-  const nationality=text($("aNationality").value);
-  const courseId=$("aCourse").value;
-  const c=courses.find(x=>x.id===courseId);
-
-  if(!nameAr && !nameEn) return alert("أدخل اسم الطالب.");
-  if(!iqama) return alert("أدخل رقم الهوية / الإقامة.");
-  if(!phone) return alert("أدخل رقم الجوال.");
-  if(!c) return alert("اختر الدورة المفتوحة.");
-
-  const fee=num($("aFee").value);
-  const paid=num($("aPaid").value);
-  const remaining=Math.max(fee-paid,0);
-  const courseName=text(val(c,"TrainingCourse","CourseName","courseName","name"));
-  const branch=text(val(c,"Branch","branch"));
-  const section=text(val(c,"Section","section"));
-  const courseType=text(val(c,"CourseType","courseType","mode"));
-  const program=text(val(c,"Program","program"));
-  const period=text(val(c,"Period","period"));
-  const trainer=text(val(c,"Trainer","trainer"));
-  const room=text(val(c,"Room","room"));
-  const paymentType=text($("aPaymentType").value);
-
-  const data={
-    name_ar:nameAr, name:nameEn, name_en:nameEn,
-    iqama, phone, age, Nationality:nationality, nationality,
-    Branch:branch, branch, Section:section, section,
-    CourseType:courseType, courseType, Program:program, program,
-    TrainingCourse:courseName, courseName, Period:period, period,
-    Trainer:trainer, trainer, Room:room, room,
-    CourseFee:fee, PaidAmount:paid, RemainingAmount:remaining,
-    PaymentType:paymentType, paymentType, status:"new",
-    courseId:c.id,
-    course:{
-      id:c.id, name:courseName, TrainingCourse:courseName,
-      Branch:branch, branch, Section:section, section,
-      CourseType:courseType, courseType, Program:program, program,
-      Period:period, period, Trainer:trainer, trainer, Room:room, room
-    },
-    createdAt:firebase.firestore.Timestamp.now()
-  };
-
-  try{
-    $("saveAddRecord").disabled=true;
-    $("saveAddRecord").innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> جاري الحفظ...';
-    await db.collection("FakeRegistrations").add(data);
-    closeAddRecordModal();
-    await load();
-    $("search").value=iqama || phone || nameAr || nameEn;
-    render();
-    alert("تمت إضافة الطالب بنجاح.");
-  }catch(e){
-    console.error(e);
-    alert("تعذر إضافة السجل. راجع صلاحيات Firestore.");
-  }finally{
-    $("saveAddRecord").disabled=false;
-    $("saveAddRecord").innerHTML='<i class="fa-solid fa-floppy-disk"></i> حفظ السجل';
-  }
-};
 
 function renderUndoList(){
 
