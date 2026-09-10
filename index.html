@@ -396,7 +396,9 @@ value="promotion">مسجل مسبقًا</option>
   <input
 id="addedDate" type="date" title="تاريخ الإضافة">
 
-  <button
+  <button id="addRecordBtn" class="green"><i class="fa-solid fa-plus"></i> إضافة طالب</button>
+
+<button
 id="refresh">تحديث</button>
 
   <button
@@ -406,11 +408,6 @@ id="clearFilters" class="gray">مسح
 </section>
 
 <section class="actions">
-
-  <button id="addNewRecord" class="green">
-    <i class="fa-solid fa-user-plus"></i>
-    إضافة سجل جديد
-  </button>
 
   <button
 id="selectAll" class="soft">تحديد
@@ -562,6 +559,41 @@ colspan="23" class="muted">اختر
 </section>
 
 </main>
+
+<div class="modal" id="addRecordModal">
+  <div class="modal-card">
+    <h3><i class="fa-solid fa-user-plus"></i> إضافة طالب جديد</h3>
+    <p>أدخل بيانات الطالب واختر الدورة المفتوحة، ثم اضغط حفظ السجل.</p>
+    <div class="details-grid" id="addRecordGrid">
+      <div class="detail-card"><label>الاسم بالعربي</label><input id="aNameAr" autocomplete="off"></div>
+      <div class="detail-card"><label>الاسم بالإنجليزية</label><input id="aNameEn" autocomplete="off" dir="ltr"></div>
+      <div class="detail-card"><label>رقم الهوية / الإقامة</label><input id="aIqama" autocomplete="off" dir="ltr"></div>
+      <div class="detail-card"><label>الجوال</label><input id="aPhone" autocomplete="off" dir="ltr"></div>
+      <div class="detail-card"><label>العمر</label><input id="aAge" type="number" min="0"></div>
+      <div class="detail-card"><label>الجنسية</label>
+        <select id="aNationality">
+          <option value="">— اختر الجنسية —</option>
+          <option value="Saudi">Saudi</option><option value="Yemeni">Yemeni</option>
+          <option value="Sudanese">Sudanese</option><option value="Egyptian">Egyptian</option>
+          <option value="Pakistani">Pakistani</option><option value="Indian">Indian</option>
+          <option value="Bangladeshi">Bangladeshi</option><option value="Syrian">Syrian</option>
+          <option value="Jordanian">Jordanian</option><option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="detail-card full"><label>الدورة المفتوحة</label><select id="aCourse"><option value="">— اختر الدورة —</option></select></div>
+      <div class="detail-card"><label>الرسوم</label><input id="aFee" type="number" min="0" value="0"></div>
+      <div class="detail-card"><label>المدفوع</label><input id="aPaid" type="number" min="0" value="0"></div>
+      <div class="detail-card"><label>المتبقي</label><input id="aRemaining" type="number" min="0" value="0" readonly></div>
+      <div class="detail-card"><label>طريقة الدفع</label>
+        <select id="aPaymentType"><option value="">—</option><option>Tabby</option><option>Tamara</option><option>Cash</option><option>Visa</option><option>MasterCard</option><option>Mada</option></select>
+      </div>
+    </div>
+    <div class="modal-buttons">
+      <button id="saveAddRecord" class="green"><i class="fa-solid fa-floppy-disk"></i> حفظ السجل</button>
+      <button id="closeAddRecord" class="cancel">إغلاق</button>
+    </div>
+  </div>
+</div>
 
 <div class="modal" id="detailsModal">
 
@@ -1600,238 +1632,8 @@ $("detailsModal").classList.remove("show");
 
 $("saveDetails").onclick=async()=>{
 
-  /* إضافة سجل جديد */
-  if(detailsKey==="__NEW__"){
-    const fee=num($("dFee").value);
-    const paid=num($("dPaid").value);
-    const remaining=Math.max(fee-paid,0);
-
-    const nameAr=text($("dNameAr").value);
-    const nameEn=text($("dNameEn").value);
-    const iqama=text($("dIqama").value);
-    const phone=text($("dPhone").value);
-
-    if(!nameAr && !nameEn) return alert("أدخل اسم الطالب.");
-    if(!iqama) return alert("أدخل رقم الهوية / الإقامة.");
-    if(!phone) return alert("أدخل رقم الجوال.");
-
-    const courseName=text($("dCourse").value);
-    const period=text($("dPeriod").value);
-    const trainer=text($("dTrainer").value);
-    const room=text($("dRoom").value);
-    const branch=text($("dBranch").value);
-    const section=text($("dSection").value);
-    const courseType=text($("dCourseType").value);
-    const program=text($("dProgram").value);
-    const previousCourse=text($("dPreviousCourse").value);
-    const previousPeriod=text($("dPreviousPeriod").value);
-
-    const data={
-      name_ar:nameAr,
-      name:nameEn,
-      name_en:nameEn,
-      iqama,
-      phone,
-      email:text($("dEmail").value),
-      Birthdate:text($("dBirthdate").value),
-      birthdate:text($("dBirthdate").value),
-      age:text($("dAge").value),
-      Nationality:text($("dNationality").value),
-      nationality:text($("dNationality").value),
-      HealthStatus:text($("dHealth").value),
-      healthStatus:text($("dHealth").value),
-      EducationLevel:text($("dEducation").value),
-      educationLevel:text($("dEducation").value),
-      HeardAbout:text($("dHeard").value),
-      heardAbout:text($("dHeard").value),
-      CourseType:courseType,
-      courseType,
-      Branch:branch,
-      branch,
-      Section:section,
-      section,
-      Program:program,
-      program,
-      TrainingCourse:courseName,
-      courseName,
-      Period:period,
-      period,
-      Trainer:trainer,
-      trainer,
-      Room:room,
-      room,
-      previousCourse,
-      previousPeriod,
-      CourseFee:fee,
-      PaidAmount:paid,
-      RemainingAmount:remaining,
-      PaymentType:text($("dPaymentType").value),
-      paymentType:text($("dPaymentType").value),
-      status:text($("dStatus").value)||"new",
-      course:{
-        name:courseName,
-        TrainingCourse:courseName,
-        period,
-        Period:period,
-        trainer,
-        Trainer:trainer,
-        room,
-        Room:room,
-        branch,
-        Branch:branch,
-        section,
-        Section:section,
-        courseType,
-        CourseType:courseType,
-        program,
-        Program:program
-      },
-      fromCourse:{
-        name:previousCourse,
-        TrainingCourse:previousCourse,
-        period:previousPeriod,
-        Period:previousPeriod
-      },
-      createdAt:firebase.firestore.Timestamp.now(),
-      updatedAt:firebase.firestore.Timestamp.now()
-    };
-
-    try{
-      $("saveDetails").disabled=true;
-      $("saveDetails").innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> جاري الإضافة...';
-
-      await db.collection("FakeRegistrations").add(data);
-
-      closeDetails();
-      await load();
-      alert("تمت إضافة السجل الجديد بنجاح.");
-    }catch(e){
-      console.error(e);
-      alert("تعذر إضافة السجل. راجع صلاحيات Firestore.");
-    }finally{
-      $("saveDetails").disabled=false;
-      $("saveDetails").innerHTML='<i class="f
-/* ==========================================================
-   ADD NEW RECORD
-   Uses the same editable student form used by "عرض البيانات"
-   ========================================================== */
-let addingNewRecord=false;
-
-function emptyNewRecord(){
-  return {
-    id:"",
-    source:"FakeRegistrations",
-    kind:"registration",
-    raw:{},
-    nameAr:"",
-    nameEn:"",
-    iqama:"",
-    phone:"",
-    birthdate:"",
-    age:"",
-    email:"",
-    nationality:"",
-    healthStatus:"",
-    educationLevel:"",
-    heardAbout:"",
-    branch:"",
-    section:"",
-    courseType:"",
-    program:"",
-    course:"",
-    period:"",
-    trainer:"",
-    room:"",
-    previousCourse:"",
-    previousPeriod:"",
-    previousTrainer:"",
-    previousRoom:"",
-    fee:0,
-    paid:0,
-    remaining:0,
-    paymentType:"",
-    grade:"",
-    status:"new",
-    created:null
-  };
-}
-
-function openNewRecord(){
-  addingNewRecord=true;
-  detailsKey="__NEW__";
-
-  const r=emptyNewRecord();
-
-  $("detailsTitle").textContent="إضافة سجل طالب جديد";
-
-  $("detailsGrid").innerHTML=
-    detailInput("dNameAr","الاسم بالعربي",r.nameAr)+
-    detailInput("dNameEn","الاسم بالإنجليزية",r.nameEn)+
-    detailInput("dIqama","رقم الهوية / الإقامة",r.iqama)+
-    detailInput("dPhone","الجوال",r.phone)+
-    detailInput("dEmail","البريد الإلكتروني",r.email,"email")+
-    detailInput("dBirthdate","تاريخ الميلاد",r.birthdate,"date")+
-    detailInput("dAge","العمر",r.age,"number",'min="0"')+
-    detailInput("dNationality","الجنسية",r.nationality)+
-    detailInput("dHealth","الحالة الصحية",r.healthStatus)+
-    detailInput("dEducation","المؤهل العلمي",r.educationLevel)+
-    detailInput("dHeard","مصدر المعرفة",r.heardAbout)+
-    detailSelect("dCourseType","نوع الدورة",r.courseType,[
-      {value:"",label:"— غير محدد —"},
-      "حضوري","اونلاين"
-    ])+
-    detailInput("dBranch","الفرع",r.branch)+
-    detailSelect("dSection","القسم",r.section,[
-      {value:"",label:"— غير محدد —"},
-      {value:"Men",label:"رجال"},
-      {value:"Women",label:"نساء"},
-      {value:"Kids",label:"أطفال"}
-    ])+
-    detailInput("dProgram","البرنامج",r.program)+
-    detailInput("dCourse","المستوى / الدورة",r.course)+
-    detailInput("dPeriod","الفترة",r.period)+
-    detailInput("dTrainer","المدرب",r.trainer)+
-    detailInput("dRoom","القاعة",r.room)+
-    detailInput("dPreviousCourse","الدورة السابقة",r.previousCourse)+
-    detailInput("dPreviousPeriod","الفترة السابقة",r.previousPeriod)+
-    detailInput("dFee","الرسوم",r.fee,"number",'min="0" step="1"')+
-    detailInput("dPaid","المدفوع",r.paid,"number",'min="0" step="1"')+
-    detailInput("dRemaining","المتبقي",r.remaining,"number",'min="0" step="1" readonly')+
-    detailSelect("dPaymentType","طريقة الدفع (Payment Method)",r.paymentType,[
-      {value:"",label:"—"},
-      "Tabby","Tamara","Cash","Visa","MasterCard","Mada"
-    ])+
-    detailSelect("dStatus","الحالة",r.status,[
-      {value:"new",label:"جديد"},
-      {value:"pass",label:"ناجح"},
-      {value:"fail",label:"راسب"},
-      {value:"not_recorded",label:"لم يتم الرصد"}
-    ]);
-
-  const recalc=()=>{
-    const fee=num($("dFee").value);
-    const paid=num($("dPaid").value);
-    $("dRemaining").value=Math.max(fee-paid,0);
-  };
-
-  $("dFee").addEventListener("input",recalc);
-  $("dPaid").addEventListener("input",recalc);
-
-  $("saveDetails").innerHTML='<i class="fa-solid fa-plus"></i> إضافة السجل';
-  $("detailsModal").classList.add("show");
-}
-
-$("addNewRecord").onclick=openNewRecord;
-
-/* Replace existing save behavior for NEW mode before normal edit handler executes */
-const originalSaveDetails=$("saveDetails").onclick;
-
-a-solid fa-floppy-disk"></i> حفظ التعديلات';
-    }
-    return;
-  }
-
-  const r=rows.find(x=>x.source+"/"+x.id===detailsKey);
+  const
+r=rows.find(x=>x.source+"/"+x.id===detailsKey);
 
   if(!r) return alert("تعذر العثور على السجل.");
 
@@ -2101,6 +1903,110 @@ fa-floppy-disk"></i> حفظ التعديلات';
 $("closeDetails").onclick=closeDetails;
 
 $("detailsModal").onclick=e=>{if(e.target===$("detailsModal"))closeDetails()};
+
+/* ===========================
+   ADD NEW STUDENT / RECORD
+=========================== */
+function openAddRecordModal(){
+  const courseEl=$("aCourse");
+  courseEl.innerHTML='<option value="">— اختر الدورة —</option>';
+  courses.forEach(c=>{
+    const name=text(val(c,"TrainingCourse","CourseName","courseName","name"))||"دورة";
+    const br=text(val(c,"Branch","branch"))||"—";
+    const sec=sectionLabel(val(c,"Section","section"));
+    const per=text(val(c,"Period","period"))||"—";
+    const trainer=text(val(c,"Trainer","trainer"))||"بدون مدرب";
+    courseEl.add(new Option(`${name} — ${br} — ${sec} — ${per} — ${trainer}`,c.id));
+  });
+
+  ["aNameAr","aNameEn","aIqama","aPhone","aAge"].forEach(id=>$(id).value="");
+  $("aNationality").value="";
+  $("aCourse").value="";
+  $("aFee").value=0;
+  $("aPaid").value=0;
+  $("aRemaining").value=0;
+  $("aPaymentType").value="";
+  $("addRecordModal").classList.add("show");
+}
+
+function closeAddRecordModal(){
+  $("addRecordModal").classList.remove("show");
+}
+
+function recalcAddPayment(){
+  $("aRemaining").value=Math.max(num($("aFee").value)-num($("aPaid").value),0);
+}
+
+$("addRecordBtn").onclick=openAddRecordModal;
+$("closeAddRecord").onclick=closeAddRecordModal;
+$("addRecordModal").onclick=e=>{if(e.target===$("addRecordModal"))closeAddRecordModal()};
+$("aFee").addEventListener("input",recalcAddPayment);
+$("aPaid").addEventListener("input",recalcAddPayment);
+
+$("saveAddRecord").onclick=async()=>{
+  const nameAr=text($("aNameAr").value);
+  const nameEn=text($("aNameEn").value);
+  const iqama=text($("aIqama").value);
+  const phone=text($("aPhone").value);
+  const age=text($("aAge").value);
+  const nationality=text($("aNationality").value);
+  const courseId=$("aCourse").value;
+  const c=courses.find(x=>x.id===courseId);
+
+  if(!nameAr && !nameEn) return alert("أدخل اسم الطالب.");
+  if(!iqama) return alert("أدخل رقم الهوية / الإقامة.");
+  if(!phone) return alert("أدخل رقم الجوال.");
+  if(!c) return alert("اختر الدورة المفتوحة.");
+
+  const fee=num($("aFee").value);
+  const paid=num($("aPaid").value);
+  const remaining=Math.max(fee-paid,0);
+  const courseName=text(val(c,"TrainingCourse","CourseName","courseName","name"));
+  const branch=text(val(c,"Branch","branch"));
+  const section=text(val(c,"Section","section"));
+  const courseType=text(val(c,"CourseType","courseType","mode"));
+  const program=text(val(c,"Program","program"));
+  const period=text(val(c,"Period","period"));
+  const trainer=text(val(c,"Trainer","trainer"));
+  const room=text(val(c,"Room","room"));
+  const paymentType=text($("aPaymentType").value);
+
+  const data={
+    name_ar:nameAr, name:nameEn, name_en:nameEn,
+    iqama, phone, age, Nationality:nationality, nationality,
+    Branch:branch, branch, Section:section, section,
+    CourseType:courseType, courseType, Program:program, program,
+    TrainingCourse:courseName, courseName, Period:period, period,
+    Trainer:trainer, trainer, Room:room, room,
+    CourseFee:fee, PaidAmount:paid, RemainingAmount:remaining,
+    PaymentType:paymentType, paymentType, status:"new",
+    courseId:c.id,
+    course:{
+      id:c.id, name:courseName, TrainingCourse:courseName,
+      Branch:branch, branch, Section:section, section,
+      CourseType:courseType, courseType, Program:program, program,
+      Period:period, period, Trainer:trainer, trainer, Room:room, room
+    },
+    createdAt:firebase.firestore.Timestamp.now()
+  };
+
+  try{
+    $("saveAddRecord").disabled=true;
+    $("saveAddRecord").innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> جاري الحفظ...';
+    await db.collection("FakeRegistrations").add(data);
+    closeAddRecordModal();
+    await load();
+    $("search").value=iqama || phone || nameAr || nameEn;
+    render();
+    alert("تمت إضافة الطالب بنجاح.");
+  }catch(e){
+    console.error(e);
+    alert("تعذر إضافة السجل. راجع صلاحيات Firestore.");
+  }finally{
+    $("saveAddRecord").disabled=false;
+    $("saveAddRecord").innerHTML='<i class="fa-solid fa-floppy-disk"></i> حفظ السجل';
+  }
+};
 
 function renderUndoList(){
 
