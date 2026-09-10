@@ -629,8 +629,7 @@ function val(x,...keys){
   for(const k of keys){
 
     if(x &&
-x[k]!==undefined && x[k]!==null && x[k]!=="") return
-x[k];
+x[k]!==undefined && x[k]!==null && x[k]!=="") return x[k];
 
   }
 
@@ -640,8 +639,7 @@ x[k];
 
 function escapeHtml(v){
 
-  return
-text(v).replace(/[&<>'"]/g,c=>({
+  return text(v).replace(/[&<>'"]/g,c=>({
 
    
 "&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"
@@ -656,8 +654,7 @@ function dateObj(v){
 
     if(!v) return null;
 
-    if(v.toDate) return
-v.toDate();
+    if(v.toDate) return v.toDate();
 
     if(v.seconds) return new
 Date(v.seconds*1000);
@@ -1044,8 +1041,7 @@ $("statusFilter").value ||
 
 function filtered(){
 
-  if(!hasActiveFilter()) return
-[];
+  if(!hasActiveFilter()) return [];
 
   const
 q=text($("search").value).toLowerCase();
@@ -1080,8 +1076,7 @@ type=$("type").value;
   const
 addedDate=$("addedDate").value;
 
-  return
-rows.filter(r=>{
+  return rows.filter(r=>{
 
     if(branch &&
 r.branch!==branch) return false;
@@ -1122,8 +1117,7 @@ r.nameAr,r.nameEn,r.iqama,r.phone,r.email,r.branch,r.section,r.course
 
       ].join(" ").toLowerCase();
 
-      if(!hay.includes(q)) return
-false;
+      if(!hay.includes(q)) return false;
 
     }
 
@@ -1335,8 +1329,7 @@ list.every(r=>selected.has(r.source+"/"+r.id));
 
 function selectedRows(){
 
-  return
-rows.filter(r=>selected.has(r.source+"/"+r.id));
+  return rows.filter(r=>selected.has(r.source+"/"+r.id));
 
 }
 
@@ -1944,8 +1937,7 @@ $("selectAll").onclick=()=>{
 
   const list=filtered();
 
-  if(!list.length) return
-alert("اختر فلترًا أولاً لعرض وتحديد السجلات.");
+  if(!list.length) return alert("اختر فلترًا أولاً لعرض وتحديد السجلات.");
 
   const allSelected=list.every(r=>selected.has(r.source+"/"+r.id));
 
@@ -1976,8 +1968,7 @@ $("deleteBtn").onclick=async()=>{
 
   const a=selectedRows();
 
-  if(!a.length) return
-alert("حدد السجلات المراد حذفها أولاً.");
+  if(!a.length) return alert("حدد السجلات المراد حذفها أولاً.");
 
   if(!confirm(`سيتم حذف ${a.length} سجل.\nيمكنك
 التراجع بعد الحذف.\nهل
@@ -2045,11 +2036,9 @@ id=$("targetCourse").value;
   const
 course=courses.find(c=>c.id===id);
 
-  if(!a.length) return
-alert("حدد السجلات المراد ترحيلها أولاً.");
+  if(!a.length) return alert("حدد السجلات المراد ترحيلها أولاً.");
 
-  if(!course) return
-alert("اختر الدورة الهدف.");
+  if(!course) return alert("اختر الدورة الهدف.");
 
   const
 targetLabel=text($("targetCourse").selectedOptions[0]?.textContent||"");
@@ -2290,8 +2279,7 @@ $("fees").onclick=async()=>{
 
   const a=selectedRows();
 
-  if(!a.length) return
-alert("حدد السجلات أولاً.");
+  if(!a.length) return alert("حدد السجلات أولاً.");
 
   const fee=prompt("إجمالي الرسوم للجميع (ر.س):");
 
@@ -2797,8 +2785,7 @@ $("paymentStatement").onclick=()=>{
 
   const a=selectedRows();
 
-  if(!a.length) return
-alert("حدد سجلًا واحدًا أو أكثر لإصدار بيان الدفعات.");
+  if(!a.length) return alert("حدد سجلًا واحدًا أو أكثر لإصدار بيان الدفعات.");
 
   openPaymentPdf(a);
 
@@ -2809,8 +2796,7 @@ $("generalReport").onclick=()=>{
   const a=selectedRows().length ?
 selectedRows() : filtered();
 
-  if(!a.length) return
-alert("لا توجد بيانات لإصدار التقرير.");
+  if(!a.length) return alert("لا توجد بيانات لإصدار التقرير.");
 
   const d=new Date();
 
@@ -3104,8 +3090,7 @@ $("exportCsv").onclick=()=>{
 
   const a=filtered();
 
-  if(!a.length) return
-alert("لا توجد بيانات لتصديرها.");
+  if(!a.length) return alert("لا توجد بيانات لتصديرها.");
 
   const fields=[
 
