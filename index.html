@@ -2552,7 +2552,35 @@ HeardAbout:r.heardAbout,
 heardAbout:r.heardAbout,
 
 
-courseId:course.id,
+
+          // الدورة السابقة: الدورة التي كان الطالب مسجلاً فيها قبل الترحيل
+          previousCourse:r.course || "",
+          previousPeriod:r.period || "",
+          previousTrainer:r.trainer || "",
+          previousRoom:r.room || "",
+
+          fromCourse:{
+            id:r.raw.courseId || r.raw.course?.id || "",
+            courseId:r.raw.courseId || r.raw.course?.courseId || r.raw.course?.id || "",
+            name:r.course || "",
+            TrainingCourse:r.course || "",
+            period:r.period || "",
+            Period:r.period || "",
+            trainer:r.trainer || "",
+            Trainer:r.trainer || "",
+            room:r.room || "",
+            Room:r.room || "",
+            branch:r.branch || "",
+            Branch:r.branch || "",
+            section:r.section || "",
+            Section:r.section || "",
+            courseType:r.courseType || "",
+            CourseType:r.courseType || "",
+            program:r.program || "",
+            Program:r.program || ""
+          },
+
+          courseId:course.id,
 
 
 TrainingCourse:targetName,
@@ -2590,7 +2618,30 @@ PaidAmount:r.paid,
          
 RemainingAmount:r.remaining,
 
-          course:{
+          
+          // الدورة الهدف المختارة في الترحيل
+          targetCourse:{
+            id:course.id,
+            courseId:course.id,
+            name:targetName,
+            TrainingCourse:targetName,
+            period:targetPeriod,
+            Period:targetPeriod,
+            trainer:targetTrainer,
+            Trainer:targetTrainer,
+            room:targetRoom,
+            Room:targetRoom,
+            branch:targetBranch,
+            Branch:targetBranch,
+            section:targetSection,
+            Section:targetSection,
+            courseType:targetType,
+            CourseType:targetType,
+            program:targetProgram,
+            Program:targetProgram
+          },
+
+          course:{
 
             ...oldCourse,
 
@@ -2819,13 +2870,20 @@ paidRatio=totalFee>0?Math.round((totalPaid/totalFee)*100):0;
 rowsHtml=a.map((r,i)=>{
 
     const status =
-      r.fee<=0
-        ? '<span class="pay-status unpaid">غير مكتمل</span>'
-        : r.remaining<=0
-          ? '<span class="pay-status full">مكتمل</span>'
-          : r.paid>0
-            ? '<span class="pay-status partial">جزئي</span>'
-            : '<span class="pay-status unpaid">غير مدفوع</span>';
+
+r.remaining<=0
+
+      ? '<span
+class="pay-status full">مكتمل</span>'
+
+      : r.paid>0
+
+        ? '<span class="pay-status
+partial">جزئي</span>'
+
+        : '<span
+class="pay-status unpaid">غير
+مدفوع</span>';
 
     return `
 
