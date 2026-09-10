@@ -9453,7 +9453,27 @@ function preparePrintReport(pdfCourses=getPdfCourses()){
       .map((c,index)=>{
 
         const att=exactAttendanceMetric(c);
-        const act=exactTaskMetric(c.id,"نشاط");
+        const courseActivities=displayedTasks.filter(
+          t=>t.courseId===c.id&&t.kind==="نشاط"
+        );
+
+        const classroomActivities=courseActivities.filter(
+          t=>t.activityMode!=="individual"
+        );
+
+        const individualActivities=courseActivities.filter(
+          t=>t.activityMode==="individual"||t.activityMode==="both"
+        );
+
+        const individualDone=individualActivities.reduce(
+          (sum,t)=>sum+Number(t.completed||0),0
+        );
+
+        const individualTotal=individualActivities.reduce(
+          (sum,t)=>sum+Number(t.total||0),0
+        );
+
+        const act=exactMetric(individualDone,individualTotal);
         const quiz=exactTaskMetric(c.id,"كويز");
 
         const students=
