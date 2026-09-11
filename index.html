@@ -821,8 +821,21 @@ d.toISOString().slice(0,10) : "";
 }
 
 function sectionLabel(v){
-  return ({Men:"رجال",Women:"نساء",Kids:"أطفال",WomenKids:"نساء + أطفال"})[text(v)] ||
-  text(v) || "—";
+
+  return ({Men:"رجال",Women:"نساء",Kids:"أطفال",WomenKids:"السيدات والأطفال"})[text(v)] ||
+
+text(v) || "—";
+
+}
+
+function sectionMatches(value,filter){
+
+  value=text(value);
+
+  return !filter || (filter==="WomenKids" ?
+
+(value==="Women" || value==="Kids") : value===filter);
+
 }
 
 function statusLabel(v){
@@ -1092,28 +1105,35 @@ el.value=keep;
 
 function fillFilterOptions(){
 
-  setSelectOptions("branch",rows.map(r=>r.branch),"كل الفروع");
+  const currentSection=$("section").value;
 
-  const sectionEl=$("section");
-  const keepSection=sectionEl.value;
+ 
+setSelectOptions("branch",rows.map(r=>r.branch),"كل الفروع");
 
-  sectionEl.innerHTML=`
-    <option value="">كل الأقسام</option>
-    <option value="Men">رجال</option>
-    <option value="Women">نساء</option>
-    <option value="WomenKids">نساء + أطفال</option>
-    <option value="Kids">أطفال</option>
-  `;
 
-  if(["","Men","Women","WomenKids","Kids"].includes(keepSection)){
-    sectionEl.value=keepSection;
-  }
+setSelectOptions("section",rows.map(r=>r.section),"كل الأقسام",sectionLabel);
 
-  setSelectOptions("courseType",rows.map(r=>r.courseType),"كل أنواع الدورات");
-  setSelectOptions("program",rows.map(r=>r.program),"كل البرامج");
-  setSelectOptions("courseFilter",rows.map(r=>r.course),"كل الدورات / المستويات");
-  setSelectOptions("period",rows.map(r=>r.period),"كل الفترات");
-  setSelectOptions("room",rows.map(r=>r.room),"كل القاعات");
+if(rows.some(r=>r.section==="Women" || r.section==="Kids"))
+
+$("section").add(new Option("السيدات والأطفال","WomenKids"));
+
+if(currentSection==="WomenKids") $("section").value="WomenKids";
+
+
+setSelectOptions("courseType",rows.map(r=>r.courseType),"كل أنواع الدورات");
+
+
+setSelectOptions("program",rows.map(r=>r.program),"كل البرامج");
+
+
+setSelectOptions("courseFilter",rows.map(r=>r.course),"كل الدورات / المستويات");
+
+
+setSelectOptions("period",rows.map(r=>r.period),"كل الفترات");
+
+
+setSelectOptions("room",rows.map(r=>r.room),"كل القاعات");
+
 }
 
 function fillTargetCourses(){
@@ -1133,19 +1153,22 @@ branch=$("branch").value;
 
 section=$("section").value;
 
-  const list=courses.filter(c=>{
-    const br=text(c.Branch||c.branch);
-    const sec=text(c.Section||c.section);
+  const
 
-    const sectionMatch =
-      !section ||
-      (section==="WomenKids"
-        ? (sec==="Women" || sec==="Kids")
-        : sec===section
-      );
+list=courses.filter(c=>{
 
-    return (!branch || br===branch) && sectionMatch;
-  });
+    const
+br=text(c.Branch||c.branch);
+
+    const
+
+sec=text(c.Section||c.section);
+
+    return (!branch ||
+
+br===branch) && sectionMatches(sec,section);
+
+  });
 
   list.forEach(c=>{
 
@@ -1282,17 +1305,7 @@ rows.filter(r=>{
 
 r.branch!==branch) return false;
 
-    if(section){
-      if(section==="WomenKids"){
-        if(r.section!=="Women" && r.section!=="Kids"){
-          return false;
-        }
-      }else{
-        if(r.section!==section){
-          return false;
-        }
-      }
-    }
+    if(!sectionMatches(r.section,section)) return false;
 
     if(courseType
 &&
@@ -3833,4 +3846,5 @@ load();
 </script>
 
 </body>
+
 </html>
