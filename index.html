@@ -237,9 +237,6 @@ tr:hover td{background:#fbfdff}
 .pill-fail{background:#fdeaea;color:#c93636}
 
 .pill-not{background:#fff4d8;color:#9a6900}
-.duplicate-alert{display:none;margin:0 0 16px;padding:12px 16px;border:1px solid #f3b13f;border-radius:14px;background:#fff8e7;color:#8a5800;font-weight:900;box-shadow:0 5px 16px rgba(138,88,0,.08)}
-.duplicate-row{background:#fffaf0!important}
-.duplicate-tag{display:inline-block;margin-top:4px;padding:3px 8px;border-radius:999px;background:#fff0cf;color:#a45e00;border:1px solid #f3c66c;font-size:10px;font-weight:900}
 
 .money{font-weight:800;white-space:nowrap}
 
@@ -485,8 +482,6 @@ id="clearFilters" class="gray">مسح
 الفلاتر</button>
 
 </section>
-
-<div id="duplicateAlert" class="duplicate-alert" role="alert" aria-live="polite"></div>
 
 <section class="actions">
 
@@ -826,27 +821,8 @@ d.toISOString().slice(0,10) : "";
 }
 
 function sectionLabel(v){
-
-  return ({Men:"رجال",Women:"نساء",Kids:"أطفال"})[text(v)] ||
-
-text(v) || "—";
-
-}
-function isWomenSection(v){
-  return ["women","woman","female","ladies","نساء","سيدات","قسم النساء","قسم السيدات"].includes(text(v).toLowerCase());
-}
-function isKidsSection(v){
-  return ["kids","children","child","أطفال","اطفال","قسم الأطفال","قسم الاطفال"].includes(text(v).toLowerCase());
-}
-function sectionMatches(actual,selectedSection){
-  if(!selectedSection) return true;
-  if(selectedSection==="__women_kids__") return isWomenSection(actual)||isKidsSection(actual);
-  return text(actual)===text(selectedSection);
-}
-function previousCourseValue(x,from){
-  const direct=val(x,"previousCourse","PreviousCourse","previousCourseName","PreviousCourseName","previousLevel","PreviousLevel","fromLevel");
-  if(direct && typeof direct==="object") return text(direct.name||direct.TrainingCourse||direct.courseName);
-  return text(direct || from.TrainingCourse || from.name || from.courseName);
+  return ({Men:"رجال",Women:"نساء",Kids:"أطفال",WomenKids:"نساء + أطفال"})[text(v)] ||
+  text(v) || "—";
 }
 
 function statusLabel(v){
@@ -984,7 +960,9 @@ trainer:text(val(x,"Trainer","trainer") || c.Trainer
 room:text(val(x,"Room","room") || c.Room || c.room),
 
    
-previousCourse:previousCourseValue(x,from),
+previousCourse:text(val(x,"previousCourse")
+
+|| from.TrainingCourse || from.name),
 
 
 previousPeriod:text(val(x,"previousPeriod") || from.Period ||
@@ -1114,31 +1092,28 @@ el.value=keep;
 
 function fillFilterOptions(){
 
- 
-setSelectOptions("branch",rows.map(r=>r.branch),"كل الفروع");
+  setSelectOptions("branch",rows.map(r=>r.branch),"كل الفروع");
 
+  const sectionEl=$("section");
+  const keepSection=sectionEl.value;
 
-setSelectOptions("section",rows.map(r=>r.section),"كل الأقسام",sectionLabel);
-const sectionSelect=$("section");
-const keptSection=sectionSelect.value;
-sectionSelect.add(new Option("نساء + أطفال","__women_kids__"));
-if(keptSection==="__women_kids__") sectionSelect.value=keptSection;
+  sectionEl.innerHTML=`
+    <option value="">كل الأقسام</option>
+    <option value="Men">رجال</option>
+    <option value="Women">نساء</option>
+    <option value="WomenKids">نساء + أطفال</option>
+    <option value="Kids">أطفال</option>
+  `;
 
+  if(["","Men","Women","WomenKids","Kids"].includes(keepSection)){
+    sectionEl.value=keepSection;
+  }
 
-setSelectOptions("courseType",rows.map(r=>r.courseType),"كل أنواع الدورات");
-
-
-setSelectOptions("program",rows.map(r=>r.program),"كل البرامج");
-
-
-setSelectOptions("courseFilter",rows.map(r=>r.course),"كل الدورات / المستويات");
-
-
-setSelectOptions("period",rows.map(r=>r.period),"كل الفترات");
-
-
-setSelectOptions("room",rows.map(r=>r.room),"كل القاعات");
-
+  setSelectOptions("courseType",rows.map(r=>r.courseType),"كل أنواع الدورات");
+  setSelectOptions("program",rows.map(r=>r.program),"كل البرامج");
+  setSelectOptions("courseFilter",rows.map(r=>r.course),"كل الدورات / المستويات");
+  setSelectOptions("period",rows.map(r=>r.period),"كل الفترات");
+  setSelectOptions("room",rows.map(r=>r.room),"كل القاعات");
 }
 
 function fillTargetCourses(){
@@ -1158,22 +1133,19 @@ branch=$("branch").value;
 
 section=$("section").value;
 
-  const
+  const list=courses.filter(c=>{
+    const br=text(c.Branch||c.branch);
+    const sec=text(c.Section||c.section);
 
-list=courses.filter(c=>{
+    const sectionMatch =
+      !section ||
+      (section==="WomenKids"
+        ? (sec==="Women" || sec==="Kids")
+        : sec===section
+      );
 
-    const
-br=text(c.Branch||c.branch);
-
-    const
-
-sec=text(c.Section||c.section);
-
-    return (!branch ||
-
-br===branch) && sectionMatches(sec,section);
-
-  });
+    return (!branch || br===branch) && sectionMatch;
+  });
 
   list.forEach(c=>{
 
@@ -1310,7 +1282,17 @@ rows.filter(r=>{
 
 r.branch!==branch) return false;
 
-    if(!sectionMatches(r.section,section)) return false;
+    if(section){
+      if(section==="WomenKids"){
+        if(r.section!=="Women" && r.section!=="Kids"){
+          return false;
+        }
+      }else{
+        if(r.section!==section){
+          return false;
+        }
+      }
+    }
 
     if(courseType
 &&
@@ -1367,27 +1349,6 @@ return false;
 
 }
 
-function duplicateKey(r){
-  const iqama=text(r.iqama).replace(/\D/g,"");
-  if(iqama) return "iqama:"+iqama;
-  const phone=text(r.phone).replace(/\D/g,"");
-  if(phone) return "phone:"+phone;
-  const name=(text(r.nameAr)||text(r.nameEn)).toLowerCase().replace(/\s+/g," ");
-  return name ? "name:"+name : "";
-}
-function duplicateInfo(list){
-  const counts={};
-  list.forEach(r=>{const key=duplicateKey(r);if(key) counts[key]=(counts[key]||0)+1;});
-  const keys=new Set(Object.keys(counts).filter(key=>counts[key]>1));
-  return {keys,rows:list.filter(r=>keys.has(duplicateKey(r)))};
-}
-function showDuplicateAlert(info,active){
-  const el=$("duplicateAlert");
-  if(!active || !info.rows.length){el.style.display="none";el.textContent="";return;}
-  el.textContent=`⚠️ تنبيه تكرار: يوجد ${info.rows.length} سجل مكرر ضمن ${info.keys.size} حالة. تمت الإشارة إليها داخل الجدول.`;
-  el.style.display="block";
-}
-
 function render(){
 
   fillTargetCourses();
@@ -1396,9 +1357,6 @@ function render(){
 
   const
 active=hasActiveFilter();
-
-  const duplicates=duplicateInfo(list);
-  showDuplicateAlert(duplicates,active);
 
 
 $("heroCount").textContent=list.length;
@@ -1480,8 +1438,7 @@ if(r.status==="pass") statusClass="pill-pass";
 
 if(r.status==="fail") statusClass="pill-fail";
 
-    const isDuplicate=duplicates.keys.has(duplicateKey(r));
-    return `<tr class="${isDuplicate?'duplicate-row':''}">
+    return `<tr>
 
       <td><input
 
@@ -1504,8 +1461,6 @@ class="name-ar">${escapeHtml(r.nameAr||"—")}</div>
         <div
 
 class="name-en">${escapeHtml(r.nameEn||"—")}</div>
-
-        ${isDuplicate?'<div class="duplicate-tag">⚠️ سجل مكرر</div>':''}
 
       </td>
 
