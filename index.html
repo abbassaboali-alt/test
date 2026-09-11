@@ -351,6 +351,14 @@ input{grid-column:1/-1}
 
 }
 
+
+/* تحسين احترافي خفيف مع المحافظة على التصميم الأصلي */
+.panel{box-shadow:0 14px 35px rgba(22,68,120,.10)}
+.table-scroll{border-radius:0 0 16px 16px}
+thead th{position:sticky;top:0;z-index:2;box-shadow:0 1px 0 rgba(255,255,255,.18)}
+tbody tr{transition:background .18s ease,transform .18s ease}
+tbody tr:hover{background:#f1f6fc}
+.details-btn{white-space:nowrap}
 </style>
 
 </head>
@@ -820,20 +828,12 @@ d.toISOString().slice(0,10) : "";
 
 }
 
-function normalizeSectionValue(v){
-  const s=text(v).toLowerCase();
-
-  if(["women","woman","female","ladies","سيدات","نساء","السيدات"].includes(s)) return "Women";
-  if(["kids","kid","children","child","أطفال","اطفال"].includes(s)) return "Kids";
-  if(["men","man","male","رجال","الرجال"].includes(s)) return "Men";
-
-  return text(v);
-}
-
 function sectionLabel(v){
-  const s=normalizeSectionValue(v);
-  return ({Men:"رجال",Women:"السيدات",Kids:"أطفال",WomenKids:"السيدات والأطفال"})[s] ||
-         text(v) || "—";
+
+  return ({Men:"رجال",Women:"نساء",Kids:"أطفال"})[text(v)] ||
+
+text(v) || "—";
+
 }
 
 function statusLabel(v){
@@ -852,163 +852,100 @@ function statusLabel(v){
 
 }
 
-function normalize(doc,kind){
-
-  const x=doc.data()||{};
-
-  const c=x.course||{};
-
-  const
-from=x.fromCourse||{};
-
-  const
-
-gradeRaw=val(x,"grade","Grade","total","Total");
-
-  const
-
-storedStatus=text(val(x,"status","Status"));
-
-  let status=storedStatus;
-
-  if(!status){
-
-
-if(kind==="registration") status="new";
-
-    else
-
-if(gradeRaw==="" || gradeRaw===null || gradeRaw===undefined)
-
-status="not_recorded";
-
-    else
-
-status=num(gradeRaw)>=65 ? "pass" : "fail";
-
-  }
-
-  return {
-
-    id:doc.id,
-
-
-source:kind==="registration"?"FakeRegistrations":"FakePromotions",
-
-    kind,
-
-    raw:x,
-
-
-nameAr:text(val(x,"name_ar","nameAr","NameAr")),
-
-
-nameEn:text(val(x,"name","name_en","NameEn")),
-
-
-iqama:text(val(x,"iqama","Iqama","StudentID")),
-
-   
-phone:text(val(x,"phone","Phone")),
-
-
-birthdate:text(val(x,"Birthdate","birthdate","DateOfBirth")),
-
-
-age:text(val(x,"age","Age")),
-
-
-email:text(val(x,"email","Email")),
-
-
-nationality:text(val(x,"Nationality","nationality")),
-
-   
-healthStatus:text(val(x,"HealthStatus","healthStatus")),
-
-
-educationLevel:text(val(x,"EducationLevel","educationLevel")),
-
-
-heardAbout:text(val(x,"HeardAbout","heardAbout","HowDidYouHear")),
-
-
-branch:text(val(x,"Branch","branch") || c.Branch ||
-
-c.branch),
-
-   
-section:normalizeSectionValue(val(x,"Section","section") || c.Section || c.section),
-
-
-courseType:text(val(x,"CourseType","courseType","mode")
-
-|| c.CourseType || c.courseType),
-
-
-program:text(val(x,"Program","program") || c.Program
-
-|| c.program),
-
-
-course:text(val(x,"TrainingCourse","courseName") ||
-
-c.TrainingCourse || c.name),
-
-
-period:text(val(x,"Period","period") || c.Period ||
-
-c.period),
-
-
-trainer:text(val(x,"Trainer","trainer") || c.Trainer
-
-|| c.trainer),
-
-
-room:text(val(x,"Room","room") || c.Room || c.room),
-
-   
-previousCourse:text(val(x,"previousCourse")
-
-|| from.TrainingCourse || from.name),
-
-
-previousPeriod:text(val(x,"previousPeriod") || from.Period ||
-
-from.period),
-
-
-previousTrainer:text(from.Trainer || from.trainer),
-
-   
-previousRoom:text(from.Room ||
-
-from.room),
-
-
-fee:num(val(x,"CourseFee","courseFee")),
-
-
-paid:num(val(x,"PaidAmount","paidAmount")),
-
-
-remaining:num(val(x,"RemainingAmount","remainingAmount")),
-
-
-paymentType:text(val(x,"PaymentType","paymentType","PayMethod","payMethod")),
-
-    grade:gradeRaw,
-
-    status,
-
-
-created:val(x,"createdAt","date","Date","created_at")
-
-  };
-
+function canonicalBranch(v){
+  const raw=text(v), k=raw.toLowerCase().replace(/[\s_–—-]+/g,"");
+  const map={
+    "alhamdaniya":"Al-Hamdaniya","hamdaniya":"Al-Hamdaniya","الحمدانية":"Al-Hamdaniya",
+    "aljumum":"Al-Jumum","jumum":"Al-Jumum","الجموم":"Al-Jumum",
+    "asfan":"Asfan","عسفان":"Asfan",
+    "alzahra":"Al-Zahra","zahra":"Al-Zahra","الزهراء":"Al-Zahra","الزهرة":"Al-Zahra"
+  };
+  return map[k]||raw;
 }
 
+function canonicalSection(v){
+  const raw=text(v), k=raw.toLowerCase().replace(/\s+/g,"");
+  if(["men","male","رجال","الرجال"].includes(k)) return "Men";
+  if(["women","female","نساء","سيدات","السيدات"].includes(k)) return "Women";
+  if(["kids","children","أطفال","اطفال","الأطفال"].includes(k)) return "Kids";
+  return raw;
+}
+
+function canonicalCourseType(v){
+  const raw=text(v), k=raw.toLowerCase().replace(/[\sأإآ]/g,"");
+  if(["online","on-line","ونلاين","اونلاين"].includes(k)) return "اونلاين";
+  if(["حضوري","onsite","inperson"].includes(k)) return "حضوري";
+  return raw;
+}
+
+function normalizeStatus(v,kind,gradeRaw){
+  const k=text(v).toLowerCase().replace(/\s+/g,"_");
+  if(["pass","passed","ناجح"].includes(k)) return "pass";
+  if(["fail","failed","راسب"].includes(k)) return "fail";
+  if(["new","جديد"].includes(k)) return "new";
+  if(["not_recorded","notrecorded","لم_يتم_الرصد"].includes(k)) return "not_recorded";
+  if(kind==="registration") return "new";
+  return gradeRaw==="" || gradeRaw===null || gradeRaw===undefined
+    ? "not_recorded" : (num(gradeRaw)>=65 ? "pass" : "fail");
+}
+
+function nestedObject(v){ return v && typeof v==="object" ? v : {}; }
+function nestedText(v){ return typeof v==="string" ? text(v) : ""; }
+
+function normalize(doc,kind){
+  const x=doc.data()||{};
+  const c=nestedObject(x.course);
+  const from=nestedObject(x.fromCourse);
+  const previous=nestedObject(x.previousCourse);
+  const gradeRaw=val(x,"grade","Grade","finalGrade","FinalGrade","final","totalGrade","total","Total");
+  const fee=num(val(x,"CourseFee","courseFee","Fee","fees"));
+  const paid=num(val(x,"PaidAmount","paidAmount","Paid","paid"));
+  const explicitRemaining=val(x,"RemainingAmount","remainingAmount","Remaining","remaining");
+  const remaining=explicitRemaining==="" ? Math.max(0,fee-paid) : Math.max(0,num(explicitRemaining));
+
+  const course=text(val(x,"TrainingCourse","CourseName","courseName","currentCourse","currentLevel")
+    || nestedText(x.course) || val(c,"TrainingCourse","CourseName","courseName","name","level"));
+  const previousCourse=text(
+    (typeof x.previousCourse==="string" ? x.previousCourse : "")
+    || val(previous,"TrainingCourse","CourseName","courseName","name","level")
+    || val(from,"TrainingCourse","CourseName","courseName","name","level")
+    || val(x,"fromLevel","previousLevel","PreviousCourse")
+  );
+
+  return {
+    id:doc.id,
+    source:kind==="registration"?"FakeRegistrations":"FakePromotions",
+    kind, raw:x,
+    nameAr:text(val(x,"name_ar","nameAr","NameAr","arabicName","studentNameAr")),
+    nameEn:text(val(x,"name_en","nameEn","NameEn","name","studentName","StudentName")),
+    iqama:text(val(x,"iqama","Iqama","StudentID","studentId","ID","idNumber")),
+    phone:text(val(x,"phone","Phone","mobile","Mobile","phoneNumber")),
+    birthdate:text(val(x,"Birthdate","birthdate","DateOfBirth","dateOfBirth","dob")),
+    age:text(val(x,"age","Age")),
+    email:text(val(x,"email","Email")),
+    nationality:text(val(x,"Nationality","nationality")),
+    healthStatus:text(val(x,"HealthStatus","healthStatus","health")),
+    educationLevel:text(val(x,"EducationLevel","educationLevel","qualification")),
+    heardAbout:text(val(x,"HeardAbout","heardAbout","HowDidYouHear","howDidYouHear","source")),
+    branch:canonicalBranch(val(x,"Branch","branch") || val(c,"Branch","branch")),
+    section:canonicalSection(val(x,"Section","section") || val(c,"Section","section")),
+    courseType:canonicalCourseType(val(x,"CourseType","courseType","mode","Mode") || val(c,"CourseType","courseType","mode")),
+    program:text(val(x,"Program","program") || val(c,"Program","program")),
+    course,
+    period:text(val(x,"Period","period","PeriodName","periodName") || val(c,"Period","period","PeriodName","periodName")),
+    trainer:text(val(x,"Trainer","trainer","TrainerName","trainerName") || val(c,"Trainer","trainer","TrainerName","trainerName")),
+    room:text(val(x,"Room","room","Classroom","classroom") || val(c,"Room","room","Classroom","classroom")),
+    previousCourse,
+    previousPeriod:text(val(x,"previousPeriod","PreviousPeriod") || val(previous,"Period","period") || val(from,"Period","period")),
+    previousTrainer:text(val(x,"previousTrainer","PreviousTrainer") || val(previous,"Trainer","trainer") || val(from,"Trainer","trainer")),
+    previousRoom:text(val(x,"previousRoom","PreviousRoom") || val(previous,"Room","room") || val(from,"Room","room")),
+    fee, paid, remaining,
+    paymentType:text(val(x,"PaymentType","paymentType","PaymentMethod","paymentMethod","PayMethod","payMethod")),
+    grade:gradeRaw,
+    status:normalizeStatus(val(x,"status","Status"),kind,gradeRaw),
+    created:val(x,"createdAt","date","Date","created_at","addedAt","registrationDate")
+  };
+}
 async function load(){
 
 
@@ -1067,9 +1004,7 @@ rows.sort((a,b)=>(dateObj(b.created)?.getTime()||0)-(dateObj(a.created)?.getTime
 $("status").textContent="تعذر تحميل البيانات";
 
 
-$("tbody").innerHTML='<tr><td
-colspan="23" class="muted">حدث
-خطأ أثناء الاتصال بقاعدة البيانات.</td></tr>';
+$("tbody").innerHTML='<tr><td colspan="23" class="muted">حدث خطأ أثناء الاتصال بقاعدة البيانات.</td></tr>';
 
   }
 
@@ -1105,28 +1040,7 @@ function fillFilterOptions(){
 setSelectOptions("branch",rows.map(r=>r.branch),"كل الفروع");
 
 
-{
-  const el=$("section");
-  const keep=el.value;
-  const available=[...new Set(rows.map(r=>normalizeSectionValue(r.section)).filter(Boolean))];
-
-  el.innerHTML='<option value="">كل الأقسام</option>';
-
-  if(available.includes("Men")) el.add(new Option("رجال","Men"));
-  if(available.includes("Women")) el.add(new Option("السيدات","Women"));
-  if(available.includes("Kids")) el.add(new Option("أطفال","Kids"));
-
-  if(available.includes("Women") || available.includes("Kids")){
-    el.add(new Option("السيدات والأطفال","WomenKids"));
-  }
-
-  available
-    .filter(v=>!["Men","Women","Kids"].includes(v))
-    .sort((a,b)=>a.localeCompare(b,"ar"))
-    .forEach(v=>el.add(new Option(sectionLabel(v),v)));
-
-  if([...el.options].some(o=>o.value===keep)) el.value=keep;
-}
+setSelectOptions("section",rows.map(r=>r.section),"كل الأقسام",sectionLabel);
 
 
 setSelectOptions("courseType",rows.map(r=>r.courseType),"كل أنواع الدورات");
@@ -1151,8 +1065,7 @@ function fillTargetCourses(){
 
 el=$("targetCourse"),keep=el.value;
 
-  el.innerHTML='<option
-value="">اختر الدورة للترحيل</option>';
+  el.innerHTML='<option value="">اختر الدورة للترحيل</option>';
 
   const
 
@@ -1169,14 +1082,13 @@ list=courses.filter(c=>{
     const
 br=text(c.Branch||c.branch);
 
-    const sec=normalizeSectionValue(c.Section||c.section);
+    const
 
-    const sectionMatch =
-      !section ||
-      (section==="WomenKids" && (sec==="Women" || sec==="Kids")) ||
-      sec===section;
+sec=text(c.Section||c.section);
 
-    return (!branch || br===branch) && sectionMatch;
+    return (!branch ||
+
+br===branch) && (!section || sec===section);
 
   });
 
@@ -1200,8 +1112,7 @@ per=text(c.Period||c.period)||"—";
 
     const
 
-trainer=text(c.Trainer||c.trainer)||"بدون
-مدرب";
+trainer=text(c.Trainer||c.trainer)||"بدون مدرب";
 
     el.add(new
 
@@ -1315,13 +1226,9 @@ rows.filter(r=>{
 
 r.branch!==branch) return false;
 
-    if(section){
-      const rowSection=normalizeSectionValue(r.section);
-      const okSection =
-        (section==="WomenKids" && (rowSection==="Women" || rowSection==="Kids")) ||
-        rowSection===section;
-      if(!okSection) return false;
-    }
+    if(section &&
+
+r.section!==section) return false;
 
     if(courseType
 &&
@@ -1362,10 +1269,9 @@ dateKey(r.created)!==addedDate) return false;
       const hay=[
 
 
-r.nameAr,r.nameEn,r.iqama,r.phone,r.email,r.branch,r.section,sectionLabel(r.section),r.course
+r.nameAr,r.nameEn,r.iqama,r.phone,r.email,r.branch,r.section,r.course
 
-      ].join("
-").toLowerCase();
+      ].join(" ").toLowerCase();
 
       if(!hay.includes(q))
 return false;
@@ -1400,8 +1306,7 @@ $("newCount").textContent=list.filter(r=>r.kind==="registration").length;
 $("promotionCount").textContent=list.filter(r=>r.kind==="promotion").length;
 
 
-$("remaining").textContent=list.reduce((s,r)=>s+r.remaining,0).toLocaleString()+"
-ر.س";
+$("remaining").textContent=list.reduce((s,r)=>s+r.remaining,0).toLocaleString()+" ر.س";
 
   if(!active){
 
@@ -1409,9 +1314,7 @@ $("remaining").textContent=list.reduce((s,r)=>s+r.remaining,0).toLocaleString()+
 $("status").textContent="اختر فلترًا لعرض البيانات";
 
 
-$("tbody").innerHTML='<tr><td
-colspan="23" class="muted">لا
-يتم عرض البيانات تلقائيًا. اختر فلترًا أو استخدم البحث.</td></tr>';
+$("tbody").innerHTML='<tr><td colspan="23" class="muted">لا يتم عرض البيانات تلقائيًا. اختر فلترًا أو استخدم البحث.</td></tr>';
 
     updateSelected();
 
@@ -1425,9 +1328,7 @@ $("status").textContent=`${list.length} نتيجة`;
   if(!list.length){
 
 
-$("tbody").innerHTML='<tr><td
-colspan="23" class="muted">لا
-توجد بيانات مطابقة للفلاتر.</td></tr>';
+$("tbody").innerHTML='<tr><td colspan="23" class="muted">لا توجد بيانات مطابقة للفلاتر.</td></tr>';
 
     updateSelected();
 
@@ -1445,12 +1346,9 @@ key=r.source+"/"+r.id;
 
 typePill=r.kind==="promotion"
 
-      ? '<span
-class="pill pill-promotion">مسجل
-مسبقًا</span>'
+      ? '<span class="pill pill-promotion">مسجل مسبقًا</span>'
 
-      : '<span
-class="pill pill-new">تسجيل جديد</span>';
+      : '<span class="pill pill-new">تسجيل جديد</span>';
 
     let
 
@@ -1712,34 +1610,28 @@ ${r.iqama||"بدون هوية"}`;
 $("saveDetails").textContent=draft ? "حفظ السجل الجديد" : "حفظ التعديلات";
 
   if(draft)
-$("detailsTitle").textContent="إضافة
-سجل جديد";
+$("detailsTitle").textContent="إضافة سجل جديد";
 
  
 $("detailsGrid").innerHTML=
 
 
-detailInput("dNameAr","الاسم
-بالعربي",r.nameAr)+
+detailInput("dNameAr","الاسم بالعربي",r.nameAr)+
 
 
-detailInput("dNameEn","الاسم
-بالإنجليزية",r.nameEn)+
+detailInput("dNameEn","الاسم بالإنجليزية",r.nameEn)+
 
 
-detailInput("dIqama","رقم
-الهوية / الإقامة",r.iqama)+
+detailInput("dIqama","رقم الهوية / الإقامة",r.iqama)+
 
 
 detailInput("dPhone","الجوال",r.phone)+
 
 
-detailInput("dEmail","البريد
-الإلكتروني",r.email,"email")+
+detailInput("dEmail","البريد الإلكتروني",r.email,"email")+
 
 
-detailInput("dBirthdate","تاريخ
-الميلاد",r.birthdate,"date")+
+detailInput("dBirthdate","تاريخ الميلاد",r.birthdate,"date")+
 
 
 detailInput("dAge","العمر",r.age,"number",'min="0"')+
@@ -1748,24 +1640,19 @@ detailInput("dAge","العمر",r.age,"number",'min="0"')+
 detailInput("dNationality","الجنسية",r.nationality)+
 
 
-detailInput("dHealth","الحالة
-الصحية",r.healthStatus)+
+detailInput("dHealth","الحالة الصحية",r.healthStatus)+
 
 
-detailInput("dEducation","المؤهل
-العلمي",r.educationLevel)+
+detailInput("dEducation","المؤهل العلمي",r.educationLevel)+
 
 
-detailInput("dHeard","مصدر
-المعرفة",r.heardAbout)+
+detailInput("dHeard","مصدر المعرفة",r.heardAbout)+
 
 
-detailSelect("dCourseType","نوع
-الدورة",r.courseType,[
+detailSelect("dCourseType","نوع الدورة",r.courseType,[
 
 
-{value:"",label:"— غير
-محدد —"},
+{value:"",label:"— غير محدد —"},
 
       "حضوري","اونلاين"
 
@@ -1778,8 +1665,7 @@ detailInput("dBranch","الفرع",r.branch)+
 detailSelect("dSection","القسم",r.section,[
 
 
-{value:"",label:"— غير
-محدد —"},
+{value:"",label:"— غير محدد —"},
 
 
 {value:"Men",label:"رجال"},
@@ -1796,8 +1682,7 @@ detailSelect("dSection","القسم",r.section,[
 detailInput("dProgram","البرنامج",r.program)+
 
 
-detailInput("dCourse","المستوى
-/ الدورة",r.course)+
+detailInput("dCourse","المستوى / الدورة",r.course)+
 
 
 detailInput("dPeriod","الفترة",r.period)+
@@ -1809,28 +1694,22 @@ detailInput("dTrainer","المدرب",r.trainer)+
 detailInput("dRoom","القاعة",r.room)+
 
 
-detailInput("dPreviousCourse","الدورة
-السابقة",r.previousCourse)+
+detailInput("dPreviousCourse","الدورة السابقة",r.previousCourse)+
 
 
-detailInput("dPreviousPeriod","الفترة
-السابقة",r.previousPeriod)+
+detailInput("dPreviousPeriod","الفترة السابقة",r.previousPeriod)+
 
 
-detailInput("dFee","الرسوم",r.fee,"number",'min="0"
-step="1"')+
+detailInput("dFee","الرسوم",r.fee,"number",'min="0" step="1"')+
 
 
-detailInput("dPaid","المدفوع",r.paid,"number",'min="0"
-step="1"')+
+detailInput("dPaid","المدفوع",r.paid,"number",'min="0" step="1"')+
 
 
-detailInput("dRemaining","المتبقي",r.remaining,"number",'min="0"
-step="1" readonly')+
+detailInput("dRemaining","المتبقي",r.remaining,"number",'min="0" step="1" readonly')+
 
 
-detailSelect("dPaymentType","طريقة
-الدفع (Payment Method)",r.paymentType,[
+detailSelect("dPaymentType","طريقة الدفع (Payment Method)",r.paymentType,[
 
 
 {value:"",label:"—"},
@@ -2029,16 +1908,13 @@ status=text($("dStatus").value);
   if(isNew){
 
     if(!nameAr &&
-!nameEn){ $("dNameAr").focus(); return alert("أدخل
-اسم الطالب."); }
+!nameEn){ $("dNameAr").focus(); return alert("أدخل اسم الطالب."); }
 
     if(!iqama){
-$("dIqama").focus(); return alert("أدخل
-رقم الهوية / الإقامة."); }
+$("dIqama").focus(); return alert("أدخل رقم الهوية / الإقامة."); }
 
     if(!phone){
-$("dPhone").focus(); return alert("أدخل
-رقم الجوال."); }
+$("dPhone").focus(); return alert("أدخل رقم الجوال."); }
 
   }
 
@@ -2210,9 +2086,7 @@ updateData.createdAt=firebase.firestore.Timestamp.now();
 $("saveDetails").disabled=true;
 
 
-$("saveDetails").innerHTML='<i class="fa-solid
-fa-spinner fa-spin"></i> جاري
-الحفظ...';
+$("saveDetails").innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> جاري الحفظ...';
 
     await
 
@@ -2229,8 +2103,7 @@ db.collection(r.source).doc(r.id).set(updateData,{merge:true});
 
     console.error(e);
 
-    alert("تعذر حفظ التعديلات. راجع صلاحيات
-Firestore.");
+    alert("تعذر حفظ التعديلات. راجع صلاحيات Firestore.");
 
   }finally{
 
@@ -2238,8 +2111,7 @@ Firestore.");
 $("saveDetails").disabled=false;
 
 
-$("saveDetails").innerHTML='<i class="fa-solid
-fa-floppy-disk"></i> حفظ التعديلات';
+$("saveDetails").innerHTML='<i class="fa-solid fa-floppy-disk"></i> حفظ التعديلات';
 
   }
 
@@ -2337,8 +2209,7 @@ undoActions[key];
 
     console.error(e);
 
-    alert("تعذر تنفيذ التراجع. راجع صلاحيات
-Firestore.");
+    alert("تعذر تنفيذ التراجع. راجع صلاحيات Firestore.");
 
   }
 
@@ -2442,8 +2313,7 @@ ${r.nameAr||r.nameEn||r.iqama||"سجل"}`,{
 
     console.error(e);
 
-    alert("تعذر حذف السجلات. راجع صلاحيات
-Firestore.");
+    alert("تعذر حذف السجلات. راجع صلاحيات Firestore.");
 
   }
 
@@ -2584,35 +2454,7 @@ HeardAbout:r.heardAbout,
 heardAbout:r.heardAbout,
 
 
-
-          // الدورة السابقة: الدورة التي كان الطالب مسجلاً فيها قبل الترحيل
-          previousCourse:r.course || "",
-          previousPeriod:r.period || "",
-          previousTrainer:r.trainer || "",
-          previousRoom:r.room || "",
-
-          fromCourse:{
-            id:r.raw.courseId || r.raw.course?.id || "",
-            courseId:r.raw.courseId || r.raw.course?.courseId || r.raw.course?.id || "",
-            name:r.course || "",
-            TrainingCourse:r.course || "",
-            period:r.period || "",
-            Period:r.period || "",
-            trainer:r.trainer || "",
-            Trainer:r.trainer || "",
-            room:r.room || "",
-            Room:r.room || "",
-            branch:r.branch || "",
-            Branch:r.branch || "",
-            section:r.section || "",
-            Section:r.section || "",
-            courseType:r.courseType || "",
-            CourseType:r.courseType || "",
-            program:r.program || "",
-            Program:r.program || ""
-          },
-
-          courseId:course.id,
+courseId:course.id,
 
 
 TrainingCourse:targetName,
@@ -2650,30 +2492,7 @@ PaidAmount:r.paid,
          
 RemainingAmount:r.remaining,
 
-          
-          // الدورة الهدف المختارة في الترحيل
-          targetCourse:{
-            id:course.id,
-            courseId:course.id,
-            name:targetName,
-            TrainingCourse:targetName,
-            period:targetPeriod,
-            Period:targetPeriod,
-            trainer:targetTrainer,
-            Trainer:targetTrainer,
-            room:targetRoom,
-            Room:targetRoom,
-            branch:targetBranch,
-            Branch:targetBranch,
-            section:targetSection,
-            Section:targetSection,
-            courseType:targetType,
-            CourseType:targetType,
-            program:targetProgram,
-            Program:targetProgram
-          },
-
-          course:{
+          course:{
 
             ...oldCourse,
 
@@ -2796,8 +2615,7 @@ ${item.raw.name_ar||item.raw.name||item.raw.iqama||"طالب"}`,
 
     console.error(e);
 
-    alert("تعذر إكمال الترحيل. راجع صلاحيات
-Firestore.");
+    alert("تعذر إكمال الترحيل. راجع صلاحيات Firestore.");
 
   }
 
@@ -2905,17 +2723,13 @@ rowsHtml=a.map((r,i)=>{
 
 r.remaining<=0
 
-      ? '<span
-class="pay-status full">مكتمل</span>'
+      ? '<span class="pay-status full">مكتمل</span>'
 
       : r.paid>0
 
-        ? '<span class="pay-status
-partial">جزئي</span>'
+        ? '<span class="pay-status partial">جزئي</span>'
 
-        : '<span
-class="pay-status unpaid">غير
-مدفوع</span>';
+        : '<span class="pay-status unpaid">غير مدفوع</span>';
 
     return `
 
@@ -3419,8 +3233,7 @@ $("paymentStatement").onclick=()=>{
   const a=selectedRows();
 
   if(!a.length) return
-alert("حدد سجلًا واحدًا أو أكثر لإصدار بيان
-الدفعات.");
+alert("حدد سجلًا واحدًا أو أكثر لإصدار بيان الدفعات.");
 
   openPaymentPdf(a);
 
@@ -3523,8 +3336,7 @@ dir="ltr">${escapeHtml(r.phone||"—")}</td>
 w=window.open("","_blank","width=1400,height=900");
 
   if(!w) return
-alert("اسمح للمتصفح بفتح النافذة لإصدار
-التقرير.");
+alert("اسمح للمتصفح بفتح النافذة لإصدار التقرير.");
 
 
 w.document.write(`<!DOCTYPE html>
@@ -3795,13 +3607,7 @@ alert("لا توجد بيانات لتصديرها.");
 
   const fields=[
 
-    ["الاسم العربي","الاسم
-الإنجليزي","الهوية","الجوال","تاريخ
-الميلاد","العمر","البريد","الجنسية","الحالة
-الصحية","المؤهل","مصدر المعرفة","الفرع","القسم","نوع
-الدورة","البرنامج","المستوى","الفترة","المدرب","القاعة","الدورة
-السابقة","الرسوم","المدفوع","المتبقي","الحالة","نوع
-السجل","التاريخ"],
+    ["الاسم العربي","الاسم الإنجليزي","الهوية","الجوال","تاريخ الميلاد","العمر","البريد","الجنسية","الحالة الصحية","المؤهل","مصدر المعرفة","الفرع","القسم","نوع الدورة","البرنامج","المستوى","الفترة","المدرب","القاعة","الدورة السابقة","الرسوم","المدفوع","المتبقي","الحالة","نوع السجل","التاريخ"],
 
     ...a.map(r=>[
 
@@ -3818,8 +3624,7 @@ r.courseType,r.program,r.course,r.period,r.trainer,r.room,r.previousCourse,
 r.fee,r.paid,r.remaining,statusLabel(r.status),
 
 
-r.kind==="promotion"?"مسجل
-مسبقًا":"تسجيل جديد",dateText(r.created)
+r.kind==="promotion"?"مسجل مسبقًا":"تسجيل جديد",dateText(r.created)
 
     ])
 
