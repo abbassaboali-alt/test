@@ -217,6 +217,9 @@ html,body{
   background:linear-gradient(135deg,#0f766e,#14b8a6);
 }
 
+#newStudentsBtnSide{
+  background:linear-gradient(135deg,#2563eb,#3b82f6);
+}
 #backupBtnSide{
   background:linear-gradient(135deg,#7c3aed,#9333ea);
 }
@@ -227,6 +230,7 @@ html,body{
 
 @media(max-width:980px){
   #supervisoryBtnMobile{background:linear-gradient(135deg,#0f766e,#14b8a6);}
+  #newStudentsBtnMobile{background:linear-gradient(135deg,#2563eb,#3b82f6);}
   #backupBtnMobile{background:linear-gradient(135deg,#7c3aed,#9333ea);}
   #credentialsBtnMobile{background:linear-gradient(135deg,#334155,#64748b);}
 }
@@ -1182,6 +1186,11 @@ html,body{
     </button>
 
     <div class="sidebar-bottom">
+      <button id="newStudentsBtnSide" class="side-btn" onclick="load('newstudents')">
+        <i class="fa-solid fa-user-plus"></i>
+        <span id="newStudentsSideText">المستجدين</span>
+      </button>
+
       <button id="supervisoryBtnSide" class="side-btn" onclick="openPage('https://www.prudle-education.com/gm-dashboard')">
         <i class="fa-solid fa-user-tie"></i>
         <span id="supervisorySideText">الجهة الإشرافية</span>
@@ -1240,6 +1249,10 @@ html,body{
 
   <button id="adminBtnMobile" onclick="load('admin')">
     الإدارة
+  </button>
+
+  <button id="newStudentsBtnMobile" onclick="load('newstudents')">
+    <span id="newStudentsMobileText">المستجدين</span>
   </button>
 
   <button id="supervisoryBtnMobile" onclick="openPage('https://www.prudle-education.com/gm-dashboard')">
@@ -1433,6 +1446,7 @@ const UI_TEXT = {
     booking:"قسم الحجوزات",
     admin:"قسم الإدارة",
     tasks:"إسناد المهام",
+    newstudents:"المستجدين",
     supervisory:"الجهة الإشرافية",
     backup:"النسخ الاحتياطي",
     credentials:"اسم المستخدم وكلمة المرور",
@@ -1447,6 +1461,7 @@ const UI_TEXT = {
     bookingMobile:"الحجوزات",
     adminMobile:"الإدارة",
     tasksMobile:"المهام",
+    newstudentsMobile:"المستجدين",
     supervisoryMobile:"الجهة الإشرافية",
     backupMobile:"النسخ الاحتياطي",
     credentialsMobile:"اسم المستخدم وكلمة المرور",
@@ -1467,7 +1482,8 @@ const UI_TEXT = {
       online:"قسم الأونلاين",
       booking:"قسم الحجوزات",
       admin:"قسم الإدارة",
-      tasks:"إسناد المهام"
+      tasks:"إسناد المهام",
+      newstudents:"المستجدين"
     }
   },
 
@@ -1491,6 +1507,7 @@ const UI_TEXT = {
     booking:"Bookings",
     admin:"Administration",
     tasks:"Task Assignment",
+    newstudents:"New Students",
     supervisory:"Supervisory Authority",
     backup:"Backup",
     credentials:"Username & Password",
@@ -1505,6 +1522,7 @@ const UI_TEXT = {
     bookingMobile:"Bookings",
     adminMobile:"Admin",
     tasksMobile:"Tasks",
+    newstudentsMobile:"New Students",
     supervisoryMobile:"Supervision",
     backupMobile:"Backup",
     credentialsMobile:"Username & Password",
@@ -1525,7 +1543,8 @@ const UI_TEXT = {
       online:"Online",
       booking:"Bookings",
       admin:"Administration",
-      tasks:"Task Assignment"
+      tasks:"Task Assignment",
+      newstudents:"New Students"
     }
   }
 };
@@ -1584,7 +1603,9 @@ const EN_ITEM_TEXT = {
 
   "الانضمام للاجتماع المباشر":"Join Live Meeting",
   "إسناد مهمة جديدة":"Assign New Task",
-  "استعراض المهام":"View Tasks"
+  "استعراض المهام":"View Tasks",
+  "إضافة مستجد":"Add New Student",
+  "تقارير المستجدين":"New Student Reports"
 };
 
 const EN_HEADING_TEXT = {
@@ -1598,7 +1619,8 @@ const EN_HEADING_TEXT = {
   "الحجوزات":"Bookings",
   "تفاصيل الترحيل":"Student Transfer",
   "الإدارة":"Administration",
-  "إسناد المهام":"Task Assignment"
+  "إسناد المهام":"Task Assignment",
+  "المستجدين":"New Students"
 };
 
 function setText(id,value){
@@ -1630,6 +1652,7 @@ function applyDashboardLanguage(){
   setText("bookingSideText",t.booking);
   setText("adminSideText",t.admin);
   setText("tasksSideText",t.tasks);
+  setText("newStudentsSideText",t.newstudents);
   setText("supervisorySideText",t.supervisory);
   setText("backupSideText",t.backup);
   setText("credentialsSideText",t.credentials);
@@ -1644,6 +1667,7 @@ function applyDashboardLanguage(){
   setText("bookingMobileText",t.bookingMobile);
   setText("adminMobileText",t.adminMobile);
   setText("tasksMobileText",t.tasksMobile);
+  setText("newStudentsMobileText",t.newstudentsMobile);
   setText("supervisoryMobileText",t.supervisoryMobile);
   setText("backupMobileText",t.backupMobile);
   setText("credentialsMobileText",t.credentialsMobile);
@@ -2103,6 +2127,31 @@ placement: {
     ]
   },
 
+  newstudents: {
+    title: "المستجدين",
+    sections: [
+      {
+        heading: "المستجدين",
+        items: [
+          [
+            "إضافة مستجد",
+            "fa-user-plus",
+            "https://www.prudle.edu.sa/registration4",
+            "green",
+            "إضافة وتسجيل طالب مستجد"
+          ],
+          [
+            "تقارير المستجدين",
+            "fa-chart-column",
+            "https://www.prudle-education.com/studentss-edit",
+            "blue",
+            "عرض ومتابعة تقارير وسجلات المستجدين"
+          ]
+        ]
+      }
+    ]
+  },
+
   booking: {
     title: "قسم الحجوزات",
     sections: [
@@ -2164,7 +2213,8 @@ const allSide = [
   "examsBtnSide",
   "certificatesBtnSide",
   "crmBtnSide",
-  "tasksBtnSide"
+  "tasksBtnSide",
+  "newStudentsBtnSide"
 ];
 
 const allMobile = [
@@ -2177,7 +2227,8 @@ const allMobile = [
   "examsBtnMobile",
   "certificatesBtnMobile",
   "crmBtnMobile",
-  "tasksBtnMobile"
+  "tasksBtnMobile",
+  "newStudentsBtnMobile"
 ];
 
   allSide.forEach(id=>{
@@ -2239,6 +2290,10 @@ if(type==="crm"){
 if(type==="tasks"){
   document.getElementById("tasksBtnSide")?.classList.add("active");
   document.getElementById("tasksBtnMobile")?.classList.add("active");
+}
+if(type==="newstudents"){
+  document.getElementById("newStudentsBtnSide")?.classList.add("active");
+  document.getElementById("newStudentsBtnMobile")?.classList.add("active");
 }
 }
 /* =========================================================
