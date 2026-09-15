@@ -1,867 +1,554 @@
+<script>
+function goLogin(){
+  localStorage.clear();
+  sessionStorage.clear();
+  location.replace("https://www.prudle-education.com/log-in-out");
+}
+
+function checkTrainerAccess(){
+  const user = localStorage.getItem("username");
+  const role = String(localStorage.getItem("role") || "").trim().toLowerCase();
+  const last = localStorage.getItem("loginDate");
+  const today = new Date().toDateString();
+
+  if(!user || role !== "trainer" || last !== today){
+    goLogin();
+    return false;
+  }
+  return true;
+}
+
+if(!checkTrainerAccess()){
+  throw new Error("Access Denied");
+}
+
+window.addEventListener("pageshow",()=>checkTrainerAccess());
+</script>
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>Prudle Trainer Panel</title>
+<title>Trainer Attendance</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- LOGIN PROTECTION REMOVED -->
-<!-- Font Awesome -->
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-<!-- Google Font -->
-<link
-  rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap">
+<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore-compat.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
+body{margin:0;font-family:Poppins,Arial,sans-serif;background:#f6f8fb}
+header{background:#fff;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.logo{width:45px;border-radius:50%}
+.card{background:#fff;padding:20px;border-radius:14px;width:92%;max-width:900px;margin:20px auto;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+select{padding:10px;border-radius:8px;font-size:15px;max-width:92%}
+button{padding:9px 16px;border:none;border-radius:6px;font-size:14px;cursor:pointer;margin:4px}
+.in{background:#2ecc71;color:#fff}
+.break{background:#ff9800;color:#fff}
+.out{background:#d33;color:#fff}
+.reset{background:#555;color:#fff}
+.logout{background:#164478;color:#fff;border-radius:30px;padding:8px 20px}
+.row{margin:6px 0;font-size:15px}
+.label{font-weight:700;color:#164478}
+.timer{font-size:22px;font-weight:700;margin:10px 0;color:#2ecc71}
+.timer.warn{color:#e67e22}
+.timer.danger{color:#d33}
+.break-info{margin:12px 0;padding:11px;border-radius:10px;background:#fff5df;color:#a45b00;font-weight:800}
 
-:root{
-  --blue:#164478;
-  --blue-light:#235d99;
-  --orange:#ff9800;
-  --orange-dark:#d35400;
-  --orange-soft:#fff4d6;
-  --green:#2ecc71;
-  --red:#e74c3c;
-  --background:#f3f6fa;
-  --card:#ffffff;
-  --text:#202020;
-  --muted:#7b8795;
-  --shadow:0 10px 28px rgba(22,68,120,.10);
-  --shadow-hover:0 18px 38px rgba(22,68,120,.18);
+/* CHECK POPUP */
+.check-overlay{
+  position:fixed;inset:0;z-index:99999;
+  display:none;align-items:center;justify-content:center;
+  padding:18px;background:rgba(5,20,38,.72);
+  backdrop-filter:blur(4px)
 }
-
-*{
-  box-sizing:border-box;
+.check-overlay.show{display:flex}
+.check-modal{
+  width:min(460px,96vw);background:#fff;border-radius:22px;
+  padding:25px;text-align:center;border-top:7px solid #164478;
+  box-shadow:0 24px 70px rgba(0,0,0,.30)
 }
-
-html{
-  scroll-behavior:smooth;
+.check-logo{width:72px;height:72px;object-fit:contain;border-radius:50%}
+.check-modal h2{margin:8px 0;color:#164478;font-size:31px}
+.check-modal p{color:#657384;font-size:14px;line-height:1.7}
+.popup-course{width:100%;margin:8px 0 12px}
+.popup-break{
+  margin:10px 0 15px;padding:13px;border-radius:12px;
+  background:#fff3d8;color:#9b5c00;font-weight:900
 }
-
-body{
-  margin:0;
-  min-height:100vh;
-  background:
-    radial-gradient(
-      circle at 10% 5%,
-      rgba(22,68,120,.06),
-      transparent 26%
-    ),
-    radial-gradient(
-      circle at 95% 95%,
-      rgba(255,152,0,.07),
-      transparent 28%
-    ),
-    var(--background);
-  font-family:"Poppins",sans-serif;
-  color:var(--text);
+.popup-check{
+  width:100%;padding:14px;font-size:17px;font-weight:900;
+  border-radius:12px;background:#2ecc71;color:#fff
 }
-
-/* =====================================
-   HEADER
-===================================== */
-
-.user-header{
-  position:relative;
-  min-height:90px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:20px 140px;
-  background:
-    linear-gradient(
-      135deg,
-      #123c6b,
-      #1f5c99
-    );
-  color:#fff;
-  box-shadow:
-    0 8px 25px rgba(22,68,120,.22);
+.popup-check:disabled{opacity:.45;cursor:not-allowed}
+.popup-close{
+  width:100%;margin-top:8px;padding:11px;border-radius:12px;
+  background:#eef2f6;color:#52606d;font-weight:800
 }
-
-.header-user{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:12px;
-  text-align:center;
-  font-size:22px;
-  font-weight:800;
+@media(max-width:600px){
+  header{padding:12px;gap:8px}
+  header h2{font-size:17px}
+  .card{width:90%;padding:16px}
 }
-
-.header-user-icon{
-  width:48px;
-  height:48px;
-  flex:0 0 48px;
-  display:grid;
-  place-items:center;
-  border-radius:15px;
-  background:rgba(255,255,255,.14);
-  border:1px solid rgba(255,255,255,.20);
-  font-size:22px;
-}
-
-.header-user span{
-  color:#ffd66b;
-}
-
-/* =====================================
-   LOGOUT
-===================================== */
-
-.logout-badge{
-  position:absolute;
-  left:22px;
-  top:50%;
-  transform:translateY(-50%);
-  min-height:42px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  padding:10px 17px;
-  border:none;
-  border-radius:12px;
-  background:var(--red);
-  color:#fff;
-  font-size:13px;
-  font-weight:800;
-  cursor:pointer;
-  box-shadow:
-    0 8px 18px rgba(231,76,60,.25);
-  transition:
-    transform .25s,
-    background .25s,
-    box-shadow .25s;
-}
-
-.logout-badge:hover{
-  background:#c0392b;
-  transform:
-    translateY(-50%)
-    translateY(-2px);
-  box-shadow:
-    0 12px 22px rgba(231,76,60,.32);
-}
-
-/* =====================================
-   PAGE HEADING
-===================================== */
-
-.dashboard-heading{
-  max-width:1100px;
-  margin:38px auto 30px;
-  padding:0 18px;
-  text-align:center;
-}
-
-.dashboard-heading h1{
-  margin:0;
-  color:var(--blue);
-  font-size:clamp(27px,4vw,36px);
-  font-weight:900;
-  letter-spacing:-.5px;
-}
-
-.dashboard-heading p{
-  max-width:740px;
-  margin:9px auto 0;
-  color:#718096;
-  font-size:14px;
-  font-weight:600;
-  line-height:1.7;
-}
-
-/* =====================================
-   MENU GRID
-===================================== */
-
-.menu-box{
-  width:min(1500px,94%);
-  display:grid;
-  grid-template-columns:
-    repeat(
-      auto-fit,
-      minmax(250px,1fr)
-    );
-  gap:28px;
-  margin:0 auto;
-  padding:0 10px 70px;
-}
-
-/* =====================================
-   GENERAL CARD
-===================================== */
-
-.item{
-  position:relative;
-  min-height:220px;
-  overflow:hidden;
-  isolation:isolate;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:15px;
-  padding:32px 22px;
-  border:2px solid transparent;
-  border-radius:24px;
-  background:var(--card);
-  box-shadow:var(--shadow);
-  cursor:pointer;
-  text-align:center;
-  transition:
-    transform .28s ease,
-    box-shadow .28s ease,
-    border-color .28s ease,
-    background .28s ease;
-}
-
-.item::before{
-  content:"";
-  position:absolute;
-  right:-50px;
-  bottom:-70px;
-  width:160px;
-  height:160px;
-  border-radius:50%;
-  background:rgba(22,68,120,.04);
-  z-index:-1;
-  transition:
-    transform .35s ease,
-    opacity .35s ease;
-}
-
-.item:hover{
-  transform:translateY(-8px);
-  box-shadow:var(--shadow-hover);
-  border-color:rgba(22,68,120,.12);
-}
-
-.item:hover::before{
-  transform:scale(1.35);
-  opacity:.95;
-}
-
-/* =====================================
-   CARD ICON
-===================================== */
-
-.item-icon{
-  width:94px;
-  height:94px;
-  flex:0 0 94px;
-  display:grid;
-  place-items:center;
-  border-radius:30px;
-  background:#edf4fa;
-  color:var(--blue);
-  font-size:41px;
-  transition:
-    transform .28s ease,
-    background .28s ease,
-    color .28s ease;
-}
-
-.item:hover .item-icon{
-  transform:scale(1.06) rotate(-3deg);
-  background:var(--blue);
-  color:#fff;
-}
-
-/* =====================================
-   CARD TEXT
-===================================== */
-
-.item h3{
-  margin:0;
-  color:var(--text);
-  font-size:20px;
-  font-weight:900;
-  line-height:1.4;
-  direction:ltr;
-}
-
-.item-description{
-  max-width:310px;
-  margin:0;
-  color:var(--muted);
-  font-size:13px;
-  font-weight:600;
-  line-height:1.7;
-}
-
-/* =====================================
-   ACTIVITY FEATURE CARDS
-===================================== */
-
-.item.activity-feature{
-  border-color:var(--orange);
-  background:
-    linear-gradient(
-      135deg,
-      #fff9e8,
-      var(--orange-soft)
-    );
-  box-shadow:
-    0 10px 28px rgba(255,152,0,.14);
-}
-
-.item.activity-feature::before{
-  background:rgba(255,152,0,.13);
-}
-
-.item.activity-feature .item-icon{
-  background:transparent;
-  color:var(--orange);
-}
-
-.item.activity-feature h3{
-  color:var(--orange-dark);
-}
-
-.item.activity-feature .item-description{
-  color:#a45c17;
-}
-
-.item.activity-feature:hover{
-  border-color:#f28c00;
-  background:
-    linear-gradient(
-      135deg,
-      #fff6d7,
-      #ffeab1
-    );
-  box-shadow:
-    0 18px 38px rgba(255,152,0,.25);
-}
-
-.item.activity-feature:hover .item-icon{
-  background:var(--orange);
-  color:#fff;
-}
-
-/* =====================================
-   GOOGLE MEET CARDS
-===================================== */
-
-.item.zoom{
-  border-color:#2ecc71;
-}
-
-.item.zoom .item-icon{
-  color:#2ecc71;
-  background:#ecfbf2;
-}
-
-.item.zoom:hover .item-icon{
-  background:#2ecc71;
-  color:#fff;
-}
-
-.item.meet{
-  border-color:#4285f4;
-}
-
-.item.meet .item-icon{
-  color:#4285f4;
-  background:#edf4ff;
-}
-
-.item.meet:hover .item-icon{
-  background:#4285f4;
-  color:#fff;
-}
-
-/* =====================================
-   MOBILE
-===================================== */
-
-@media(max-width:750px){
-
-  .user-header{
-    min-height:132px;
-    padding:
-      18px
-      16px
-      70px;
-  }
-
-  .header-user{
-    font-size:18px;
-  }
-
-  .header-user-icon{
-    width:42px;
-    height:42px;
-    flex-basis:42px;
-  }
-
-  .logout-badge{
-    left:50%;
-    top:auto;
-    bottom:14px;
-    transform:translateX(-50%);
-  }
-
-  .logout-badge:hover{
-    transform:
-      translateX(-50%)
-      translateY(-2px);
-  }
-
-  .dashboard-heading{
-    margin-top:28px;
-  }
-
-  .menu-box{
-    width:95%;
-    grid-template-columns:1fr;
-    gap:18px;
-  }
-
-  .item{
-    min-height:205px;
-    border-radius:22px;
-  }
-
-  .item-icon{
-    width:82px;
-    height:82px;
-    flex-basis:82px;
-    border-radius:26px;
-    font-size:36px;
-  }
-
-}
-
 </style>
 </head>
 
 <body>
 
-<!-- =====================================
-     HEADER
-===================================== -->
-
-<header class="user-header">
-
-  <div class="header-user">
-
-    <div class="header-user-icon">
-      <i class="fa-solid fa-chalkboard-user"></i>
-    </div>
-
-    <div>
-      Trainer:
-      <span id="username">Trainer</span>
-    </div>
-
-  </div>
-
-  <button
-    class="logout-badge"
-    type="button"
-    onclick="logout()">
-
-    <i class="fa-solid fa-right-from-bracket"></i>
-    Logout
-
-  </button>
-
+<header>
+  <h2>
+    <img class="logo" src="https://prudle.edu.sa/wp-content/uploads/2020/11/about.png">
+    Trainer Attendance
+  </h2>
+  <div id="userBox" style="font-weight:700;color:#164478"></div>
 </header>
 
-<!-- =====================================
-     DASHBOARD HEADING
-===================================== -->
+<div style="text-align:center;margin:20px">
+  <button class="logout" onclick="logout()">
+    <i class="fa-solid fa-right-from-bracket"></i> Logout
+  </button>
+</div>
 
-<section class="dashboard-heading">
+<div style="text-align:center">
+  <select id="courseSelect">
+    <option value="">Select Course</option>
+  </select>
+</div>
 
-  <h1>Prudle Trainer Dashboard</h1>
+<div id="attendanceArea"></div>
 
-  <p>
-    Access teaching tools, student evaluations, activities,
-    reports, homework services, and online classes.
-  </p>
+<!-- تظهر تلقائياً إذا لم يوجد startTS اليوم -->
+<div id="checkOverlay" class="check-overlay">
+  <div class="check-modal">
+    <img class="check-logo" src="https://prudle.edu.sa/wp-content/uploads/2020/11/about.png">
+    <h2>CHECK</h2>
+    <p id="popupTrainer"></p>
+    <p>لم يتم تسجيل Check-In اليوم. اختر الدورة ثم اضغط CHECK-IN.</p>
 
-</section>
+    <select id="popupCourseSelect" class="popup-course">
+      <option value="">Select Course</option>
+    </select>
 
-<!-- =====================================
-     MENU
-===================================== -->
-
-<main class="menu-box">
-
-  <!-- Attendance -->
-
-  <div
-    class="item"
-    onclick="openPage(
-      'https://www.prudle-education.com/attendance'
-    )">
-
-    <div class="item-icon">
-      <i class="fa-solid fa-user-check"></i>
+    <div id="popupBreakInfo" class="popup-break">
+      Break Time: --
     </div>
 
-    <h3>Attendance</h3>
+    <button id="popupCheckBtn" class="popup-check" onclick="popupCheckIn()" disabled>
+      <i class="fa-solid fa-circle-check"></i> CHECK-IN
+    </button>
 
-    <p class="item-description">
-      Record and review student attendance.
-    </p>
-
+    <button class="popup-close" onclick="closeCheckPopup()">
+      الدخول للشاشة بدون تسجيل
+    </button>
   </div>
-
-  <!-- Grades -->
-
-  <div
-    class="item"
-    onclick="openPage(
-      'https://www.prudle-education.com/grades'
-    )">
-
-    <div class="item-icon">
-      <i class="fa-solid fa-book-open"></i>
-    </div>
-
-    <h3>Grades</h3>
-
-    <p class="item-description">
-      Enter and manage student grades.
-    </p>
-
-  </div>
-
-  <!-- Evaluations -->
-
-  <div
-    class="item"
-    onclick="openPage(
-      'https://www.prudle-education.com/new-activities'
-    )">
-
-    <div class="item-icon">
-      <i class="fa-solid fa-star"></i>
-    </div>
-
-    <h3>Evaluations</h3>
-
-    <p class="item-description">
-      View and manage student evaluations.
-    </p>
-
-  </div>
-
-  <!-- Create New Activity -->
-
-  <div
-    class="item activity-feature"
-    onclick="openPage(
-      'https://www.prudle-education.com/new-activity-t'
-    )">
-
-    <div class="item-icon">
-      <i class="fa-solid fa-circle-plus"></i>
-    </div>
-
-    <h3>Create New Activity</h3>
-
-    <p class="item-description">
-      Create a new interactive learning activity.
-    </p>
-
-  </div>
-
-  <!-- Playing Activities -->
-
-  <div
-    class="item activity-feature"
-    onclick="openPage(
-      'https://www.prudle-education.com/quizz-t'
-    )">
-
-    <div class="item-icon">
-      <i class="fa-solid fa-trophy"></i>
-    </div>
-
-    <h3>Playing Activities</h3>
-
-    <p class="item-description">
-      Start and manage classroom competitions.
-    </p>
-
-  </div>
-
-  <!-- Comments Sheet -->
-
-  <div
-    class="item"
-    onclick="openPage(
-      'https://www.prudle-education.com/comments'
-    )">
-
-    <div class="item-icon">
-      <i class="fa-solid fa-chart-line"></i>
-    </div>
-
-    <h3>Comments Sheet</h3>
-
-    <p class="item-description">
-      Add academic notes and observations.
-    </p>
-
-  </div>
-
-  <!-- Conversation Course -->
-
-  <div
-    class="item"
-    onclick="openPage(
-      'https://www.prudle-education.com/conversation-evaluation'
-    )">
-
-    <div class="item-icon">
-      <i class="fa-solid fa-comments"></i>
-    </div>
-
-    <h3>Conversation Course</h3>
-
-    <p class="item-description">
-      Evaluate conversation course performance.
-    </p>
-
-  </div>
-
-  <!-- Recording Time -->
-
-  <div
-    class="item"
-    onclick="openPage(
-      'https://www.prudle-education.com/time-sheet'
-    )">
-
-    <div class="item-icon">
-      <i class="fa-solid fa-clock"></i>
-    </div>
-
-    <h3>Recording Time</h3>
-
-    <p class="item-description">
-      Record and review working hours.
-    </p>
-
-  </div>
-
-  <!-- Study Plan -->
-
-  <div
-    class="item"
-    onclick="openPage(
-      'https://www.prudle-education.com/course-plan'
-    )">
-
-    <div class="item-icon">
-      <i class="fa-solid fa-calendar-days"></i>
-    </div>
-
-    <h3>Study Plan</h3>
-
-    <p class="item-description">
-      View and update the course study plan.
-    </p>
-
-  </div>
-
-  <!-- Online Google Meet -->
-
-  <div
-    class="item zoom"
-    onclick="openPage(
-      'https://www.prudle-education.com/link-zoom'
-    )">
-
-    <div class="item-icon">
-      <i class="fa-solid fa-video"></i>
-    </div>
-
-    <h3>Online (Google Meet)</h3>
-
-    <p class="item-description">
-      Create or access online class meetings.
-    </p>
-
-  </div>
-
-  <!-- Google Meet Attendance -->
-
-  <div
-    class="item meet"
-    onclick="openPage(
-      'https://www.prudle-education.com/google-meet-attendance'
-    )">
-
-    <div class="item-icon">
-      <i class="fa-brands fa-google"></i>
-    </div>
-
-    <h3>Google Meet Attendance</h3>
-
-    <p class="item-description">
-      Review online class attendance.
-    </p>
-
-  </div>
-
-  <!-- Recording Lectures -->
-
-  <div
-    class="item"
-    onclick="openPage(
-      'https://www.prudle-education.com/recording-videos-t'
-    )">
-
-    <div class="item-icon">
-      <i class="fa-solid fa-circle-play"></i>
-    </div>
-
-    <h3>Recording Lectures</h3>
-
-    <p class="item-description">
-      Access recorded lectures and lessons.
-    </p>
-
-  </div>
-
-  <!-- Quizzes -->
-
-  <div
-    class="item"
-    onclick="openPage(
-      'https://www.prudle-education.com/quizz'
-    )">
-
-    <div class="item-icon">
-      <i class="fa-solid fa-pen-to-square"></i>
-    </div>
-
-    <h3>Quizzes</h3>
-
-    <p class="item-description">
-      Create and manage quizzes.
-    </p>
-
-  </div>
-
-  <!-- Quizzes Reports -->
-
-  <div
-    class="item"
-    onclick="openPage(
-      'https://www.prudle-education.com/homework-report-t'
-    )">
-
-    <div class="item-icon">
-      <i class="fa-solid fa-chart-column"></i>
-    </div>
-
-    <h3>Quizzes Reports</h3>
-
-    <p class="item-description">
-      Review quiz results and student progress.
-    </p>
-
-  </div>
-
-  <!-- Placement Test Reports -->
-
-  <div
-    class="item"
-    onclick="openPage(
-      'https://www.prudle-education.com/placement-test-trainer'
-    )">
-
-    <div class="item-icon">
-      <i class="fa-solid fa-chart-simple"></i>
-    </div>
-
-    <h3>Placement Test Reports</h3>
-
-    <p class="item-description">
-      Review student placement test results.
-    </p>
-
-  </div>
-
-  <!-- Prudle Bookstore -->
-
-  <div
-    class="item"
-    onclick="openPage(
-      'https://www.prudle-education.com/prudle-bookstore'
-    )">
-
-    <div class="item-icon">
-      <i class="fa-solid fa-book"></i>
-    </div>
-
-    <h3>Prudle Bookstore</h3>
-
-    <p class="item-description">
-      Access books and learning materials.
-    </p>
-
-  </div>
-
-</main>
+</div>
 
 <script>
+if(!firebase.apps.length){
+  firebase.initializeApp({
+    apiKey:"AIzaSyCCFBvZosI8dwShZjxvZzI-SU5igEbcOKk",
+    authDomain:"prudle-system.firebaseapp.com",
+    projectId:"prudle-system"
+  });
+}
+const db=firebase.firestore();
 
-/* =====================================
-   DISPLAY TRAINER NAME
-===================================== */
+const user=localStorage.getItem("username");
+const userBox=document.getElementById("userBox");
+const courseSelect=document.getElementById("courseSelect");
+const attendanceArea=document.getElementById("attendanceArea");
+const checkOverlay=document.getElementById("checkOverlay");
+const popupCourseSelect=document.getElementById("popupCourseSelect");
+const popupBreakInfo=document.getElementById("popupBreakInfo");
+const popupCheckBtn=document.getElementById("popupCheckBtn");
+const popupTrainer=document.getElementById("popupTrainer");
 
-document.getElementById("username").textContent =
-  localStorage.getItem("username") ||
-  "Trainer";
+userBox.innerText="Trainer: "+user;
+popupTrainer.innerText="Trainer: "+user;
 
-/* =====================================
-   OPEN PAGE
-===================================== */
+let dayDoc=null;
+let dayUnsub=null;
+let breakMinutes=10;
+let breakStartTime="";
+let breakNote="";
+let timerInt=null;
+let coursesMap=new Map();
+let openCourses=[];
+let selectedCourseId="";
 
-function openPage(url){
+function clean(v){return String(v??"").trim()}
+function todayISO(){return new Date().toISOString().split("T")[0]}
+function fmt(ts){
+  if(!ts)return "--";
+  return ts.toDate().toLocaleTimeString("en-GB");
+}
+function safeId(value){
+  try{return btoa(unescape(encodeURIComponent(value))).replace(/[+/=]/g,"_")}
+  catch(e){return String(value).replace(/[^a-z0-9_-]/gi,"_")}
+}
+function branch(c){return clean(c.branch||c.Branch)}
+function section(c){return clean(c.section||c.Section)}
+function courseName(c){return clean(c.TrainingCourse||c.Course||c.courseName||c.Program||"Course")}
+function period(c){return clean(c.Period||c.period)}
 
-  if(
-    !url ||
-    typeof url !== "string"
-  ){
+function showCheckPopup(){checkOverlay.classList.add("show")}
+function closeCheckPopup(){checkOverlay.classList.remove("show")}
+
+async function loadBreakSetting(courseId){
+  const c=coursesMap.get(courseId)||{};
+  let duration=10, start="", note="";
+
+  // أولوية: إعداد خاص بالدورة
+  const courseSnap=await db.collection("BreakSettings")
+    .doc("course_"+courseId).get().catch(()=>null);
+
+  if(courseSnap?.exists && courseSnap.data()?.enabled!==false){
+    const d=courseSnap.data()||{};
+    duration=Number(d.duration)||10;
+    start=clean(d.breakStart);
+    note=clean(d.note);
+  }else{
+    // توافق مع الإعداد السابق: فرع/قسم ثم Global
+    const b=branch(c), s=section(c);
+    const globalSnap=await db.collection("BreakSettings")
+      .doc("GlobalSettings").get().catch(()=>null);
+
+    if(globalSnap?.exists){
+      const d=globalSnap.data()||{};
+      duration=Number(d.duration)||10;
+      start=clean(d.breakStart);
+      note=clean(d.note);
+    }
+
+    if(b&&s){
+      const scoped=await db.collection("BreakSettings")
+        .doc("scope_"+safeId(b+"||"+s)).get().catch(()=>null);
+      if(scoped?.exists){
+        const d=scoped.data()||{};
+        duration=Number(d.duration)||duration;
+        start=clean(d.breakStart)||start;
+        note=clean(d.note)||note;
+      }
+    }
+  }
+
+  breakMinutes=duration;
+  breakStartTime=start;
+  breakNote=note;
+
+  const timePart=start ? ` · Start ${start}` : "";
+  popupBreakInfo.textContent=
+    `Break: ${duration} Minutes${timePart}${note?" · "+note:""}`;
+}
+
+/* حساب الأسبوع */
+async function calcWeek(courseId){
+  const snap=await db.collection("Courses")
+    .doc(courseId).collection("Attendance").get();
+  return Math.floor(snap.size/5)+1;
+}
+
+/* فحص الدورة: النافذة تعتمد على Firestore startTS وليس localStorage */
+async function checkCourseToday(courseId, allowPopup=true){
+  if(!courseId)return false;
+
+  selectedCourseId=courseId;
+  courseSelect.value=courseId;
+  popupCourseSelect.value=courseId;
+
+  await loadBreakSetting(courseId);
+
+  const ref=db.collection("Courses").doc(courseId)
+    .collection("Attendance").doc(todayISO());
+
+  const snap=await ref.get();
+  const checked=!!(snap.exists && snap.data()?.startTS);
+
+  if(checked){
+    closeCheckPopup();
+  }else if(allowPopup){
+    showCheckPopup();
+  }
+
+  popupCheckBtn.disabled=checked;
+  popupCheckBtn.innerHTML=checked
+    ? '<i class="fa-solid fa-check"></i> ALREADY CHECKED-IN'
+    : '<i class="fa-solid fa-circle-check"></i> CHECK-IN';
+
+  return checked;
+}
+
+/* تحميل دورات المدرب ثم إظهار CHECK فوراً عند الحاجة */
+db.collection("Courses").where("Trainer","==",user)
+.onSnapshot(async s=>{
+  openCourses=[];
+  coursesMap.clear();
+
+  s.forEach(doc=>{
+    const c={id:doc.id,...doc.data()};
+    if(clean(c.status).toLowerCase()==="closed")return;
+    openCourses.push(c);
+    coursesMap.set(doc.id,c);
+  });
+
+  const options=openCourses.map(c=>`
+    <option value="${c.id}">
+      ${courseName(c)}${period(c)?" - "+period(c):""}
+    </option>`).join("");
+
+  courseSelect.innerHTML='<option value="">Select Course</option>'+options;
+  popupCourseSelect.innerHTML='<option value="">Select Course</option>'+options;
+
+  if(!openCourses.length){
+    closeCheckPopup();
+    popupBreakInfo.textContent="No open courses";
     return;
   }
 
-  location.href = url;
+  /*
+    نفحص كل الدورات المفتوحة.
+    أول دورة ليس لديها startTS اليوم => تظهر النافذة فوراً.
+    إذا كل الدورات لديها startTS => لا تظهر النافذة بعد التحديث.
+  */
+  let courseNeedingCheck=null;
 
+  for(const c of openCourses){
+    const snap=await db.collection("Courses").doc(c.id)
+      .collection("Attendance").doc(todayISO()).get();
+
+    if(!(snap.exists && snap.data()?.startTS)){
+      courseNeedingCheck=c;
+      break;
+    }
+  }
+
+  if(courseNeedingCheck){
+    popupCourseSelect.value=courseNeedingCheck.id;
+    courseSelect.value=courseNeedingCheck.id;
+    await checkCourseToday(courseNeedingCheck.id,true);
+    await prepareDay(courseNeedingCheck.id);
+  }else{
+    closeCheckPopup();
+    // عرض أول دورة فقط دون إعادة CHECK
+    courseSelect.value=openCourses[0].id;
+    popupCourseSelect.value=openCourses[0].id;
+    await prepareDay(openCourses[0].id);
+  }
+});
+
+/* تغيير الدورة داخل النافذة */
+popupCourseSelect.onchange=async()=>{
+  const id=popupCourseSelect.value;
+  popupCheckBtn.disabled=!id;
+  if(!id){
+    popupBreakInfo.textContent="Break Time: --";
+    return;
+  }
+  courseSelect.value=id;
+  await checkCourseToday(id,true);
+  await prepareDay(id);
+};
+
+/* تغيير الدورة الرئيسية */
+courseSelect.onchange=async()=>{
+  if(!courseSelect.value){
+    attendanceArea.innerHTML="";
+    return;
+  }
+  popupCourseSelect.value=courseSelect.value;
+  await prepareDay(courseSelect.value);
+  await checkCourseToday(courseSelect.value,true);
+};
+
+async function prepareDay(courseId){
+  if(!courseId)return;
+
+  selectedCourseId=courseId;
+  await loadBreakSetting(courseId);
+
+  const week=await calcWeek(courseId);
+  dayDoc=db.collection("Courses").doc(courseId)
+    .collection("Attendance").doc(todayISO());
+
+  const snap=await dayDoc.get();
+
+  if(!snap.exists){
+    await dayDoc.set({
+      Trainer:user,
+      Date:todayISO(),
+      Week:week,
+      startTS:null,
+      breakStartTS:null,
+      breakEndTS:null,
+      breakEndExpected:null,
+      endTS:null,
+      status:""
+    });
+  }
+
+  if(dayUnsub)dayUnsub();
+  dayUnsub=dayDoc.onSnapshot(d=>{
+    const data=d.data()||{};
+    render(data);
+
+    // بمجرد وجود startTS تغلق النافذة، ولذلك لا تعود بعد Refresh.
+    if(data.startTS)closeCheckPopup();
+  });
 }
 
-/* =====================================
-   LOGOUT
-===================================== */
+/* CHECK-IN من النافذة */
+async function popupCheckIn(){
+  const courseId=popupCourseSelect.value;
+  if(!courseId)return;
+
+  popupCheckBtn.disabled=true;
+
+  await prepareDay(courseId);
+
+  const snap=await dayDoc.get();
+  if(!(snap.exists && snap.data()?.startTS)){
+    await dayDoc.set({
+      Trainer:user,
+      Date:todayISO(),
+      startTS:firebase.firestore.FieldValue.serverTimestamp(),
+      status:"Checked-In"
+    },{merge:true});
+  }
+
+  closeCheckPopup();
+}
+
+/* Render */
+function render(d){
+  const breakText=
+    `${breakMinutes} Minutes`+
+    (breakStartTime?` · Start ${breakStartTime}`:"")+
+    (breakNote?` · ${breakNote}`:"");
+
+  attendanceArea.innerHTML=`
+    <div class="card">
+      <h3 style="color:#164478">Week ${d.Week||"-"} – ${d.Date||todayISO()}</h3>
+
+      <div class="break-info">
+        <i class="fa-solid fa-mug-hot"></i>
+        <strong>Break:</strong> ${breakText}
+      </div>
+
+      <div class="row"><span class="label">Check-In:</span> ${fmt(d.startTS)}</div>
+      <div class="row"><span class="label">Break-In:</span> ${fmt(d.breakStartTS)}</div>
+      <div class="row"><span class="label">Break-Out:</span> ${fmt(d.breakEndTS)}</div>
+      <div class="row"><span class="label">Check-Out:</span> ${fmt(d.endTS)}</div>
+      <div class="row"><span class="label">Status:</span> ${d.status||"-"}</div>
+
+      <div id="timer" class="timer">--:--</div>
+
+      <div style="margin-top:15px">
+        <button class="in" onclick="checkIn()">Check-In</button>
+        <button class="break" onclick="breakIn()">Break-In</button>
+        <button class="break" onclick="breakOut()">Break-Out</button>
+        <button class="out" onclick="checkOut()">Check-Out</button>
+        <button class="reset" onclick="resetDay()">Reset</button>
+      </div>
+    </div>`;
+
+  if(d.breakEndExpected)startTimer(d.breakEndExpected.toDate());
+  else clearInterval(timerInt);
+}
+
+function startTimer(end){
+  clearInterval(timerInt);
+  const el=document.getElementById("timer");
+
+  function tick(){
+    const diff=end-new Date();
+    if(diff<=0){
+      el.textContent="00:00";
+      el.className="timer danger";
+      clearInterval(timerInt);
+      return;
+    }
+    const m=Math.floor(diff/60000);
+    const s=Math.floor((diff%60000)/1000);
+    el.textContent=`${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    el.className=diff<60000?"timer warn":"timer";
+  }
+  tick();
+  timerInt=setInterval(tick,1000);
+}
+
+async function ensureDay(){
+  if(!dayDoc && courseSelect.value)await prepareDay(courseSelect.value);
+  return !!dayDoc;
+}
+
+async function checkIn(){
+  if(!await ensureDay())return;
+  await dayDoc.update({
+    startTS:firebase.firestore.FieldValue.serverTimestamp(),
+    status:"Checked-In"
+  });
+  closeCheckPopup();
+}
+
+async function breakIn(){
+  if(!await ensureDay())return;
+  const end=new Date();
+  end.setMinutes(end.getMinutes()+breakMinutes);
+  await dayDoc.update({
+    breakStartTS:firebase.firestore.FieldValue.serverTimestamp(),
+    breakEndExpected:firebase.firestore.Timestamp.fromDate(end),
+    status:"On Break"
+  });
+}
+
+async function breakOut(){
+  if(!await ensureDay())return;
+  clearInterval(timerInt);
+  await dayDoc.update({
+    breakEndTS:firebase.firestore.FieldValue.serverTimestamp(),
+    breakEndExpected:null,
+    status:"Back From Break"
+  });
+}
+
+async function checkOut(){
+  if(!await ensureDay())return;
+  await dayDoc.update({
+    endTS:firebase.firestore.FieldValue.serverTimestamp(),
+    status:"Checked-Out"
+  });
+}
+
+async function resetDay(){
+  if(!await ensureDay())return;
+  clearInterval(timerInt);
+  await dayDoc.update({
+    startTS:null,
+    breakStartTS:null,
+    breakEndTS:null,
+    breakEndExpected:null,
+    endTS:null,
+    status:""
+  });
+  // بعد Reset لا يوجد startTS، لذلك تظهر CHECK مجدداً.
+  showCheckPopup();
+}
 
 function logout(){
-
   localStorage.clear();
   sessionStorage.clear();
 
-  location.replace(
-    "https://www.prudle-education.com/log-in-out"
-  );
+  if(window.parent&&window.parent!==window){
+    window.parent.postMessage("PRUDLE_LOGOUT","*");
+  }
 
+  location.replace("https://www.prudle-education.com/log-in-out");
 }
 
-/* RETURN-PAGE ACCESS PROTECTION REMOVED */
+window.addEventListener("beforeunload",()=>{
+  if(dayUnsub)dayUnsub();
+  clearInterval(timerInt);
+});
 </script>
-
 </body>
 </html>
