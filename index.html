@@ -253,12 +253,26 @@ tbody tr:nth-child(even){background:#f8fbff}
     </div>
     <div class="modal-body">
       <p>
-        No attendance record exists for this course today.
-        You can start today's attendance now, or close this message and start later.
+        No Check-In has been recorded for this course today.
+        Press <b>CHECK-IN</b> to start today's attendance.
       </p>
+
+      <div style="
+        margin:14px 0;
+        padding:12px;
+        border-radius:12px;
+        background:#eef5fa;
+        color:#164478;
+        font-weight:900;
+        line-height:1.8
+      ">
+        <div id="modalCourseText">Course: --</div>
+        <div id="modalBreakText">Break Time: --</div>
+      </div>
+
       <div class="modal-actions">
         <button class="modal-start" onclick="startTodayAttendance()">
-          Start & Check-In
+          CHECK-IN
         </button>
         <button class="modal-close" onclick="closeStartModal()">
           Close
@@ -344,6 +358,8 @@ const sectionCoursesBody=document.getElementById("sectionCoursesBody");
 const breakInfoText=document.getElementById("breakInfoText");
 const scopeInfo=document.getElementById("scopeInfo");
 const startModal=document.getElementById("startModal");
+const modalCourseText=document.getElementById("modalCourseText");
+const modalBreakText=document.getElementById("modalBreakText");
 const toast=document.getElementById("toast");
 
 let MY_COURSES=[];
@@ -452,8 +468,11 @@ function listenBreakSettings(){
 }
 
 function updateBreakText(note=""){
-  breakInfoText.textContent=
-    `${breakMinutes} minutes${note?" · "+note:""}`;
+  const txt=`${breakMinutes} minutes${note?" · "+note:""}`;
+  breakInfoText.textContent=txt;
+  if(modalBreakText){
+    modalBreakText.textContent=`Break Time: ${txt}`;
+  }
 }
 
 function startMyCoursesListener(){
@@ -472,10 +491,92 @@ function startMyCoursesListener(){
       currentScopeLabel();
       listenBreakSettings();
       startAllOpenCoursesListener();
+
+      // عند فتح الصفحة: افحص تلقائياً أول دورة مفتوحة لم تسجل Check-In اليوم.
+      // إذا كان startTS مسجلاً فلن تظهر نافذة CHECK مرة أخرى عند التحديث.
+      autoOpenCheckPopup();
     },err=>{
       console.error(err);
       courseSelect.innerHTML='<option value="">Unable to load courses</option>';
     });
+}
+
+
+let AUTO_CHECK_DONE=false;
+
+async function autoOpenCheckPopup(){
+  if(AUTO_CHECK_DONE)return;
+  AUTO_CHECK_DONE=true;
+
+  if(!MY_COURSES.length)return;
+
+  const today=todayIso();
+
+  // نفحص الدورات المفتوحة للمدرب بالترتيب.
+  for(const course of MY_COURSES){
+    try{
+      const ref=db.collection("Courses")
+        .doc(course.id)
+        .collection("Attendance")
+        .doc(today);
+
+      const snap=await ref.get();
+      const data=snap.exists?(snap.data()||{}):{};
+
+      // إذا لم يوجد Check-In لهذه الدورة اليوم، افتح CHECK تلقائياً.
+      if(!data.startTS){
+        ACTIVE_COURSE=course;
+        courseSelect.value=course.id;
+        pendingNewDayCourse=course;
+        dayDoc=ref;
+
+        // اقرأ وقت البريك الخاص بفرع/قسم الدورة قبل إظهار النافذة.
+        const k=scopeKey(course);
+        const sectionSetting=await db.collection("BreakSettings")
+          .doc("scope_"+safeId(k))
+          .get()
+          .catch(()=>null);
+
+        const globalSetting=await db.collection("BreakSettings")
+          .doc("GlobalSettings")
+          .get()
+          .catch(()=>null);
+
+        if(sectionSetting?.exists && Number(sectionSetting.data().duration)>0){
+          breakMinutes=Number(sectionSetting.data().duration);
+          updateBreakText(sectionSetting.data().note||"");
+        }else if(globalSetting?.exists && Number(globalSetting.data().duration)>0){
+          breakMinutes=Number(globalSetting.data().duration);
+          updateBreakText(globalSetting.data().note||"");
+        }else{
+          updateBreakText();
+        }
+
+        if(modalCourseText){
+          modalCourseText.textContent=
+            `Course: ${courseName(course)} · ${coursePeriod(course)||"No Period"}`;
+        }
+
+        showStartModal();
+
+        attendanceArea.innerHTML=`
+          <div class="card" style="box-shadow:none;border:1px dashed #c9d6e3;margin-top:10px">
+            <div class="empty">
+              CHECK-IN has not been recorded for today.<br>
+              Use the CHECK popup to start attendance.
+            </div>
+          </div>`;
+
+        return;
+      }
+    }catch(error){
+      console.warn("Auto CHECK error:",error);
+    }
+  }
+
+  // كل الدورات المفتوحة لديها Check-In اليوم:
+  // لا نظهر النافذة إطلاقاً بعد التحديث.
+  closeStartModal();
 }
 
 function fillMyCourseSelect(){
@@ -616,8 +717,17 @@ async function openTodayCourse(course){
 
   const snap=await dayDoc.get();
 
-  if(!snap.exists){
+  if(!snap.exists || !snap.data()?.startTS){
     pendingNewDayCourse=course;
+    if(modalCourseText){
+      modalCourseText.textContent=
+        `Course: ${courseName(course)} · ${coursePeriod(course)||"No Period"}`;
+    }
+    updateBreakText(
+      modalBreakText
+        ? String(modalBreakText.textContent||"").replace(/^Break Time:\s*/,"")
+        : ""
+    );
     showStartModal();
     attendanceArea.innerHTML=`
       <div class="card" style="box-shadow:none;border:1px dashed #c9d6e3;margin-top:10px">
@@ -662,9 +772,10 @@ async function startTodayAttendance(){
   },{merge:true});
 
   closeStartModal();
+  AUTO_CHECK_DONE=true;
   pendingNewDayCourse=null;
   subscribeDay();
-  showToast("Today's attendance started");
+  showToast("Check-In recorded successfully");
 }
 
 function subscribeDay(){
