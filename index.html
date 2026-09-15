@@ -285,60 +285,8 @@ tbody tr:nth-child(even){background:#f8fbff}
 <div id="toast" class="toast"></div>
 
 <script>
-const LOGIN_URL="https://www.prudle-education.com/log-in-out";
-
-function getRoles(){
-  try{
-    const roles=JSON.parse(localStorage.getItem("roles")||"[]");
-    if(Array.isArray(roles)&&roles.length){
-      return roles.map(r=>String(r||"").trim().toLowerCase()).filter(Boolean);
-    }
-  }catch(e){}
-  const oldRole=String(localStorage.getItem("role")||localStorage.getItem("userRole")||"").trim().toLowerCase();
-  return oldRole?[oldRole]:[];
-}
-
-function hasTrainerAccess(){
-  const user=String(localStorage.getItem("username")||"").trim();
-  const last=localStorage.getItem("loginDate");
-  const today=new Date().toDateString();
-  const roles=getRoles();
-  return !!(user && last===today && (roles.includes("trainer")||roles.includes("admin")));
-}
-
-function goLogin(){
-  localStorage.removeItem("username");
-  localStorage.removeItem("role");
-  localStorage.removeItem("roles");
-  localStorage.removeItem("userRole");
-  localStorage.removeItem("loginDate");
-  sessionStorage.clear();
-  window.top.location.replace(LOGIN_URL+"?expired="+Date.now());
-}
-
-function logout(){
-  localStorage.setItem("prudleLoggedOut","1");
-  localStorage.removeItem("username");
-  localStorage.removeItem("role");
-  localStorage.removeItem("roles");
-  localStorage.removeItem("userRole");
-  localStorage.removeItem("loginDate");
-  sessionStorage.clear();
-
-  try{
-    if(window.parent&&window.parent!==window){
-      window.parent.postMessage("PRUDLE_LOGOUT","*");
-    }
-  }catch(e){}
-
-  window.top.location.replace(LOGIN_URL+"?logout="+Date.now());
-}
-
-if(!hasTrainerAccess()){
-  goLogin();
-  throw new Error("Access denied");
-}
-window.addEventListener("pageshow",()=>{if(!hasTrainerAccess())goLogin();});
+/* الحماية أزيلت حسب الطلب.
+   لا يوجد تحقق من username / role / loginDate ولا تحويل تلقائي لصفحة الدخول. */
 
 if(!firebase.apps.length){
   firebase.initializeApp({
@@ -349,7 +297,20 @@ if(!firebase.apps.length){
 }
 const db=firebase.firestore();
 
-const USER=String(localStorage.getItem("username")||"").trim();
+/* زر الخروج فقط - لا توجد حماية دخول على الصفحة */
+function logout(){
+  localStorage.clear();
+  sessionStorage.clear();
+  try{
+    if(window.parent && window.parent!==window){
+      window.parent.postMessage("PRUDLE_LOGOUT","*");
+    }
+  }catch(e){}
+  window.top.location.replace("https://www.prudle-education.com/log-in-out?logout="+Date.now());
+}
+
+
+const USER=String(localStorage.getItem("username")||"Trainer").trim();
 document.getElementById("trainerName").textContent=USER||"Trainer";
 
 const courseSelect=document.getElementById("courseSelect");
