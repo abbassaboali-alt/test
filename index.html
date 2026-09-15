@@ -1,29 +1,4 @@
-<script>
-function goLogin(){
-  localStorage.clear();
-  sessionStorage.clear();
-  location.replace("https://www.prudle-education.com/log-in-out");
-}
-
-function checkTrainerAccess(){
-  const user = localStorage.getItem("username");
-  const role = String(localStorage.getItem("role") || "").trim().toLowerCase();
-  const last = localStorage.getItem("loginDate");
-  const today = new Date().toDateString();
-
-  if(!user || role !== "trainer" || last !== today){
-    goLogin();
-    return false;
-  }
-  return true;
-}
-
-if(!checkTrainerAccess()){
-  throw new Error("Access Denied");
-}
-
-window.addEventListener("pageshow",()=>checkTrainerAccess());
-</script>
+<!-- TRAINER ACCESS PROTECTION REMOVED -->
 
 <!DOCTYPE html>
 <html lang="ar">
