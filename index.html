@@ -32,18 +32,34 @@ button{padding:9px 16px;border:none;border-radius:6px;font-size:14px;cursor:poin
 
 /* CHECK POPUP */
 .check-overlay{
-  position:fixed;inset:0;z-index:99999;
-  display:none;align-items:center;justify-content:center;
-  padding:18px;background:rgba(5,20,38,.72);
-  backdrop-filter:blur(4px)
+  position:fixed;
+  right:18px;
+  top:18px;
+  z-index:99999;
+  display:none;
+  width:min(360px,calc(100vw - 24px));
+  pointer-events:none;
 }
-.check-overlay.show{display:flex}
+.check-overlay.show{display:block}
 .check-modal{
-  width:min(460px,96vw);background:#fff;border-radius:22px;
-  padding:25px;text-align:center;border-top:7px solid #164478;
-  box-shadow:0 24px 70px rgba(0,0,0,.30)
+  position:relative;
+  width:100%;
+  background:#fff;
+  border-radius:18px;
+  padding:18px;
+  text-align:center;
+  border-top:5px solid #164478;
+  box-shadow:0 14px 40px rgba(0,0,0,.24);
+  pointer-events:auto;
 }
-.check-logo{width:72px;height:72px;object-fit:contain;border-radius:50%}
+.check-x{
+  position:absolute;left:9px;top:8px;
+  width:32px;height:32px;border:0;border-radius:50%;
+  background:#eef2f6;color:#52606d;font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;margin:0
+}
+.check-logo{width:58px;height:58px;object-fit:contain;border-radius:50%}
 .check-modal h2{margin:8px 0;color:#164478;font-size:31px}
 .check-modal p{color:#657384;font-size:14px;line-height:1.7}
 .popup-course{width:100%;margin:8px 0 12px}
@@ -64,6 +80,12 @@ button{padding:9px 16px;border:none;border-radius:6px;font-size:14px;cursor:poin
   header{padding:12px;gap:8px}
   header h2{font-size:17px}
   .card{width:90%;padding:16px}
+  .check-overlay{
+    top:10px;right:10px;
+    width:calc(100vw - 20px);
+  }
+  .check-modal{padding:15px}
+  .check-modal h2{font-size:24px}
 }
 </style>
 </head>
@@ -95,6 +117,7 @@ button{padding:9px 16px;border:none;border-radius:6px;font-size:14px;cursor:poin
 <!-- تظهر تلقائياً إذا لم يوجد startTS اليوم -->
 <div id="checkOverlay" class="check-overlay">
   <div class="check-modal">
+    <button class="check-x" type="button" onclick="closeCheckPopup()" aria-label="Close">×</button>
     <img class="check-logo" src="https://prudle.edu.sa/wp-content/uploads/2020/11/about.png">
     <h2>CHECK</h2>
     <p id="popupTrainer"></p>
