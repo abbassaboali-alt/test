@@ -91,27 +91,27 @@ tbody tr:nth-child(even){background:#f8fbff}
 
 .pdf{
 
-  border:0;
+  border:0;
 
-  border-radius:10px;
+  border-radius:10px;
 
-  padding:9px 13px;
+  padding:9px 13px;
 
-  background:#164478;
+  background:#164478;
 
-  color:#fff;
+  color:#fff;
 
-  font-family:Tajawal;
+  font-family:Tajawal;
 
-  font-weight:900;
+  font-weight:900;
 
-  cursor:pointer;
+  cursor:pointer;
 
-  display:inline-flex;
+  display:inline-flex;
 
-  align-items:center;
+  align-items:center;
 
-  gap:7px;
+  gap:7px;
 
 }
 
@@ -259,162 +259,162 @@ input{width:17px;height:17px;margin:0;accent-color:#164478}
 
 <header>
 
-  <div
+  <div
 class="header-inner">
 
-    <div
+    <div
 class="brand">
 
-      <img
+      <img
 src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJprpZXU4pTSCYXKhzWCpqdZ_mnPHMwqsACA&s"
 alt="Prudle">
 
-      <div>
+      <div>
 
-        <h1>متابعة حضور وأوقات المدربين</h1>
+        <h1>متابعة حضور وأوقات المدربين</h1>
 
-        <p>الدخول · البريك · العودة · الخروج · إعداد مدة
+        <p>الدخول · البريك · العودة · الخروج · إعداد مدة
 البريك حسب القسم</p>
 
-      </div>
+      </div>
 
-    </div>
+    </div>
 
-    <button
+    <button
 class="logout" onclick="logout()"><i
 class="fa-solid fa-right-from-bracket"></i>
 Logout</button>
 
-  </div>
+  </div>
 
 </header>
 
 <main class="page">
 
-  <section
+  <section
 class="grid">
 
-    <div class="card">
+    <div class="card">
 
-      <h2>إعداد وقت البريك</h2>
+      <h2>إعداد وقت البريك</h2>
 
-      <div
+      <div
 class="sub">يتم تحديد وقت البريك لكل دورة بشكل
 مستقل. اختيار دورة واحدة وتعديلها لا يغيّر أي دورة أخرى.</div>
 
-      <div
+      <div
 class="field">
 
-        <label>الفرع</label>
+        <label>الفرع</label>
 
-        <select
+        <select
 id="branchSelect" onchange="refreshSectionOptions()">
 
-          <option
+          <option
 value="">اختر الفرع</option>
 
-        </select>
+        </select>
 
-      </div>
+      </div>
 
-      <div
+      <div
 class="field">
 
-        <label>القسم</label>
+        <label>القسم</label>
 
-        <select
+        <select
 id="sectionSelect">
 
-          <option
+          <option
 value="">اختر القسم</option>
 
-        </select>
+        </select>
 
-      </div>
+      </div>
 
-      <div
+      <div
 class="field">
 
-        <label>الدورة</label>
+        <label>الدورة</label>
 
-        <select
+        <select
 id="breakCourseSelect">
 
-          <option
+          <option
 value="">اختر الدورة</option>
 
-        </select>
+        </select>
 
-      </div>
+      </div>
 
-      <div class="field">
+      <div class="field">
 
-        <label>تاريخ بدء الدورة</label>
+        <label>تاريخ بدء الدورة</label>
 
-        <select
+        <select
 id="breakCourseStartDate"
 onchange="refreshBreakCourseOptions()">
 
-          <option
+          <option
 value="">اختر تاريخ بدء الدورة</option>
 
-        </select>
+        </select>
 
-      </div>
+      </div>
 
-      <div
+      <div
 class="field">
 
-        <label>وقت بداية البريك</label>
+        <label>وقت بداية البريك</label>
 
-        <input
+        <input
 id="breakStartInput" type="time"
 value="19:00">
 
-      </div>
+      </div>
 
-      <div
+      <div
 class="field">
 
-        <label>مدة البريك بالدقائق</label>
+        <label>مدة البريك بالدقائق</label>
 
-        <input
+        <input
 id="durationInput" type="number" min="1"
 max="180" value="10">
 
-      </div>
+      </div>
 
 <button class="save"
 onclick="saveSectionBreak()">حفظ
 وقت البريك لهذه الدورة</button>
 
-      <div
+      <div
 class="info">
 
-        إذا
+        إذا
 لم يوجد إعداد خاص للقسم، يستخدم النظام مدة GlobalSettings الحالية.
 
-      </div>
+      </div>
 
-    </div>
+    </div>
 
-    <div
+    <div
 class="card">
 
-      <h2>تفاصيل المدربين اليوم</h2>
+      <h2>تفاصيل المدربين اليوم</h2>
 
-      <div
+      <div
 class="sub">جميع الدورات المفتوحة مع أوقات
 Check-In وBreak-In وBreak-Out وCheck-Out.</div>
 
-      <div
+      <div
 class="toolbar">
 
-        <select id="filterBranch"
+        <select id="filterBranch"
 onchange="refreshSectionCheckboxes();refreshCourseCheckboxes();renderAdminTable()"><option
 value="">كل الفروع</option></select>
 
-        <div
+        <div
 class="section-multi" id="sectionMulti">
 
 <button type="button" class="section-multi-btn"
@@ -435,11 +435,11 @@ class="clear" onclick="clearSections()">إلغاء التحديد</button></div>
 
 </div></div>
 
-        <select
+        <select
 id="filterPeriod" onchange="refreshCourseCheckboxes();renderAdminTable()"><option
 value="">كل الفترات</option></select>
 
-        <div
+        <div
 class="course-multi" id="courseMulti">
 
 <button type="button" class="course-multi-btn"
@@ -461,7 +461,7 @@ onclick="clearCourses()">إلغاء
 
 </div></div>
 
-        <div
+        <div
 class="date-multi" id="dateMulti">
 
 <button type="button" class="date-multi-btn" onclick="toggleDateMulti(event)"><span
@@ -481,103 +481,103 @@ onclick="clearStartDates()">إلغاء
 
 </div></div>
 
-        <input
+        <input
 id="filterTrainer" placeholder="بحث
 باسم المدرب" oninput="renderAdminTable()">
 
-        <button
+        <button
 class="refresh"
 onclick="attachAttendanceListeners()"><i class="fa-solid
 fa-arrows-rotate"></i> تحديث</button>
 
-        <button
+        <button
 class="pdf" onclick="exportTrainerAttendancePDF()"><i
 class="fa-solid fa-file-pdf"></i> PDF</button>
 
-        <button
+        <button
 class="pdf" onclick="exportTrainerBreakTimesPDF()"><i
 class="fa-solid fa-clock"></i> PDF أوقات
 البريك</button>
 
-      </div>
+      </div>
 
-      <div
+      <div
 class="multi-detail-bar">
 
-        <button
+        <button
 class="show" onclick="showSelectedCoursesAttendanceDetails()"><i
 class="fa-solid fa-calendar-check"></i> تفاصيل الدورات المحددة</button>
 
-        <button
+        <button
 class="print"
 onclick="exportSelectedCoursesAttendancePDF()"><i
 class="fa-solid fa-file-pdf"></i> PDF تفاصيل الدورات المحددة</button>
 
-      </div>
+      </div>
 
-      <div class="table-wrap">
+      <div class="table-wrap">
 
-        <table>
+        <table>
 
-          <thead>
+          <thead>
 
-            <tr>
+            <tr>
 
-             
+             
 <th>#</th>
 
-              <th>الفرع</th>
+              <th>الفرع</th>
 
-              <th>القسم</th>
+              <th>القسم</th>
 
-              <th>الدورة</th>
+              <th>الدورة</th>
 
-              <th>رقم الفصل</th>
+              <th>رقم الفصل</th>
 
-              <th>تاريخ بدء الدورة</th>
+              <th>تاريخ بدء الدورة</th>
 
-              <th>الفترة</th>
+              <th>الفترة</th>
 
-              <th>المدرب</th>
+              <th>المدرب</th>
 
-              <th>وقت البريك المحدد</th>
+              <th>وقت البريك المحدد</th>
 
-              <th>مدة البريك</th>
+              <th>مدة البريك</th>
 
-             
+             
 <th>Check-In</th>
 
-             
+             
 <th>Break-In</th>
 
-             
+             
 <th>Break-Out</th>
 
-             
+             
 <th>Check-Out</th>
 
-              <th>الحالة</th>
+              <th>الحالة</th>
 
-              <th>تفاصيل الدورة</th>
+              <th>تفاصيل الدورة</th>
 
-            </tr>
+            </tr>
 
-          </thead>
+          </thead>
 
-          <tbody
+          <tbody
 id="adminBody">
 
-            <tr><td colspan="16">جاري التحميل...</td></tr>
+            <tr><td colspan="16">جاري التحميل...</td></tr>
 
-          </tbody>
+          </tbody>
 
-        </table>
+        </table>
 
-      </div>
+      </div>
 
-    </div>
+    </div>
 
-  </section>
+  </section>
 
 </main>
 
@@ -586,26 +586,26 @@ id="adminBody">
 class="att-modal"
 onclick="if(event.target===this)closeAttendanceDetails()">
 
-  <div class="att-modal-card">
+  <div class="att-modal-card">
 
-    <div
+    <div
 class="att-modal-head">
 
-      <h3
+      <h3
 id="attendanceDetailTitle">تفاصيل
 حضور الدورة</h3>
 
-      <button
+      <button
 class="att-modal-close"
 onclick="closeAttendanceDetails()">إغلاق
 ×</button>
 
-    </div>
+    </div>
 
-    <div
+    <div
 id="attendanceDetailBody" class="att-modal-body">جاري التحميل...</div>
 
-  </div>
+  </div>
 
 </div>
 
@@ -613,45 +613,45 @@ id="attendanceDetailBody" class="att-modal-body">جاري التحميل...</div
 
 function logout(){
 
- 
+ 
 localStorage.setItem("prudleLoggedOut","1");
 
- 
+ 
 localStorage.removeItem("username");
 
- 
+ 
 localStorage.removeItem("role");
 
- 
+ 
 localStorage.removeItem("roles");
 
- 
+ 
 localStorage.removeItem("userRole");
 
- 
+ 
 localStorage.removeItem("loginDate");
 
-  sessionStorage.clear();
+  sessionStorage.clear();
 
- 
+ 
 window.top.location.replace("https://www.prudle-education.com/log-in-out?logout="+Date.now());
 
 }
 
 if(!firebase.apps.length){
 
-  firebase.initializeApp({
+  firebase.initializeApp({
 
-   
+   
 apiKey:"AIzaSyCCFBvZosI8dwShZjxvZzI-SU5igEbcOKk",
 
-   
+   
 authDomain:"prudle-system.firebaseapp.com",
 
-   
+   
 projectId:"prudle-system"
 
-  });
+  });
 
 }
 
@@ -720,70 +720,70 @@ function period(c){return clean(c?.Period||c?.period);}
 
 function courseStartDate(c){
 
-  const raw =
+  const raw =
 
-    c?.StartingDate ??
+    c?.StartingDate ??
 
-    c?.startingDate ??
+    c?.startingDate ??
 
-    c?.startDate ??
+    c?.startDate ??
 
-    "";
+    "";
 
-  if(!raw) return
+  if(!raw) return
 "";
 
-  try{
+  try{
 
-    let d = null;
+    let d = null;
 
-    if(raw &&
+    if(raw &&
 typeof raw.toDate === "function"){
 
-      d = raw.toDate();
+      d = raw.toDate();
 
-    }else if(raw && typeof
+    }else if(raw && typeof
 raw === "object" && typeof raw.seconds ===
 "number"){
 
-      d = new Date(raw.seconds *
+      d = new Date(raw.seconds *
 1000);
 
-    }else{
+    }else{
 
-      const text = clean(raw);
+      const text = clean(raw);
 
-      const iso =
+      const iso =
 text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
 
-      if(iso){
+      if(iso){
 
-        return
+        return
 `${iso[1]}-${String(iso[2]).padStart(2,"0")}-${String(iso[3]).padStart(2,"0")}`;
 
-      }
+      }
 
-      d = new Date(text);
+      d = new Date(text);
 
-    }
+    }
 
-    if(!d ||
+    if(!d ||
 Number.isNaN(d.getTime())) return "";
 
-    return
+    return
 `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 
-  }catch(error){
+  }catch(error){
 
-    return "";
+    return "";
 
-  }
+  }
 
 }
 
 function displayCourseStartDate(c){
 
-  return courseStartDate(c) ||
+  return courseStartDate(c) ||
 "-";
 
 }
@@ -792,491 +792,491 @@ function trainer(c){return clean(c?.Trainer||c?.trainer);}
 
 function safeId(value){
 
-  try{return
+  try{return
 btoa(unescape(encodeURIComponent(value))).replace(/[+/=]/g,"_");}
 
-  catch(e){return
+  catch(e){return
 value.replace(/[^a-z0-9_-]/gi,"_");}
 
 }
 
 function fmt(ts){
 
-  if(!ts)return "--";
+  if(!ts)return "--";
 
-  try{
+  try{
 
-    const
+    const
 d=ts.toDate?ts.toDate():new Date(ts.seconds?ts.seconds*1000:ts);
 
-    return
+    return
 d.toLocaleTimeString("en-US",{
 
-      hour:"numeric",
+      hour:"numeric",
 
-      minute:"2-digit",
+      minute:"2-digit",
 
-      hour12:true
+      hour12:true
 
-    });
+    });
 
-  }catch(e){return "--";}
+  }catch(e){return "--";}
 
 }
 
 function tsToDate(ts){
 
-  if(!ts)return null;
+  if(!ts)return null;
 
-  try{
+  try{
 
-    const
+    const
 d=ts.toDate?ts.toDate():new Date(ts.seconds?ts.seconds*1000:ts);
 
-    return
+    return
 Number.isNaN(d.getTime())?null:d;
 
-  }catch(e){return null}
+  }catch(e){return null}
 
 }
 
 function isoLocal(d){
 
-  return
+  return
 `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 
 }
 
 function roomNumber(c){
 
-  return
+  return
 clean(c?.Room||c?.room||c?.RoomNumber||c?.roomNumber||c?.Classroom||c?.classroom||c?.ClassRoom||c?.classRoom||c?.Hall||c?.hall||c?.classNo||c?.ClassNo||c?.classNumber||c?.ClassNumber||"-");
 
 }
 
 function expectedCourseDates(c){
 
-  const start=courseStartDate(c);
+  const start=courseStartDate(c);
 
-  if(!start)return [];
+  if(!start)return [];
 
-  const startD=new
+  const startD=new
 Date(start+"T00:00:00");
 
- 
+ 
 if(Number.isNaN(startD.getTime()))return [];
 
-  const today=new Date();
+  const today=new Date();
 today.setHours(0,0,0,0);
 
-  const
+  const
 explicitEnd=clean(c?.EndingDate||c?.endingDate||c?.endDate||c?.EndDate);
 
-  let endD=null;
+  let endD=null;
 
-  if(explicitEnd){
+  if(explicitEnd){
 
-    const x=new Date(explicitEnd);
+    const x=new Date(explicitEnd);
 
-   
+   
 if(!Number.isNaN(x.getTime()))endD=x;
 
-  }
+  }
 
-  if(!endD){
+  if(!endD){
 
-    endD=new Date(startD);
+    endD=new Date(startD);
 
-   
+   
 endD.setDate(endD.getDate()+30);
 
-  }
+  }
 
-  endD.setHours(0,0,0,0);
+  endD.setHours(0,0,0,0);
 
-  const
+  const
 limit=endD<today?endD:today;
 
-  const out=[];
+  const out=[];
 
-  for(let d=new
+  for(let d=new
 Date(startD);d<=limit;d.setDate(d.getDate()+1)){
 
-    const day=d.getDay();
+    const day=d.getDay();
 
-   
+   
 if(day>=0&&day<=4)out.push(isoLocal(d)); // الأحد إلى الخميس
 
-  }
+  }
 
-  return out;
+  return out;
 
 }
 
 function parsePeriodStart(periodValue,dateIso){
 
-  const txt=clean(periodValue).toLowerCase().replace(/–|—/g,"-");
+  const txt=clean(periodValue).toLowerCase().replace(/–|—/g,"-");
 
-  if(!txt)return null;
+  if(!txt)return null;
 
-  let
+  let
 m=txt.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/i);
 
-  if(!m)return null;
+  if(!m)return null;
 
-  let h=Number(m[1]),
+  let h=Number(m[1]),
 min=Number(m[2]||0), ap=(m[3]||"").toLowerCase();
 
- 
+ 
 if(ap==="pm"&&h<12)h+=12;
 
- 
+ 
 if(ap==="am"&&h===12)h=0;
 
-  if(!ap && h>=1
+  if(!ap && h>=1
 && h<=8) h+=12; // 4-6 و6-8 و8-10
 مسائية، بينما 10-1 تبقى صباحية
 
-  const d=new
+  const d=new
 Date(dateIso+"T00:00:00");
 
-  d.setHours(h,min,0,0);
+  d.setHours(h,min,0,0);
 
-  return d;
+  return d;
 
 }
 
 function attendanceAlertInfo(c,dateIso,d){
 
-  if(!d||!d.startTS)return
+  if(!d||!d.startTS)return
 {danger:true,label:"لم يحضر",late:null};
 
-  const
+  const
 actual=tsToDate(d.startTS);
 
-  const
+  const
 scheduled=parsePeriodStart(period(c),dateIso);
 
-  if(!actual||!scheduled)return
+  if(!actual||!scheduled)return
 {danger:false,label:"حاضر",late:null};
 
-  const
+  const
 late=Math.max(0,Math.round((actual-scheduled)/60000));
 
-  if(late>15)return
+  if(late>15)return
 {danger:true,label:`متأخر ${late} دقيقة`,late};
 
-  return
+  return
 {danger:false,label:late?`متأخر ${late} دقيقة`:"في الوقت",late};
 
 }
 
 function closeAttendanceDetails(){
 
- 
+ 
 document.getElementById("attendanceDetailModal")?.classList.remove("open");
 
 }
 
 function attendanceDeviceName(d){
 
-  if(!d)return "--";
+  if(!d)return "--";
 
-  const direct=clean(
+  const direct=clean(
 
-   
+   
 d.deviceName||d.DeviceName||d.device||d.Device||
 
-   
+   
 d.loginDevice||d.LoginDevice||d.startDevice||d.startDeviceName||
 
-   
+   
 d.browserDevice||d.platform||d.Platform
 
-  );
+  );
 
-  if(direct)return direct;
+  if(direct)return direct;
 
-  const
+  const
 ua=clean(d.userAgent||d.UserAgent||d.ua);
 
-  if(!ua)return "--";
+  if(!ua)return "--";
 
-  if(/iPhone/i.test(ua))return
+  if(/iPhone/i.test(ua))return
 "iPhone";
 
-  if(/iPad/i.test(ua))return
+  if(/iPad/i.test(ua))return
 "iPad";
 
-  if(/Android/i.test(ua)){
+  if(/Android/i.test(ua)){
 
-    const
+    const
 m=ua.match(/Android[^;]*;\s*([^;)]+)/i);
 
-    return
+    return
 m&&m[1]?m[1].trim():"Android";
 
-  }
+  }
 
- 
+ 
 if(/Windows/i.test(ua))return "Windows PC";
 
-  if(/Macintosh|Mac
+  if(/Macintosh|Mac
 OS/i.test(ua))return "Mac";
 
-  if(/Linux/i.test(ua))return
+  if(/Linux/i.test(ua))return
 "Linux";
 
-  return
+  return
 ua.length>38?ua.slice(0,38)+"…":ua;
 
 }
 
 function isSpecificTrainerSelected(c){
 
-  const
+  const
 q=clean(document.getElementById("filterTrainer")?.value).toLowerCase();
 
-  return !!q &&
+  return !!q &&
 clean(trainer(c)).toLowerCase().includes(q);
 
 }
 
 async function showCourseAttendanceDetails(courseId){
 
-  const
+  const
 c=COURSES.find(x=>x.id===courseId);
 
-  if(!c)return;
+  if(!c)return;
 
-  const
+  const
 modal=document.getElementById("attendanceDetailModal");
 
-  const body=document.getElementById("attendanceDetailBody");
+  const body=document.getElementById("attendanceDetailBody");
 
-  const
+  const
 title=document.getElementById("attendanceDetailTitle");
 
-  title.textContent=`تفاصيل حضور
+  title.textContent=`تفاصيل حضور
 ${trainer(c)||"-"} · ${name(c)} · ${period(c)||"-"}`;
 
-  body.innerHTML="جاري تحميل جميع أيام الدورة...";
+  body.innerHTML="جاري تحميل جميع أيام الدورة...";
 
-  modal.classList.add("open");
+  modal.classList.add("open");
 
-  try{
+  try{
 
-    const snap=await
+    const snap=await
 db.collection("Courses").doc(c.id).collection("Attendance").get();
 
-    const map=new
+    const map=new
 Map(snap.docs.map(d=>[d.id,d.data()]));
 
-    let
+    let
 dates=expectedCourseDates(c);
 
-    const
+    const
 storedDates=snap.docs.map(d=>d.id).filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x));
 
-    dates=[...new
+    dates=[...new
 Set([...dates,...storedDates])].sort();
 
-    let absent=0,late=0,ok=0;
+    let absent=0,late=0,ok=0;
 
-    const
+    const
 rows=dates.map((date,i)=>{
 
-      const d=map.get(date)||null;
+      const d=map.get(date)||null;
 
-      const
+      const
 a=attendanceAlertInfo(c,date,d);
 
-      if(a.danger){ if(!d?.startTS)absent++; else
+      if(a.danger){ if(!d?.startTS)absent++; else
 late++; } else ok++;
 
-      return `<tr
+      return `<tr
 class="${a.danger?"att-danger":""}">
 
-       
+       
 <td>${i+1}</td><td>${esc(displayDate(date))}</td>
 
-       
+       
 <td>${fmt(d?.startTS)}</td><td>${fmt(d?.breakStartTS)}</td>
 
-        <td>${fmt(d?.breakEndTS)}</td><td>${fmt(d?.endTS)}</td>
+        <td>${fmt(d?.breakEndTS)}</td><td>${fmt(d?.endTS)}</td>
 
-       
+       
 <td>${esc(attendanceDeviceName(d))}</td>
 
-        <td
+        <td
 class="${a.danger?"att-danger":"att-ok"}">${esc(a.label)}</td>
 
-      </tr>`;
+      </tr>`;
 
-    }).join("");
+    }).join("");
 
-    const
+    const
 pdfButton=isSpecificTrainerSelected(c)
 
-      ? `<button
+      ? `<button
 class="pdf" style="margin-bottom:10px"
 onclick="exportOneCourseAttendancePortraitPDF('${esc(c.id)}')"><i
 class="fa-solid fa-file-pdf"></i> طباعة
 PDF تفاصيل كل الأيام</button>`
 
-      : "";
+      : "";
 
-    body.innerHTML=`
+    body.innerHTML=`
 
-      ${pdfButton}
+      ${pdfButton}
 
-      <div
+      <div
 class="att-summary">
 
-       
+       
 <div><b>${dates.length}</b>أيام
 الدورة حتى اليوم</div>
 
-       
+       
 <div><b>${ok}</b>حضور
 سليم</div>
 
-        <div
+        <div
 class="${late?"att-danger":""}"><b>${late}</b>تأخر أكثر من 15 دقيقة</div>
 
-        <div
+        <div
 class="${absent?"att-danger":""}"><b>${absent}</b>عدم تحضير</div>
 
-      </div>
+      </div>
 
-      <div
+      <div
 class="table-wrap" style="max-height:60vh">
 
-        <table class="att-detail-table"><thead><tr>
+        <table class="att-detail-table"><thead><tr>
 
-         
+         
 <th>#</th><th>التاريخ</th><th>Check-In</th><th>Break-In</th><th>Break-Out</th><th>Check-Out</th><th>الجهاز</th><th>التنبيه</th>
 
-       
+       
 </tr></thead><tbody>${rows||'<tr><td
 colspan="8">لا توجد أيام حضور مسجلة</td></tr>'}</tbody></table>
 
-      </div>`;
+      </div>`;
 
-  }catch(error){
+  }catch(error){
 
-    console.error(error);
+    console.error(error);
 
-    body.innerHTML='<div
+    body.innerHTML='<div
 class="att-danger"
 style="padding:12px;border-radius:10px">تعذر
 تحميل تفاصيل الحضور.</div>';
 
-  }
+  }
 
 }
 
 async function exportOneCourseAttendancePortraitPDF(courseId){
 
-  const
+  const
 c=COURSES.find(x=>x.id===courseId);
 
-  if(!c)return;
+  if(!c)return;
 
- 
+ 
 if(!isSpecificTrainerSelected(c)){
 
-    alert("حدد اسم مدرب محدد من فلتر المدرب أولاً.");
+    alert("حدد اسم مدرب محدد من فلتر المدرب أولاً.");
 
-    return;
+    return;
 
-  }
+  }
 
-  const det=await
+  const det=await
 collectCourseAttendanceDetail(c);
 
-  let absent=0,late=0,ok=0;
+  let absent=0,late=0,ok=0;
 
-  const
+  const
 rows=det.dates.map((date,i)=>{
 
-    const
+    const
 d=det.map.get(date)||null;
 
-    const
+    const
 a=attendanceAlertInfo(c,date,d);
 
-   
+   
 if(a.danger){if(!d?.startTS)absent++;else late++;}else ok++;
 
-    const noLogin=!d?.startTS;
+    const noLogin=!d?.startTS;
 
-    const
+    const
 noLogout=!!d?.startTS&&!d?.endTS;
 
-    const
+    const
 rowClass=noLogin?"no-login":(a.danger?"late":(noLogout?"no-logout":"complete"));
 
-    const label=noLogin?"لم يسجل الدخول":(noLogout&&!a.danger?"لم يسجل الخروج":a.label);
+    const label=noLogin?"لم يسجل الدخول":(noLogout&&!a.danger?"لم يسجل الخروج":a.label);
 
-    return `<tr
+    return `<tr
 class="${rowClass}">
 
-     
+     
 <td>${i+1}</td><td>${esc(displayDate(date))}</td>
 
-     
+     
 <td>${fmt(d?.startTS)}</td><td>${fmt(d?.breakStartTS)}</td>
 
-     
+     
 <td>${fmt(d?.breakEndTS)}</td><td>${fmt(d?.endTS)}</td>
 
-      <td>${esc(attendanceDeviceName(d))}</td><td><span
+      <td>${esc(attendanceDeviceName(d))}</td><td><span
 class="status-pill
 ${rowClass}">${esc(label)}</span></td>
 
-    </tr>`;
+    </tr>`;
 
-  }).join("");
+  }).join("");
 
-  const
+  const
 rate=det.dates.length?Math.round(ok/det.dates.length*100):0;
 
-  const now=new
+  const now=new
 Date(),w=window.open("","_blank");
 
-  if(!w){alert("اسمح بالنوافذ المنبثقة.");return}
+  if(!w){alert("اسمح بالنوافذ المنبثقة.");return}
 
- 
+ 
 w.document.write(`<!doctype html><html lang="ar"
 dir="rtl"><head><meta
 charset="utf-8"><title>تفاصيل
 حضور ${esc(trainer(c))}</title><style>
 
-  @page{size:A4
+  @page{size:A4
 portrait;margin:10mm}*{box-sizing:border-box;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 
- 
+ 
 body{font-family:Arial,Tahoma,sans-serif;margin:0;color:#17324d;font-size:9px}.head{background:#164478;color:#fff;border-radius:12px;padding:13px
 15px;display:flex;justify-content:space-between;align-items:center}.brand{display:flex;align-items:center;gap:11px}.logo{width:58px;height:58px;background:#fff;border-radius:10px;padding:5px;object-fit:contain}.head
 h1{margin:0 0
 3px;font-size:18px}.en{font-size:7px;letter-spacing:.6px;opacity:.9}.meta{text-align:left;line-height:1.8;font-size:7px}
 
- 
+ 
 .course{margin-top:9px;border:1px solid
 #d8e4ee;border-radius:10px;overflow:hidden}.course-title{background:#eaf4fd;color:#164478;padding:8px
 10px;font-size:14px;font-weight:bold}.info{display:grid;grid-template-columns:repeat(2,1fr);background:#fff}.info
 div{padding:7px 9px;border-bottom:1px solid #e5ecf2}.info
 span{display:block;color:#74879a;font-size:7px}.info b{font-size:9px}
 
- 
+ 
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:9px
 0}.stats div{border:1px solid #dbe5ee;border-radius:9px;padding:7px;text-align:center;background:#f8fbfd}.stats
 span{display:block;color:#718397;font-size:7px}.stats
 b{font-size:15px;color:#164478}.stats .bad b{color:#b91c1c}.stats .warn
 b{color:#c2410c}
 
- 
+ 
 table{width:100%;border-collapse:collapse;table-layout:fixed}th{background:#164478;color:#fff;padding:6px
 3px;font-size:7px}td{padding:6px 3px;border:1px solid
 #e1e8ef;text-align:center;font-size:7px;word-break:break-word}.no-login
@@ -1286,7 +1286,7 @@ td{background:#f4fbf7;color:#285744}.status-pill{display:inline-block;padding:3p
 5px;border-radius:999px;font-weight:bold}.status-pill.no-login{background:#fde2e2;color:#b91c1c}.status-pill.late{background:#ffedcc;color:#b45309}.status-pill.no-logout{background:#fff0c9;color:#92400e}.status-pill.complete{background:#dcf4e5;color:#167344}.foot{margin-top:8px;border-top:1px
 solid #dce5ed;padding-top:6px;color:#718397;font-size:7px;display:flex;justify-content:space-between}
 
- 
+ 
 </style></head><body><div
 class="head"><div class="brand"><img
 class="logo" src="${PRUDLE_LOGO}"><div><h1>تقرير حضور المدرب – جميع أيام الدورة</h1><div
@@ -1295,7 +1295,7 @@ DETAIL</div></div></div><div class="meta">التقرير:
 ${now.toLocaleDateString("ar-SA")}<br>أعد
 بواسطة: ${esc(USER||"Admin")}</div></div>
 
-  <div
+  <div
 class="course"><div
 class="course-title">${esc(name(c))} ·
 ${esc(period(c)||"-")}</div><div
@@ -1303,176 +1303,176 @@ class="info"><div><span>المدرب</span><b>${esc(trainer(c)||"-")}</b></div><
 ·
 ${esc(section(c)||"-")}</b></div><div><span>رقم الفصل</span><b>${esc(roomNumber(c))}</b></div><div><span>تاريخ بدء الدورة</span><b>${esc(displayCourseStartDate(c))}</b></div></div></div>
 
-  <div
+  <div
 class="stats"><div><span>الأيام</span><b>${det.dates.length}</b></div><div><span>الانتظام</span><b>${rate}%</b></div><div
 class="warn"><span>تأخر
 +15</span><b>${late}</b></div><div
 class="bad"><span>عدم تحضير</span><b>${absent}</b></div></div>
 
- 
+ 
 <table><thead><tr><th>#</th><th>التاريخ</th><th>Check-In</th><th>Break-In</th><th>Break-Out</th><th>Check-Out</th><th>الجهاز</th><th>الحالة</th></tr></thead><tbody>${rows}</tbody></table>
 
-  <div
+  <div
 class="foot"><span>Prudle Institute · Training Administration</span><span>الجهاز يظهر عند حفظه داخل سجل الحضور</span></div><script>window.onload=()=>setTimeout(()=>window.print(),450)<\/script></body></html>`);
 
-  w.document.close();
+  w.document.close();
 
 }
 
 function esc(v){
 
-  return
+  return
 String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]));
 
 }
 
 function startCourses(){
 
-  if(courseUnsub)courseUnsub();
+  if(courseUnsub)courseUnsub();
 
- 
+ 
 courseUnsub=db.collection("Courses").onSnapshot(snap=>{
 
-    COURSES=snap.docs.map(d=>({id:d.id,...d.data()})).filter(isOpen);
+    COURSES=snap.docs.map(d=>({id:d.id,...d.data()})).filter(isOpen);
 
-    fillSelectors();
+    fillSelectors();
 
-    refreshSectionCheckboxes();
+    refreshSectionCheckboxes();
 
-   
+   
 attachBreakSettingsListeners();
 
-    attachAttendanceListeners();
+    attachAttendanceListeners();
 
-  });
+  });
 
 }
 
 function fillSelectors(){
 
-  const branches=[...new
+  const branches=[...new
 Set(COURSES.map(branch).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ar"));
 
-  const sections=[...new
+  const sections=[...new
 Set(COURSES.map(section).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ar"));
 
- 
+ 
 branchSelect.innerHTML='<option value="">اختر الفرع</option>'+branches.map(x=>`<option>${esc(x)}</option>`).join("");
 
- 
+ 
 filterBranch.innerHTML='<option value="">كل الفروع</option>'+branches.map(x=>`<option>${esc(x)}</option>`).join("");
 
-  const periods=[...new
+  const periods=[...new
 Set(COURSES.map(period).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"en"));
 
-  const courseNames=[...new
+  const courseNames=[...new
 Set(COURSES.map(name).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ar"));
 
- 
+ 
 filterPeriod.innerHTML='<option value="">كل الفترات</option>'+periods.map(x=>`<option>${esc(x)}</option>`).join("");
 
- 
+ 
 refreshStartDateCheckboxes();
 
-  refreshSectionOptions();
+  refreshSectionOptions();
 
-  refreshCourseCheckboxes();
+  refreshCourseCheckboxes();
 
 }
 
 function refreshSectionOptions(){
 
-  const b=branchSelect.value;
+  const b=branchSelect.value;
 
-  const sections=[...new
+  const sections=[...new
 Set(COURSES.filter(c=>!b||branch(c)===b).map(section).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ar"));
 
- 
+ 
 sectionSelect.innerHTML='<option value="">اختر القسم</option>'+sections.map(x=>`<option>${esc(x)}</option>`).join("");
 
- 
+ 
 refreshBreakStartDateOptions();
 
-  refreshBreakCourseOptions();
+  refreshBreakCourseOptions();
 
 }
 
 sectionSelect.addEventListener("change",()=>{
 
-  refreshBreakStartDateOptions();
+  refreshBreakStartDateOptions();
 
-  refreshBreakCourseOptions();
+  refreshBreakCourseOptions();
 
 });
 
 breakCourseSelect.addEventListener("change",()=>{
 
-  const
+  const
 courseId=clean(breakCourseSelect.value);
 
-  if(!courseId)return;
+  if(!courseId)return;
 
-  const
+  const
 b=BREAK_SETTINGS.get(courseId);
 
-  if(b){
+  if(b){
 
-             
+             
 if(clean(b.breakStart))breakStartInput.value=clean(b.breakStart);
 
-   
+   
 if(Number(b.duration)>0)durationInput.value=Number(b.duration);
 
-  }
+  }
 
 });
 
 
 function refreshBreakCourseOptions(){
 
-  const b=clean(branchSelect.value);
+  const b=clean(branchSelect.value);
 
-  const
+  const
 s=clean(sectionSelect.value);
 
-  const
+  const
 startDateEl=document.getElementById("breakCourseStartDate");
 
-  const
+  const
 sd=clean(startDateEl?.value);
 
-  const rows=COURSES.filter(c=>
+  const rows=COURSES.filter(c=>
 
-    (!b||branch(c)===b)&&
+    (!b||branch(c)===b)&&
 
-    (!s||section(c)===s)&&
+    (!s||section(c)===s)&&
 
-    (!sd||courseStartDate(c)===sd)
+    (!sd||courseStartDate(c)===sd)
 
-  );
+  );
 
-  rows.sort((a,b)=>
+  rows.sort((a,b)=>
 
-   
+   
 period(a).localeCompare(period(b),"en",{numeric:true,sensitivity:"base"})
 ||
 
-   
+   
 name(a).localeCompare(name(b),"ar",{numeric:true,sensitivity:"base"})
 ||
 
-   
+   
 trainer(a).localeCompare(trainer(b),"ar",{sensitivity:"base"})
 
-  );
+  );
 
- 
+ 
 breakCourseSelect.innerHTML=
 
-    '<option
+    '<option
 value="">اختر الدورة</option>'+
 
-   
+   
 rows.map(c=>`<option
 value="${esc(c.id)}">${esc(name(c))} ·
 ${esc(period(c)||"-")} · ${esc(displayCourseStartDate(c))} ·
@@ -1484,219 +1484,219 @@ ${esc(trainer(c)||"-")}</option>`).join("");
 
 function refreshBreakStartDateOptions(){
 
-  const
+  const
 el=document.getElementById("breakCourseStartDate");
 
-  if(!el)return;
+  if(!el)return;
 
-  const
+  const
 b=clean(branchSelect.value);
 
-  const
+  const
 sec=clean(sectionSelect.value);
 
-  const current=clean(el.value);
+  const current=clean(el.value);
 
-  const dates=[...new Set(
+  const dates=[...new Set(
 
-    COURSES
+    COURSES
 
-      .filter(c=>
+      .filter(c=>
 
-        (!b || branch(c)===b)
+        (!b || branch(c)===b)
 &&
 
-        (!sec || section(c)===sec)
+        (!sec || section(c)===sec)
 
-      )
+      )
 
-     
+     
 .map(courseStartDate)
 
-      .filter(Boolean)
+      .filter(Boolean)
 
-  )]
+  )]
 
- 
+ 
 .sort((a,b)=>b.localeCompare(a))
 
-  .slice(0,6);
+  .slice(0,6);
 
-  el.innerHTML=
+  el.innerHTML=
 
-    '<option
+    '<option
 value="">اختر تاريخ بدء الدورة</option>'+
 
-   
+   
 dates.map(d=>`<option
 value="${esc(d)}">${esc(d)}</option>`).join("");
 
- 
+ 
 if(dates.includes(current))el.value=current;
 
 }
 
 async function saveSectionBreak(){
 
-  const
+  const
 courseId=clean(breakCourseSelect.value);
 
-  const
+  const
 duration=Number(durationInput.value);
 
-  const
+  const
 breakStart=clean(breakStartInput.value);
 
- 
+ 
 if(!courseId){alert("اختر الدورة
 التي تريد تعديل وقت البريك لها.");return;}
 
- 
+ 
 if(!breakStart){alert("حدد وقت بداية
 البريك.");return;}
 
- 
+ 
 if(!Number.isFinite(duration)||duration<1){alert("أدخل مدة بريك صحيحة.");return;}
 
-  const
+  const
 c=COURSES.find(x=>x.id===courseId);
 
-  if(!c){alert("الدورة غير موجودة.");return;}
+  if(!c){alert("الدورة غير موجودة.");return;}
 
-  try{
+  try{
 
-    await
+    await
 db.collection("BreakSettings").doc("course_"+c.id).set({
 
-      courseId:c.id,
+      courseId:c.id,
 
-      courseName:name(c),
+      courseName:name(c),
 
-      period:period(c),
+      period:period(c),
 
-      trainer:trainer(c),
+      trainer:trainer(c),
 
-      branch:branch(c),
+      branch:branch(c),
 
-      section:section(c),
+      section:section(c),
 
-     
+     
 startDate:courseStartDate(c),
 
-      breakStart,
+      breakStart,
 
-      duration,
+      duration,
 
-      enabled:true,
+      enabled:true,
 
-      updatedBy:USER,
+      updatedBy:USER,
 
-     
+     
 updatedAt:firebase.firestore.FieldValue.serverTimestamp()
 
-    },{merge:true});
+    },{merge:true});
 
-    alert(`تم حفظ وقت البريك لدورة ${name(c)} فقط.`);
+    alert(`تم حفظ وقت البريك لدورة ${name(c)} فقط.`);
 
-  }catch(error){
+  }catch(error){
 
-    console.error(error);
+    console.error(error);
 
-    alert("تعذر حفظ وقت البريك. حاول مرة أخرى.");
+    alert("تعذر حفظ وقت البريك. حاول مرة أخرى.");
 
-  }
+  }
 
 }
 
 function clearBreakSettingsListeners(){
 
- 
+ 
 breakUnsubs.forEach(fn=>{try{fn()}catch(e){}});
 
-  breakUnsubs=[];
+  breakUnsubs=[];
 
-  BREAK_SETTINGS.clear();
+  BREAK_SETTINGS.clear();
 
 }
 
 function attachBreakSettingsListeners(){
 
-  clearBreakSettingsListeners();
+  clearBreakSettingsListeners();
 
-  COURSES.forEach(c=>{
+  COURSES.forEach(c=>{
 
-    const
+    const
 unsub=db.collection("BreakSettings").doc("course_"+c.id)
 
-      .onSnapshot(doc=>{
+      .onSnapshot(doc=>{
 
-        if(doc.exists)
+        if(doc.exists)
 BREAK_SETTINGS.set(c.id,doc.data());
 
-        else
+        else
 BREAK_SETTINGS.delete(c.id);
 
-        renderAdminTable();
+        renderAdminTable();
 
-       
+       
 if(clean(breakCourseSelect.value)===c.id && doc.exists){
 
-          const b=doc.data()||{};
+          const b=doc.data()||{};
 
-         
+         
 if(clean(b.breakStart))breakStartInput.value=clean(b.breakStart);
 
-         
+         
 if(Number(b.duration)>0)durationInput.value=Number(b.duration);
 
-        }
+        }
 
-     
+     
 },error=>console.warn("BreakSettings
 listener:",c.id,error));
 
-    breakUnsubs.push(unsub);
+    breakUnsubs.push(unsub);
 
-  });
+  });
 
 }
 
 function clearAttendanceListeners(){
 
- 
+ 
 attendanceUnsubs.forEach(fn=>{try{fn()}catch(e){}});
 
-  attendanceUnsubs=[];
+  attendanceUnsubs=[];
 
-  TODAY_ATTENDANCE.clear();
+  TODAY_ATTENDANCE.clear();
 
 }
 
 function attachAttendanceListeners(){
 
-  clearAttendanceListeners();
+  clearAttendanceListeners();
 
-  const today=todayIso();
+  const today=todayIso();
 
-  COURSES.forEach(c=>{
+  COURSES.forEach(c=>{
 
-    const
+    const
 unsub=db.collection("Courses").doc(c.id).collection("Attendance").doc(today)
 
-      .onSnapshot(d=>{
+      .onSnapshot(d=>{
 
-        TODAY_ATTENDANCE.set(c.id,d.exists?d.data():null);
+        TODAY_ATTENDANCE.set(c.id,d.exists?d.data():null);
 
-        renderAdminTable();
+        renderAdminTable();
 
-      });
+      });
 
-   
+   
 attendanceUnsubs.push(unsub);
 
-  });
+  });
 
-  renderAdminTable();
+  renderAdminTable();
 
 }
 
@@ -1707,22 +1707,22 @@ function displayDate(v){return /^\d{4}-\d{2}-\d{2}$/.test(v)?v.split("-").revers
 
 function refreshStartDateCheckboxes(){
 
-  const
+  const
 box=document.getElementById("dateCheckboxes"); if(!box)return;
 
-  const dates=[...new
+  const dates=[...new
 Set(COURSES.map(courseStartDate).filter(Boolean))].sort((a,b)=>b.localeCompare(a));
 
-  SELECTED_START_DATES=new
+  SELECTED_START_DATES=new
 Set([...SELECTED_START_DATES].filter(d=>dates.includes(d)));
 
- 
+ 
 box.innerHTML=dates.map(d=>`<label
 class="date-option"><input type="checkbox"
 value="${esc(d)}"
 ${SELECTED_START_DATES.has(d)?"checked":""} onchange="changeStartDateSelection(this)"><span>${esc(displayDate(d))}</span></label>`).join("");
 
-  updateDateMultiLabel();
+  updateDateMultiLabel();
 
 }
 
@@ -1756,48 +1756,48 @@ function getSelectedSections(){return [...SELECTED_SECTIONS]}
 
 function refreshSectionCheckboxes(){
 
-  const
+  const
 box=document.getElementById("sectionCheckboxes");if(!box)return;
 
-  const fb=clean(document.getElementById("filterBranch")?.value);
+  const fb=clean(document.getElementById("filterBranch")?.value);
 
-  const
+  const
 rows=COURSES.filter(c=>(!fb||branch(c)===fb));
 
-  const values=[...new
+  const values=[...new
 Set(rows.map(section).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"en",{numeric:true,sensitivity:"base"}));
 
-  SELECTED_SECTIONS=new
+  SELECTED_SECTIONS=new
 Set([...SELECTED_SECTIONS].filter(x=>values.includes(x)));
 
- 
+ 
 box.innerHTML=values.map(x=>`<label class="section-option"><input
 type="checkbox" value="${esc(x)}"
 ${SELECTED_SECTIONS.has(x)?"checked":""}
 onchange="changeSectionSelection(this)"><span>${esc(x)}</span></label>`).join("");
 
-  updateSectionMultiLabel();
+  updateSectionMultiLabel();
 
 }
 
 function changeSectionSelection(el){
 
- 
+ 
 el.checked?SELECTED_SECTIONS.add(el.value):SELECTED_SECTIONS.delete(el.value);
 
- 
+ 
 updateSectionMultiLabel();refreshCourseCheckboxes();renderAdminTable();
 
 }
 
 function updateSectionMultiLabel(){
 
-  const
+  const
 el=document.getElementById("sectionMultiLabel");if(!el)return;
 
-  const n=SELECTED_SECTIONS.size;
+  const n=SELECTED_SECTIONS.size;
 
-  el.textContent=n===0?"كل الأقسام":n===1?[...SELECTED_SECTIONS][0]:`${n}
+  el.textContent=n===0?"كل الأقسام":n===1?[...SELECTED_SECTIONS][0]:`${n}
 أقسام محددة`;
 
 }
@@ -1807,24 +1807,24 @@ toggleSectionMulti(e){e?.stopPropagation();document.getElementById("sectionMulti
 
 function selectAllSections(){
 
- 
+ 
 document.querySelectorAll("#sectionCheckboxes
 input").forEach(el=>{el.checked=true;SELECTED_SECTIONS.add(el.value)});
 
- 
+ 
 updateSectionMultiLabel();refreshCourseCheckboxes();renderAdminTable();
 
 }
 
 function clearSections(){
 
-  SELECTED_SECTIONS.clear();
+  SELECTED_SECTIONS.clear();
 
- 
+ 
 document.querySelectorAll("#sectionCheckboxes
 input").forEach(el=>el.checked=false);
 
- 
+ 
 updateSectionMultiLabel();refreshCourseCheckboxes();renderAdminTable();
 
 }
@@ -1838,43 +1838,43 @@ function getSelectedCourses(){return [...SELECTED_COURSES]}
 
 function refreshCourseCheckboxes(){
 
-  const
+  const
 box=document.getElementById("courseCheckboxes"); if(!box)return;
 
-  const
+  const
 fb=clean(document.getElementById("filterBranch")?.value);
 
-  const
+  const
 selectedSections=getSelectedSections();
 
-  const
+  const
 fp=clean(document.getElementById("filterPeriod")?.value);
 
-  const selectedDates=typeof
+  const selectedDates=typeof
 getSelectedStartDates==="function"?getSelectedStartDates():[];
 
-  const rows=COURSES.filter(c=>
+  const rows=COURSES.filter(c=>
 
-   
+   
 (!fb||branch(c)===fb)&&(!selectedSections.length||selectedSections.includes(section(c)))&&(!fp||period(c)===fp)&&
 
-    (!selectedDates.length||selectedDates.includes(courseStartDate(c)))
+    (!selectedDates.length||selectedDates.includes(courseStartDate(c)))
 
-  );
+  );
 
-  const names=[...new
+  const names=[...new
 Set(rows.map(name).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"en",{numeric:true,sensitivity:"base"}));
 
-  SELECTED_COURSES=new
+  SELECTED_COURSES=new
 Set([...SELECTED_COURSES].filter(x=>names.includes(x)));
 
- 
+ 
 box.innerHTML=names.map(x=>`<label
 class="course-option"><input type="checkbox"
 value="${esc(x)}"
 ${SELECTED_COURSES.has(x)?"checked":""} onchange="changeCourseSelection(this)"><span>${esc(x)}</span></label>`).join("");
 
-  updateCourseMultiLabel();
+  updateCourseMultiLabel();
 
 }
 
@@ -1901,330 +1901,330 @@ x=document.getElementById("courseMulti");if(x&&!x.contains(e.target))x.classList
 
 function getFilteredRows(){
 
-  const
+  const
 fb=clean(filterBranch.value);
 
-  const
+  const
 selectedSections=getSelectedSections();
 
-  const
+  const
 fp=clean(filterPeriod.value);
 
-  const
+  const
 selectedCourses=getSelectedCourses();
 
-  const
+  const
 selectedDates=getSelectedStartDates();
 
-  const
+  const
 ft=clean(filterTrainer.value).toLowerCase();
 
-  return
+  return
 COURSES.filter(c=>
 
-   
+   
 (!fb||branch(c)===fb)&&
 
-   
+   
 (!selectedSections.length||selectedSections.includes(section(c)))&&
 
-   
+   
 (!fp||period(c)===fp)&&
 
-   
+   
 (!selectedCourses.length||selectedCourses.includes(name(c)))&&
 
-   
+   
 (!selectedDates.length||selectedDates.includes(courseStartDate(c)))&&
 
-    (!ft||trainer(c).toLowerCase().includes(ft))
+    (!ft||trainer(c).toLowerCase().includes(ft))
 
-  ).sort((a,b)=>
+  ).sort((a,b)=>
 
-   
+   
 branch(a).localeCompare(branch(b),"ar")||
 
-   
+   
 section(a).localeCompare(section(b),"ar")||
 
-   
+   
 period(a).localeCompare(period(b),"en")||
 
-   
+   
 name(a).localeCompare(name(b),"ar")
 
-  );
+  );
 
 }
 
 
 function formatScheduledBreakTime(value){
 
-  const v=clean(value);
+  const v=clean(value);
 
-  if(!/^\d{1,2}:\d{2}$/.test(v))
+  if(!/^\d{1,2}:\d{2}$/.test(v))
 return "-";
 
-  const
+  const
 [hh,mm]=v.split(":").map(Number);
 
-  const
+  const
 suffix=hh>=12?"PM":"AM";
 
-  const h12=(hh%12)||12;
+  const h12=(hh%12)||12;
 
-  return
+  return
 `${h12}:${String(mm).padStart(2,"0")} ${suffix}`;
 
 }
 
 function renderAdminTable(){
 
-  const rows=getFilteredRows();
+  const rows=getFilteredRows();
 
- 
+ 
 adminBody.innerHTML=rows.map((c,i)=>{
 
-    const
+    const
 d=TODAY_ATTENDANCE.get(c.id);
 
-    const
+    const
 b=BREAK_SETTINGS.get(c.id)||{};
 
-    const st=clean(d?.status);
+    const st=clean(d?.status);
 
-    const cls=st==="On
+    const cls=st==="On
 Break"?"break":st==="Checked-Out"?"off":"good";
 
-    const
+    const
 scheduled=formatScheduledBreakTime(b.breakStart);
 
-    const
+    const
 duration=Number(b.duration||0);
 
-    return `
+    return `
 
-      <tr>
+      <tr>
 
-       
+       
 <td>${i+1}</td>
 
-       
+       
 <td>${esc(branch(c)||"-")}</td>
 
-       
+       
 <td>${esc(section(c)||"-")}</td>
 
-       
+       
 <td><b>${esc(name(c))}</b></td>
 
-       
+       
 <td><b>${esc(displayCourseStartDate(c))}</b></td>
 
-       
+       
 <td>${esc(period(c)||"-")}</td>
 
-       
+       
 <td><b>${esc(trainer(c)||"-")}</b></td>
 
-        <td><span class="badge
+        <td><span class="badge
 break">${esc(scheduled)}</span></td>
 
-       
+       
 <td>${duration?esc(duration+" دقيقة"):"-"}</td>
 
-       
+       
 <td>${fmt(d?.startTS)}</td>
 
-       
+       
 <td>${fmt(d?.breakStartTS)}</td>
 
-       
+       
 <td>${fmt(d?.breakEndTS)}</td>
 
-       
+       
 <td>${fmt(d?.endTS)}</td>
 
-        <td><span class="badge
+        <td><span class="badge
 ${cls}">${esc(st||"لم يبدأ")}</span></td>
 
-       
+       
 <td><button class="detail-btn"
 onclick="showCourseAttendanceDetails('${esc(c.id)}')"><i
 class="fa-solid fa-calendar-days"></i> كل الأيام</button></td>
 
-      </tr>
+      </tr>
 
-    `;
+    `;
 
- 
+ 
 }).join("")||'<tr><td colspan="16">لا توجد بيانات مطابقة</td></tr>';
 
 }
 
 async function exportTrainerAttendancePDF(){
 
-  const rows=getFilteredRows();
+  const rows=getFilteredRows();
 
-  if(!rows.length){
+  if(!rows.length){
 
-    alert("لا توجد بيانات مطابقة للفلاتر الحالية.");
+    alert("لا توجد بيانات مطابقة للفلاتر الحالية.");
 
-    return;
+    return;
 
-  }
+  }
 
-  const fb=clean(filterBranch.value)||"كل الفروع";
+  const fb=clean(filterBranch.value)||"كل الفروع";
 
-  const
+  const
 fs=clean(filterSection.value)||"كل الأقسام";
 
-  const
+  const
 fp=clean(filterPeriod.value)||"كل الفترات";
 
-  const
+  const
 fc=clean(filterCourse.value)||"كل الدورات";
 
-  const
+  const
 selectedDatesPDF=getSelectedStartDates();
 
-  const fd=selectedDatesPDF.length
+  const fd=selectedDatesPDF.length
 ? selectedDatesPDF.map(displayDate).join("،
 ") : "كل تواريخ البدء";
 
-  const
+  const
 ft=clean(filterTrainer.value)||"كل المدربين";
 
-  const now=new Date();
+  const now=new Date();
 
-  // قراءة وقت البريك المحدد لكل دورة من BreakSettings
+  // قراءة وقت البريك المحدد لكل دورة من BreakSettings
 
-  const breakDocs=await
+  const breakDocs=await
 Promise.all(
 
-   
+   
 rows.map(c=>db.collection("BreakSettings").doc("course_"+c.id).get())
 
-  );
+  );
 
-  const BREAKS=new Map();
+  const BREAKS=new Map();
 
-  rows.forEach((c,i)=>{
+  rows.forEach((c,i)=>{
 
-   
+   
 BREAKS.set(c.id,breakDocs[i].exists?breakDocs[i].data():null);
 
-  });
+  });
 
-  function
+  function
 formatBreakTime12(v){
 
-    v=clean(v);
+    v=clean(v);
 
-   
+   
 if(!/^\d{1,2}:\d{2}$/.test(v))return "-";
 
-    const
+    const
 [hh,mm]=v.split(":").map(Number);
 
-    const
+    const
 suffix=hh>=12?"PM":"AM";
 
-    return
+    return
 `${(hh%12)||12}:${String(mm).padStart(2,"0")} ${suffix}`;
 
-  }
+  }
 
-  const tableRows=rows.map((c,i)=>{
+  const tableRows=rows.map((c,i)=>{
 
-    const
+    const
 d=TODAY_ATTENDANCE.get(c.id);
 
-    const b=BREAKS.get(c.id)||{};
+    const b=BREAKS.get(c.id)||{};
 
-    const
+    const
 scheduledBreak=formatBreakTime12(b.breakStart);
 
-    const
+    const
 breakDuration=Number(b.duration||0);
 
-    const
+    const
 st=clean(d?.status)||"لم يبدأ";
 
-    const statusClass=
+    const statusClass=
 
-      st==="On
+      st==="On
 Break"?"warn":
 
-     
+     
 st==="Checked-Out"?"off":
 
-      st==="لم يبدأ"?"bad":"good";
+      st==="لم يبدأ"?"bad":"good";
 
-    return `
+    return `
 
-      <tr
+      <tr
 class="${st==="لم يبدأ"?"danger":""}">
 
-       
+       
 <td>${i+1}</td>
 
-       
+       
 <td>${esc(branch(c)||"-")}</td>
 
-        <td>${esc(section(c)||"-")}</td>
+        <td>${esc(section(c)||"-")}</td>
 
-        <td
+        <td
 class="course"><b>${esc(name(c))}</b></td>
 
-       
+       
 <td>${esc(displayCourseStartDate(c))}</td>
 
-       
+       
 <td>${esc(period(c)||"-")}</td>
 
-       
+       
 <td><b>${esc(trainer(c)||"-")}</b></td>
 
-        <td
+        <td
 class="scheduled">${esc(scheduledBreak)}</td>
 
-       
+       
 <td>${breakDuration?esc(breakDuration+"
 min"):"-"}</td>
 
-       
+       
 <td>${fmt(d?.startTS)}</td>
 
-       
+       
 <td>${fmt(d?.breakStartTS)}</td>
 
-        <td>${fmt(d?.breakEndTS)}</td>
+        <td>${fmt(d?.breakEndTS)}</td>
 
-       
+       
 <td>${fmt(d?.endTS)}</td>
 
-        <td><span
+        <td><span
 class="badge ${statusClass}">${esc(st)}</span></td>
 
-      </tr>
+      </tr>
 
-    `;
+    `;
 
-  }).join("");
+  }).join("");
 
-  const
+  const
 w=window.open("","_blank");
 
-  if(!w){
+  if(!w){
 
-    alert("اسمح بالنوافذ المنبثقة لإنشاء تقرير PDF.");
+    alert("اسمح بالنوافذ المنبثقة لإنشاء تقرير PDF.");
 
-    return;
+    return;
 
-  }
+  }
 
-  w.document.write(`
+  w.document.write(`
 
 <!DOCTYPE html>
 
@@ -2248,10 +2248,10 @@ body{margin:0;font-family:Arial,Tahoma,sans-serif;color:#172f46;background:#fff}
 
 .cover{
 
- 
+ 
 display:flex;align-items:center;gap:16px;padding:15px 18px;
 
- 
+ 
 background:linear-gradient(135deg,#0b3158,#164478
 55%,#2c70b2);color:#fff
 
@@ -2324,148 +2324,148 @@ tr.danger{background:#fff4f5!important}
 
 <div class="report">
 
-  <div
+  <div
 class="cover">
 
-    <img class="logo"
+    <img class="logo"
 src="${PRUDLE_LOGO}" alt="Prudle">
 
-    <div
+    <div
 class="title">
 
-      <h1>تقرير متابعة حضور وأوقات المدربين</h1>
+      <h1>تقرير متابعة حضور وأوقات المدربين</h1>
 
-      <p>Prudle
+      <p>Prudle
 Institute · Trainer Attendance & Scheduled Break Report</p>
 
-    </div>
+    </div>
 
-    <div
+    <div
 class="meta">
 
-      تاريخ
+      تاريخ
 التقرير: ${now.toLocaleDateString("ar-SA")}<br>
 
-      وقت التقرير:
+      وقت التقرير:
 ${now.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"})}<br>
 
-      بواسطة: ${esc(USER||"Admin")}
+      بواسطة: ${esc(USER||"Admin")}
 
-    </div>
+    </div>
 
-  </div>
+  </div>
 
-  <div
+  <div
 class="content">
 
-    <div
+    <div
 class="filters">
 
-      <div class="filterBox"><span>الفرع</span><b>${esc(fb)}</b></div>
+      <div class="filterBox"><span>الفرع</span><b>${esc(fb)}</b></div>
 
-      <div
+      <div
 class="filterBox"><span>القسم</span><b>${esc(fs)}</b></div>
 
-      <div
+      <div
 class="filterBox"><span>الفترة</span><b>${esc(fp)}</b></div>
 
-      <div
+      <div
 class="filterBox"><span>الدورة</span><b>${esc(fc)}</b></div>
 
-      <div
+      <div
 class="filterBox"><span>تاريخ
 بدء الدورة</span><b>${esc(fd)}</b></div>
 
-      <div
+      <div
 class="filterBox"><span>المدرب</span><b>${esc(ft)}</b></div>
 
-    </div>
+    </div>
 
-    <div
+    <div
 class="summary">
 
-      <div
+      <div
 class="stat"><span>إجمالي
 الدورات</span><b>${rows.length}</b></div>
 
-      <div
+      <div
 class="stat"><span>بدأوا
 الدوام</span><b>${rows.filter(c=>TODAY_ATTENDANCE.get(c.id)?.startTS).length}</b></div>
 
-      <div
+      <div
 class="stat"><span>على
 بريك الآن</span><b>${rows.filter(c=>clean(TODAY_ATTENDANCE.get(c.id)?.status)==="On
 Break").length}</b></div>
 
-      <div
+      <div
 class="stat"><span>لم
 يبدأوا</span><b>${rows.filter(c=>!TODAY_ATTENDANCE.get(c.id)?.startTS).length}</b></div>
 
-    </div>
+    </div>
 
-    <div
+    <div
 class="sectionTitle">تفاصيل الدورات
 والحضور والبريك المحدد</div>
 
-    <table>
+    <table>
 
-      <thead><tr>
+      <thead><tr>
 
-        <th
+        <th
 style="width:3%">#</th>
 
-        <th
+        <th
 style="width:7%">الفرع</th>
 
-        <th
+        <th
 style="width:7%">القسم</th>
 
-        <th
+        <th
 style="width:9%">الدورة</th>
 
-        <th
+        <th
 style="width:7%">تاريخ البدء</th>
 
-        <th
+        <th
 style="width:8%">الفترة</th>
 
-        <th
+        <th
 style="width:9%">المدرب</th>
 
-        <th
+        <th
 style="width:8%">وقت البريك المحدد</th>
 
-        <th
+        <th
 style="width:6%">المدة</th>
 
-        <th
+        <th
 style="width:8%">Check-In</th>
 
-        <th
+        <th
 style="width:8%">Break-In</th>
 
-        <th
+        <th
 style="width:8%">Break-Out</th>
 
-        <th
+        <th
 style="width:8%">Check-Out</th>
 
-        <th
+        <th
 style="width:9%">الحالة</th>
 
-     
+     
 </tr></thead>
 
-     
+     
 <tbody>${tableRows}</tbody>
 
-    </table>
+    </table>
 
-    <div
+    <div
 class="footer">Prudle Language Institute · Administrative Trainer
 Attendance Report</div>
 
-  </div>
+  </div>
 
 </div>
 
@@ -2475,9 +2475,9 @@ Attendance Report</div>
 
 </html>
 
-  `);
+  `);
 
-  w.document.close();
+  w.document.close();
 
 }
 
@@ -2485,107 +2485,107 @@ Attendance Report</div>
 
 async function collectCourseAttendanceDetail(c){
 
-  const snap=await
+  const snap=await
 db.collection("Courses").doc(c.id).collection("Attendance").get();
 
-  const map=new
+  const map=new
 Map(snap.docs.map(d=>[d.id,d.data()]));
 
-  let
+  let
 dates=expectedCourseDates(c);
 
-  const
+  const
 stored=snap.docs.map(d=>d.id).filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x));
 
-  dates=[...new
+  dates=[...new
 Set([...dates,...stored])].sort();
 
-  return {course:c,dates,map};
+  return {course:c,dates,map};
 
 }
 
 function selectedDetailCourses(){
 
-  const
+  const
 selected=getSelectedCourses();
 
-  const rows=getFilteredRows();
+  const rows=getFilteredRows();
 
-  return
+  return
 selected.length?rows.filter(c=>selected.includes(name(c))):[];
 
 }
 
 async function showSelectedCoursesAttendanceDetails(){
 
-  const
+  const
 courses=selectedDetailCourses();
 
-  if(!courses.length){alert("حدد دورة واحدة أو أكثر أولاً.");return}
+  if(!courses.length){alert("حدد دورة واحدة أو أكثر أولاً.");return}
 
-  const
+  const
 modal=document.getElementById("attendanceDetailModal");
 
-  const
+  const
 body=document.getElementById("attendanceDetailBody");
 
- 
+ 
 document.getElementById("attendanceDetailTitle").textContent=`تفاصيل حضور الدورات المحددة
 (${courses.length})`;
 
-  body.innerHTML="جاري تحميل جميع أيام الدورات...";
+  body.innerHTML="جاري تحميل جميع أيام الدورات...";
 
- 
+ 
 modal.classList.add("open");
 
-  try{
+  try{
 
-    const details=await
+    const details=await
 Promise.all(courses.map(collectCourseAttendanceDetail));
 
-   
+   
 body.innerHTML=details.map(det=>{
 
-      let absent=0,late=0,ok=0;
+      let absent=0,late=0,ok=0;
 
-      const rr=det.dates.map((date,i)=>{
+      const rr=det.dates.map((date,i)=>{
 
-        const
+        const
 d=det.map.get(date)||null,a=attendanceAlertInfo(det.course,date,d);
 
-       
+       
 if(a.danger){if(!d?.startTS)absent++;else late++;}else ok++;
 
-        return `<tr
+        return `<tr
 class="${a.danger?"att-danger":""}"><td>${i+1}</td><td>${esc(displayDate(date))}</td><td>${fmt(d?.startTS)}</td><td>${fmt(d?.breakStartTS)}</td><td>${fmt(d?.breakEndTS)}</td><td>${fmt(d?.endTS)}</td><td>${esc(a.label)}</td></tr>`;
 
-      }).join("");
+      }).join("");
 
-      return `<div
+      return `<div
 style="margin-bottom:18px;border:1px solid #d8e4ef;border-radius:13px;overflow:hidden">
 
-        <div
+        <div
 style="background:#eaf4fd;color:#164478;padding:10px
 12px;font-weight:900">${esc(name(det.course))} ·
 ${esc(period(det.course)||"-")} · المدرب:
 ${esc(trainer(det.course)||"-")} · الفصل:
 ${esc(roomNumber(det.course))}</div>
 
-        <div
+        <div
 class="att-summary"
 style="padding:9px;margin:0"><div><b>${det.dates.length}</b>الأيام</div><div><b>${ok}</b>حضور سليم</div><div
 class="${late?"att-danger":""}"><b>${late}</b>تأخر +15 دقيقة</div><div
 class="${absent?"att-danger":""}"><b>${absent}</b>عدم تحضير</div></div>
 
-        <div
+        <div
 class="table-wrap" style="border-radius:0"><table
 class="att-detail-table"><thead><tr><th>#</th><th>التاريخ</th><th>Check-In</th><th>Break-In</th><th>Break-Out</th><th>Check-Out</th><th>الحالة</th></tr></thead><tbody>${rr}</tbody></table></div>
 
-      </div>`;
+      </div>`;
 
-    }).join("");
+    }).join("");
 
- 
+ 
 }catch(e){console.error(e);body.innerHTML='<div
 class="att-danger" style="padding:12px">تعذر تحميل التفاصيل.</div>'}
 
@@ -2593,147 +2593,147 @@ class="att-danger" style="padding:12px">تعذر تحميل التفاصيل.</d
 
 async function exportSelectedCoursesAttendancePDF(){
 
-  const courses=selectedDetailCourses();
+  const courses=selectedDetailCourses();
 
-  if(!courses.length){alert("حدد دورة واحدة أو أكثر أولاً.");return}
+  if(!courses.length){alert("حدد دورة واحدة أو أكثر أولاً.");return}
 
-  const details=await
+  const details=await
 Promise.all(courses.map(collectCourseAttendanceDetail));
 
-  const now=new Date();
+  const now=new Date();
 
-  let
+  let
 totalDays=0,totalOk=0,totalLate=0,totalAbsent=0;
 
-  const
+  const
 sections=details.map((det,idx)=>{
 
-    let absent=0,late=0,ok=0;
+    let absent=0,late=0,ok=0;
 
-    const
+    const
 rows=det.dates.map((date,i)=>{
 
-      const
+      const
 d=det.map.get(date)||null,a=attendanceAlertInfo(det.course,date,d);
 
-      const noLogin=!d?.startTS;
+      const noLogin=!d?.startTS;
 
-      const noLogout=!!d?.startTS
+      const noLogout=!!d?.startTS
 && !d?.endTS;
 
-      const lateRow=!!d?.startTS
+      const lateRow=!!d?.startTS
 && a.danger && !noLogin;
 
-      let rowClass="";
+      let rowClass="";
 
-      let statusLabel=a.label;
+      let statusLabel=a.label;
 
-     
+     
 if(noLogin){rowClass="no-login";statusLabel="لم يسجل الدخول";}
 
-      else
+      else
 if(lateRow){rowClass="late";statusLabel=a.label;}
 
-      else
+      else
 if(noLogout){rowClass="no-logout";statusLabel="لم يسجل الخروج";}
 
-     
+     
 else{rowClass="complete";}
 
-      if(noLogin)absent++; else
+      if(noLogin)absent++; else
 if(lateRow)late++; else ok++;
 
-      return `<tr
+      return `<tr
 class="${rowClass}">
 
-       
+       
 <td>${i+1}</td>
 
-       
+       
 <td>${esc(displayDate(date))}</td>
 
-       
+       
 <td>${fmt(d?.startTS)}</td>
 
-       
+       
 <td>${fmt(d?.breakStartTS)}</td>
 
-       
+       
 <td>${fmt(d?.breakEndTS)}</td>
 
-       
+       
 <td>${fmt(d?.endTS)}</td>
 
-        <td>${esc(attendanceDeviceName(d))}</td>
+        <td>${esc(attendanceDeviceName(d))}</td>
 
-        <td><span
+        <td><span
 class="status-pill
 ${rowClass}">${esc(statusLabel)}</span></td>
 
-      </tr>`;
+      </tr>`;
 
-    }).join("");
+    }).join("");
 
-   
+   
 totalDays+=det.dates.length;totalOk+=ok;totalLate+=late;totalAbsent+=absent;
 
-    const
+    const
 rate=det.dates.length?Math.round(ok/det.dates.length*100):0;
 
-    return `<section
+    return `<section
 class="course">
 
-      <div
+      <div
 class="course-head"><span
 class="num">${idx+1}</span><div
 class="ct"><b>${esc(name(det.course))}</b><small>${esc(trainer(det.course)||"-")}
 · ${esc(period(det.course)||"-")}</small></div><span
 class="rate">${rate}% انتظام</span></div>
 
-      <div
+      <div
 class="meta-grid"><div><span>الفرع</span><b>${esc(branch(det.course)||"-")}</b></div><div><span>القسم</span><b>${esc(section(det.course)||"-")}</b></div><div><span>الفصل</span><b>${esc(roomNumber(det.course))}</b></div><div><span>البداية</span><b>${esc(displayCourseStartDate(det.course))}</b></div></div>
 
-      <div class="mini"><div><span>الأيام</span><b>${det.dates.length}</b></div><div
+      <div class="mini"><div><span>الأيام</span><b>${det.dates.length}</b></div><div
 class="ok"><span>سليم</span><b>${ok}</b></div><div
 class="warn"><span>تأخر
 +15</span><b>${late}</b></div><div
 class="bad"><span>عدم تحضير</span><b>${absent}</b></div></div>
 
-      <table><thead><tr><th>#</th><th>التاريخ</th><th>دخول</th><th>بداية البريك</th><th>نهاية البريك</th><th>خروج</th><th>الجهاز</th><th>الحالة</th></tr></thead><tbody>${rows}</tbody></table>
+      <table><thead><tr><th>#</th><th>التاريخ</th><th>دخول</th><th>بداية البريك</th><th>نهاية البريك</th><th>خروج</th><th>الجهاز</th><th>الحالة</th></tr></thead><tbody>${rows}</tbody></table>
 
-    </section>`;
+    </section>`;
 
-  }).join("");
+  }).join("");
 
-  const
+  const
 overall=totalDays?Math.round(totalOk/totalDays*100):0;
 
-  const
+  const
 w=window.open("","_blank");if(!w){alert("اسمح بالنوافذ المنبثقة.");return}
 
- 
+ 
 w.document.write(`<!doctype html><html lang="ar"
 dir="rtl"><head><meta
 charset="utf-8"><title>التقرير
 الإداري التفصيلي لحضور الدورات</title><style>
 
-  @page{size:A4
+  @page{size:A4
 portrait;margin:8mm}*{box-sizing:border-box;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 
- 
+ 
 body{font-family:Arial,Tahoma,sans-serif;margin:0;color:#18324a;font-size:8px}.hero{background:#164478;color:#fff;border-radius:12px;padding:13px
 14px;display:flex;justify-content:space-between;align-items:center}.brand{display:flex;align-items:center;gap:10px}.logo{width:57px;height:57px;object-fit:contain;background:#fff;border-radius:10px;padding:5px}.hero
 h1{font-size:17px;margin:0 0
 3px}.en{font-size:7px;letter-spacing:.5px;opacity:.9}.hero-meta{font-size:7px;line-height:1.8;text-align:left}
 
- 
+ 
 .executive{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:8px
 0}.executive div{border:1px solid #dce6ee;border-radius:8px;padding:6px;text-align:center;background:#f7fafc}.executive
 span{display:block;color:#75879a;font-size:6.5px}.executive
 b{font-size:13px;color:#164478}.executive .warn b{color:#c2410c}.executive .bad
 b{color:#b91c1c}
 
-  .course{border:1px solid #d7e2eb;border-radius:10px;overflow:hidden;margin:0
+  .course{border:1px solid #d7e2eb;border-radius:10px;overflow:hidden;margin:0
 0
 9px;break-inside:avoid}.course-head{background:#eaf4fd;color:#164478;padding:7px
 8px;display:flex;align-items:center;gap:7px}.num{width:22px;height:22px;background:#164478;color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:bold}.ct{flex:1}.ct
@@ -2741,7 +2741,7 @@ b{display:block;font-size:12px}.ct
 small{font-size:7px;color:#526b83}.rate{border:1px solid
 #cbddea;background:#fff;border-radius:999px;padding:4px 7px;font-weight:bold}
 
-  .meta-grid{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px
+  .meta-grid{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px
 solid #e2e9ef}.meta-grid div{padding:5px 7px;border-left:1px solid
 #e2e9ef}.meta-grid span{display:block;color:#7a8c9e;font-size:6px}.meta-grid
 b{font-size:7.5px}.mini{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:5px;background:#f8fafc}.mini
@@ -2750,7 +2750,7 @@ div{border:1px solid #e0e8ef;background:#fff;border-radius:6px;padding:4px
 span{color:#718397;font-size:6.5px}.mini b{color:#164478;font-size:9px}.mini
 .ok b{color:#15803d}.mini .warn b{color:#c2410c}.mini .bad b{color:#b91c1c}
 
- 
+ 
 table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed;border:1px
 solid #d5e1eb;border-radius:8px;overflow:hidden}th{background:#123f70;color:#fff;padding:6px
 2px;font-size:6.5px;border-left:1px solid
@@ -2769,10 +2769,10 @@ transparent}.status-pill.no-login{background:#fde2e2;color:#b91c1c;border-color:
 
 .footer{margin-top:7px;padding-top:5px;border-top:1px solid #dce5ed;color:#748698;font-size:6.5px;display:flex;justify-content:space-between}
 
- 
+ 
 </style></head><body>
 
-  <div
+  <div
 class="hero"><div class="brand"><img
 class="logo" src="${PRUDLE_LOGO}"><div><h1>التقرير الإداري التفصيلي لحضور الدورات</h1><div
 class="en">PRUDLE INSTITUTE · TRAINERS ATTENDANCE
@@ -2782,282 +2782,282 @@ class="hero-meta">إدارة التدريب<br>${now.toLocaleDateString("ar-SA")
 ${now.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"})}<br>أعد بواسطة:
 ${esc(USER||"Admin")}</div></div>
 
-  <div
+  <div
 class="executive"><div><span>الدورات</span><b>${details.length}</b></div><div><span>الأيام</span><b>${totalDays}</b></div><div><span>الانتظام</span><b>${overall}%</b></div><div
 class="warn"><span>تأخر
 +15</span><b>${totalLate}</b></div><div
 class="bad"><span>عدم تحضير</span><b>${totalAbsent}</b></div></div>
 
-  <div
+  <div
 style="display:flex;gap:5px;flex-wrap:wrap;margin:-2px 0
 8px;font-size:6.5px">
 
-    <span
+    <span
 class="status-pill complete">مكتمل</span>
 
-    <span
+    <span
 class="status-pill late">تأخير</span>
 
-    <span
+    <span
 class="status-pill no-login">لم
 يسجل الدخول</span>
 
-    <span
+    <span
 class="status-pill no-logout">لم
 يسجل الخروج</span>
 
-  </div>
+  </div>
 
-  ${sections}
+  ${sections}
 
-  <div
+  <div
 class="footer"><span>Prudle Institute · Training &
 Academic Administration</span><span>الجهاز
 يظهر عند حفظه في سجل الحضور</span><span>${now.toLocaleString("en-GB")}</span></div><script>window.onload=()=>setTimeout(()=>window.print(),500)<\/script></body></html>`);
 
-  w.document.close();
+  w.document.close();
 
 }
 
 async function exportTrainerBreakTimesPDF(){
 
-  const
+  const
 rows=getFilteredRows();
 
-  if(!rows.length){
+  if(!rows.length){
 
-    alert("لا توجد دورات مطابقة للفلاتر الحالية.");
+    alert("لا توجد دورات مطابقة للفلاتر الحالية.");
 
-    return;
+    return;
 
-  }
+  }
 
-  const settings=await
+  const settings=await
 Promise.all(
 
-   
+   
 rows.map(c=>db.collection("BreakSettings").doc("course_"+c.id).get())
 
-  );
+  );
 
-  const
+  const
 reportRows=rows.map((c,i)=>({
 
-    course:c,
+    course:c,
 
-    setting:settings[i].exists ?
+    setting:settings[i].exists ?
 settings[i].data() : null
 
-  }))
+  }))
 
-  .filter(x=>x.setting
+  .filter(x=>x.setting
 && clean(x.setting.breakStart))
 
-  .sort((a,b)=>
+  .sort((a,b)=>
 
-   
+   
 name(a.course).localeCompare(name(b.course),"ar",{numeric:true,sensitivity:"base"})
 ||
 
-   
+   
 period(a.course).localeCompare(period(b.course),"en",{numeric:true,sensitivity:"base"})
 ||
 
-   
+   
 trainer(a.course).localeCompare(trainer(b.course),"ar",{sensitivity:"base"})
 ||
 
-   
+   
 branch(a.course).localeCompare(branch(b.course),"ar",{sensitivity:"base"})
 
-  );
+  );
 
-  if(!reportRows.length){
+  if(!reportRows.length){
 
-    alert("لا توجد أوقات بريك محددة للدورات المطابقة.");
+    alert("لا توجد أوقات بريك محددة للدورات المطابقة.");
 
-    return;
+    return;
 
-  }
+  }
 
-  const trainersCount=new
+  const trainersCount=new
 Set(reportRows.map(x=>trainer(x.course))).size;
 
-  const coursesCount=new
+  const coursesCount=new
 Set(reportRows.map(x=>name(x.course))).size;
 
-  const periodsCount=new
+  const periodsCount=new
 Set(reportRows.map(x=>name(x.course)+"|||"+period(x.course))).size;
 
-  const now=new Date();
+  const now=new Date();
 
-  const groups=[];
+  const groups=[];
 
-  reportRows
+  reportRows
 
-    .sort((a,b)=>
+    .sort((a,b)=>
 
-      period(a.course).localeCompare(period(b.course),"en",{numeric:true,sensitivity:"base"})
+      period(a.course).localeCompare(period(b.course),"en",{numeric:true,sensitivity:"base"})
 ||
 
-     
+     
 name(a.course).localeCompare(name(b.course),"ar",{numeric:true,sensitivity:"base"})
 ||
 
-     
+     
 courseStartDate(b.course).localeCompare(courseStartDate(a.course)) ||
 
-      trainer(a.course).localeCompare(trainer(b.course),"ar",{sensitivity:"base"})
+      trainer(a.course).localeCompare(trainer(b.course),"ar",{sensitivity:"base"})
 
-    )
+    )
 
-    .forEach(x=>{
+    .forEach(x=>{
 
-      const
+      const
 coursePeriod=period(x.course)||"-";
 
-      let
+      let
 group=groups.find(g=>g.coursePeriod===coursePeriod);
 
-      if(!group){
+      if(!group){
 
-        group={coursePeriod,rows:[]};
+        group={coursePeriod,rows:[]};
 
-        groups.push(group);
+        groups.push(group);
 
-      }
+      }
 
-      group.rows.push(x);
+      group.rows.push(x);
 
-    });
+    });
 
-  const
+  const
 groupsHTML=groups.map(group=>{
 
-    const
+    const
 groupRows=group.rows.map((x,i)=>`
 
-      <tr>
+      <tr>
 
-       
+       
 <td>${i+1}</td>
 
-       
+       
 <td><b>${esc(name(x.course)||"-")}</b></td>
 
-       
+       
 <td>${esc(roomNumber(x.course))}</td>
 
-        <td
+        <td
 class="trainer">${esc(trainer(x.course)||"-")}</td>
 
-       
+       
 <td>${esc(branch(x.course)||"-")}</td>
 
-       
+       
 <td>${esc(section(x.course)||"-")}</td>
 
-       
+       
 <td>${esc(displayCourseStartDate(x.course)||"-")}</td>
 
-        <td
+        <td
 class="breaktime">${esc(formatScheduledBreakTime(x.setting.breakStart)||"-")}</td>
 
-       
+       
 <td>${Number(x.setting.duration||0) ?
 esc(String(Number(x.setting.duration))+" دقيقة")
 : "-"}</td>
 
-      </tr>
+      </tr>
 
-    `).join("");
+    `).join("");
 
-    const
+    const
 avgDuration=Math.round(
 
-     
+     
 group.rows.reduce((sum,x)=>sum+Number(x.setting.duration||0),0) /
 
-     
+     
 Math.max(group.rows.length,1)
 
-    );
+    );
 
-    return `
+    return `
 
-      <section
+      <section
 class="period-block">
 
-        <div class="period-head">
+        <div class="period-head">
 
-          <div
+          <div
 class="course-title">
 
-            <span
+            <span
 class="small-label">جميع الدورات
 والتواريخ ضمن</span>
 
-            <strong>الفترة
+            <strong>الفترة
 ${esc(group.coursePeriod)}</strong>
 
-          </div>
+          </div>
 
-          <div
+          <div
 class="period-pill">
 
-            <span>عدد السجلات</span>
+            <span>عدد السجلات</span>
 
-           
+           
 <strong>${group.rows.length}</strong>
 
-          </div>
+          </div>
 
-        </div>
+        </div>
 
-        <table>
+        <table>
 
-          <thead><tr>
+          <thead><tr>
 
-           
+           
 <th>#</th><th>الدورة</th><th>رقم الفصل</th><th>المدرب</th><th>الفرع</th><th>القسم</th>
 
-            <th>تاريخ بدء الدورة</th><th>وقت البريك</th><th>المدة</th>
+            <th>تاريخ بدء الدورة</th><th>وقت البريك</th><th>المدة</th>
 
-         
+         
 </tr></thead>
 
-         
+         
 <tbody>${groupRows}</tbody>
 
-        </table>
+        </table>
 
-        <div
+        <div
 class="period-summary">
 
-          <span>الفترة تظهر مرة واحدة حتى عند اختيار أكثر من
+          <span>الفترة تظهر مرة واحدة حتى عند اختيار أكثر من
 تاريخ.</span>
 
-          <span>متوسط مدة البريك:
+          <span>متوسط مدة البريك:
 <b>${avgDuration||0} دقيقة</b></span>
 
-        </div>
+        </div>
 
-      </section>`;
+      </section>`;
 
-  }).join("");
+  }).join("");
 
-  const
+  const
 w=window.open("","_blank");
 
-  if(!w){
+  if(!w){
 
-    alert("اسمح بالنوافذ المنبثقة لإنشاء التقرير.");
+    alert("اسمح بالنوافذ المنبثقة لإنشاء التقرير.");
 
-    return;
+    return;
 
-  }
+  }
 
- 
+ 
 w.document.write(`<!DOCTYPE html>
 
 <html lang="ar" dir="rtl">
@@ -3076,136 +3076,136 @@ w.document.write(`<!DOCTYPE html>
 
 body{
 
-  margin:0;
+  margin:0;
 
- 
+ 
 font-family:Arial,Tahoma,sans-serif;
 
-  background:#eef3f8;
+  background:#eef3f8;
 
-  color:#18324a;
+  color:#18324a;
 
 }
 
 .report{
 
-  background:#fff;
+  background:#fff;
 
-  border:1px solid #cfdbe7;
+  border:1px solid #cfdbe7;
 
-  border-radius:18px;
+  border-radius:18px;
 
-  overflow:hidden;
+  overflow:hidden;
 
 }
 
 .header{
 
- 
+ 
 background:linear-gradient(135deg,#0f355f,#164478,#2469ad);
 
-  color:#fff;
+  color:#fff;
 
-  padding:18px 22px;
+  padding:18px 22px;
 
-  display:flex;
+  display:flex;
 
-  align-items:center;
+  align-items:center;
 
-  justify-content:space-between;
+  justify-content:space-between;
 
-  gap:18px;
+  gap:18px;
 
 }
 
 .brand{
 
-  display:flex;
+  display:flex;
 
-  align-items:center;
+  align-items:center;
 
-  gap:14px;
+  gap:14px;
 
 }
 
 .logo{
 
-  width:76px;
+  width:76px;
 
-  height:76px;
+  height:76px;
 
-  object-fit:contain;
+  object-fit:contain;
 
-  background:#fff;
+  background:#fff;
 
-  border-radius:14px;
+  border-radius:14px;
 
-  padding:6px;
+  padding:6px;
 
 }
 
 .header h1{
 
-  margin:0;
+  margin:0;
 
-  font-size:25px;
+  font-size:25px;
 
-  font-weight:900;
+  font-weight:900;
 
 }
 
 .header .en{
 
-  margin-top:5px;
+  margin-top:5px;
 
-  font-size:10px;
+  font-size:10px;
 
-  letter-spacing:1px;
+  letter-spacing:1px;
 
-  color:#dceaf7;
+  color:#dceaf7;
 
-  font-weight:700;
+  font-weight:700;
 
 }
 
 .header .sort-note{
 
-  margin-top:7px;
+  margin-top:7px;
 
-  font-size:9px;
+  font-size:9px;
 
-  font-weight:700;
+  font-weight:700;
 
-  color:#fff;
+  color:#fff;
 
- 
+ 
 background:rgba(255,255,255,.12);
 
-  display:inline-block;
+  display:inline-block;
 
-  padding:5px 9px;
+  padding:5px 9px;
 
-  border-radius:999px;
+  border-radius:999px;
 
 }
 
 .issue{
 
-  min-width:215px;
+  min-width:215px;
 
- 
+ 
 background:rgba(255,255,255,.11);
 
-  border:1px solid
+  border:1px solid
 rgba(255,255,255,.2);
 
-  border-radius:12px;
+  border-radius:12px;
 
-  padding:10px 13px;
+  padding:10px 13px;
 
-  font-size:9px;
+  font-size:9px;
 
-  line-height:1.9;
+  line-height:1.9;
 
 }
 
@@ -3213,201 +3213,201 @@ rgba(255,255,255,.2);
 
 .summary{
 
-  display:grid;
+  display:grid;
 
- 
+ 
 grid-template-columns:repeat(4,1fr);
 
-  gap:9px;
+  gap:9px;
 
-  margin-bottom:14px;
+  margin-bottom:14px;
 
 }
 
 .stat{
 
-  border:1px solid #dbe5ee;
+  border:1px solid #dbe5ee;
 
-  background:#f7fafd;
+  background:#f7fafd;
 
-  border-radius:12px;
+  border-radius:12px;
 
-  padding:10px;
+  padding:10px;
 
-  text-align:center;
+  text-align:center;
 
 }
 
 .stat strong{
 
-  display:block;
+  display:block;
 
-  color:#164478;
+  color:#164478;
 
-  font-size:21px;
+  font-size:21px;
 
-  font-weight:900;
+  font-weight:900;
 
 }
 
 .stat span{
 
-  display:block;
+  display:block;
 
-  margin-top:3px;
+  margin-top:3px;
 
-  color:#708297;
+  color:#708297;
 
-  font-size:9px;
+  font-size:9px;
 
-  font-weight:700;
+  font-weight:700;
 
 }
 
 .period-block{
 
-  margin:0 0 15px;
+  margin:0 0 15px;
 
-  border:1px solid #d4e0eb;
+  border:1px solid #d4e0eb;
 
-  border-radius:14px;
+  border-radius:14px;
 
-  overflow:hidden;
+  overflow:hidden;
 
-  break-inside:avoid;
+  break-inside:avoid;
 
-  page-break-inside:avoid;
+  page-break-inside:avoid;
 
 }
 
 .period-head{
 
-  min-height:48px;
+  min-height:48px;
 
-  background:#eaf4fd;
+  background:#eaf4fd;
 
-  border-bottom:1px solid #cbdbe9;
+  border-bottom:1px solid #cbdbe9;
 
-  display:flex;
+  display:flex;
 
-  align-items:center;
+  align-items:center;
 
-  justify-content:space-between;
+  justify-content:space-between;
 
-  gap:12px;
+  gap:12px;
 
-  padding:9px 13px;
+  padding:9px 13px;
 
 }
 
 .course-title{
 
-  display:flex;
+  display:flex;
 
-  align-items:center;
+  align-items:center;
 
-  gap:8px;
+  gap:8px;
 
-  color:#164478;
+  color:#164478;
 
 }
 
 .course-title .small-label{
 
-  font-size:9px;
+  font-size:9px;
 
-  color:#6f8093;
+  color:#6f8093;
 
-  font-weight:800;
+  font-weight:800;
 
 }
 
 .course-title strong{
 
-  font-size:15px;
+  font-size:15px;
 
-  font-weight:900;
+  font-weight:900;
 
 }
 
 .period-pill{
 
-  min-width:205px;
+  min-width:205px;
 
-  background:#164478;
+  background:#164478;
 
-  color:#fff;
+  color:#fff;
 
-  border-radius:999px;
+  border-radius:999px;
 
-  padding:7px 13px;
+  padding:7px 13px;
 
-  display:flex;
+  display:flex;
 
-  align-items:center;
+  align-items:center;
 
-  justify-content:center;
+  justify-content:center;
 
-  gap:8px;
+  gap:8px;
 
 }
 
 .period-pill span{
 
-  font-size:9px;
+  font-size:9px;
 
-  opacity:.85;
+  opacity:.85;
 
-  font-weight:700;
+  font-weight:700;
 
 }
 
 .period-pill strong{
 
-  font-size:13px;
+  font-size:13px;
 
-  font-weight:900;
+  font-weight:900;
 
 }
 
 table{
 
-  width:100%;
+  width:100%;
 
-  border-collapse:collapse;
+  border-collapse:collapse;
 
 }
 
 th{
 
-  background:#164478;
+  background:#164478;
 
-  color:#fff;
+  color:#fff;
 
-  padding:8px 5px;
+  padding:8px 5px;
 
-  font-size:9px;
+  font-size:9px;
 
-  font-weight:900;
+  font-weight:900;
 
-  border-left:1px solid
+  border-left:1px solid
 rgba(255,255,255,.15);
 
 }
 
 td{
 
-  text-align:center;
+  text-align:center;
 
-  padding:8px 5px;
+  padding:8px 5px;
 
-  font-size:9px;
+  font-size:9px;
 
-  font-weight:700;
+  font-weight:700;
 
-  border-bottom:1px solid #e2e9f0;
+  border-bottom:1px solid #e2e9f0;
 
-  border-left:1px solid #e2e9f0;
+  border-left:1px solid #e2e9f0;
 
 }
 
@@ -3417,69 +3417,69 @@ tbody tr:last-child td{border-bottom:0}
 
 .trainer{
 
-  color:#164478;
+  color:#164478;
 
-  font-weight:900;
+  font-weight:900;
 
 }
 
 .breaktime{
 
-  color:#8a5700;
+  color:#8a5700;
 
-  background:#fff6df!important;
+  background:#fff6df!important;
 
-  font-size:10px;
+  font-size:10px;
 
-  font-weight:900;
+  font-weight:900;
 
 }
 
 .period-summary{
 
-  background:#f1f5f9;
+  background:#f1f5f9;
 
-  padding:7px 12px;
+  padding:7px 12px;
 
-  display:flex;
+  display:flex;
 
-  justify-content:space-between;
+  justify-content:space-between;
 
-  gap:15px;
+  gap:15px;
 
-  color:#52667a;
+  color:#52667a;
 
-  font-size:8.5px;
+  font-size:8.5px;
 
-  font-weight:700;
+  font-weight:700;
 
 }
 
 .period-summary b{
 
-  color:#164478;
+  color:#164478;
 
-  font-size:9.5px;
+  font-size:9.5px;
 
 }
 
 .footer{
 
-  margin-top:10px;
+  margin-top:10px;
 
-  padding-top:9px;
+  padding-top:9px;
 
-  border-top:1px solid #dce5ed;
+  border-top:1px solid #dce5ed;
 
-  display:flex;
+  display:flex;
 
-  justify-content:space-between;
+  justify-content:space-between;
 
-  align-items:center;
+  align-items:center;
 
-  color:#748699;
+  color:#748699;
 
-  font-size:8px;
+  font-size:8px;
 
 }
 
@@ -3487,12 +3487,12 @@ tbody tr:last-child td{border-bottom:0}
 
 @media print{
 
-  body{background:#fff}
+  body{background:#fff}
 
- 
+ 
 .report{border-radius:0;border:0}
 
- 
+ 
 .period-block{break-inside:avoid;page-break-inside:avoid}
 
 }
@@ -3505,80 +3505,80 @@ tbody tr:last-child td{border-bottom:0}
 
 <div class="report">
 
-  <div
+  <div
 class="header">
 
-    <div
+    <div
 class="brand">
 
-      <img
+      <img
 class="logo" src="${PRUDLE_LOGO}"
 alt="Prudle">
 
-      <div>
+      <div>
 
-        <h1>تقرير أوقات البريك للمدربين</h1>
+        <h1>تقرير أوقات البريك للمدربين</h1>
 
-        <div
+        <div
 class="en">PRUDLE INSTITUTE · TRAINERS BREAK SCHEDULE</div>
 
-        <div
+        <div
 class="sort-note">تجميع موحّد حسب
 الفترة ← الدورة ← المدرب</div>
 
-      </div>
+      </div>
 
-    </div>
+    </div>
 
-    <div
+    <div
 class="issue">
 
-      <b>تاريخ التقرير:</b>
+      <b>تاريخ التقرير:</b>
 ${now.toLocaleDateString("ar-SA")}<br>
 
-      <b>وقت الإصدار:</b>
+      <b>وقت الإصدار:</b>
 ${now.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"})}<br>
 
-      <b>أعد بواسطة:</b> ${esc(USER||"Admin")}
+      <b>أعد بواسطة:</b> ${esc(USER||"Admin")}
 
-    </div>
+    </div>
 
-  </div>
+  </div>
 
-  <div
+  <div
 class="content">
 
-    <div
+    <div
 class="summary">
 
-      <div
+      <div
 class="stat"><strong>${coursesCount}</strong><span>عدد الدورات</span></div>
 
-      <div
+      <div
 class="stat"><strong>${periodsCount}</strong><span>عدد الفترات</span></div>
 
-      <div
+      <div
 class="stat"><strong>${trainersCount}</strong><span>عدد المدربين</span></div>
 
-      <div
+      <div
 class="stat"><strong>${reportRows.length}</strong><span>أوقات البريك المسجلة</span></div>
 
-    </div>
+    </div>
 
-    ${groupsHTML}
+    ${groupsHTML}
 
-    <div
+    <div
 class="footer">
 
-      <strong>Prudle
+      <strong>Prudle
 Institute · Academic Administration</strong>
 
-      <span>كل فترة متشابهة مجمعة معًا مهما تعددت تواريخ
+      <span>كل فترة متشابهة مجمعة معًا مهما تعددت تواريخ
 بدء الدورات</span>
 
-    </div>
+    </div>
 
-  </div>
+  </div>
 
 </div>
 
@@ -3586,7 +3586,7 @@ Institute · Academic Administration</strong>
 
 window.onload=function(){
 
- 
+ 
 setTimeout(function(){window.print();},400);
 
 };
@@ -3597,17 +3597,17 @@ setTimeout(function(){window.print();},400);
 
 </html>`);
 
-  w.document.close();
+  w.document.close();
 
 }
 
 window.addEventListener("beforeunload",()=>{
 
-  if(courseUnsub)courseUnsub();
+  if(courseUnsub)courseUnsub();
 
-  clearAttendanceListeners();
+  clearAttendanceListeners();
 
-  clearBreakSettingsListeners();
+  clearBreakSettingsListeners();
 
 });
 
