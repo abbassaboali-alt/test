@@ -978,26 +978,6 @@ document.getElementById("attendanceDetailModal")?.classList.remove("open");
 
 }
 
-function attendanceDayName(d){
-  if(!d) return "--";
-  const saved=String(d.Day||d.day||d.DayName||d.dayName||"").trim();
-  if(saved) return saved;
-
-  const raw=String(d.Date||d.date||"").trim();
-  if(!raw) return "--";
-
-  let dt=null;
-  let m=raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-  if(m) dt=new Date(+m[1],+m[2]-1,+m[3],12,0,0);
-  else{
-    m=raw.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
-    if(m) dt=new Date(+m[3],+m[2]-1,+m[1],12,0,0);
-  }
-  if(!dt||isNaN(dt)) return "--";
-
-  return ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"][dt.getDay()]||"--";
-}
-
 function attendanceDeviceName(d){
   if(!d) return "--";
   const direct=[
@@ -1142,7 +1122,7 @@ class="table-wrap" style="max-height:60vh">
         <table class="att-detail-table"><thead><tr>
 
          
-<th>#</th><th>التاريخ</th><th>اليوم</th><th>Check-In</th><th>Break-In</th><th>Break-Out</th><th>Check-Out</th><th>الجهاز</th><th>التنبيه</th>
+<th>#</th><th>التاريخ</th><th>Check-In</th><th>Break-In</th><th>Break-Out</th><th>Check-Out</th><th>الجهاز</th><th>التنبيه</th>
 
        
 </tr></thead><tbody>${rows||'<tr><td
@@ -1297,7 +1277,7 @@ class="warn"><span>تأخر
 class="bad"><span>عدم تحضير</span><b>${absent}</b></div></div>
 
  
-<table><thead><tr><th>#</th><th>التاريخ</th><th>اليوم</th><th>Check-In</th><th>Break-In</th><th>Break-Out</th><th>Check-Out</th><th>الجهاز</th><th>الحالة</th></tr></thead><tbody>${rows}</tbody></table>
+<table><thead><tr><th>#</th><th>التاريخ</th><th>Check-In</th><th>Break-In</th><th>Break-Out</th><th>Check-Out</th><th>الجهاز</th><th>الحالة</th></tr></thead><tbody>${rows}</tbody></table>
 
   <div
 class="foot"><span>Prudle Institute · Training Administration</span><span>الجهاز يظهر عند حفظه داخل سجل الحضور</span></div><script>window.onload=()=>setTimeout(()=>window.print(),450)<\/script></body></html>`);
@@ -2566,7 +2546,7 @@ class="${absent?"att-danger":""}"><b>${absent}</b>عدم تحضير</div></div>
 
         <div
 class="table-wrap" style="border-radius:0"><table
-class="att-detail-table"><thead><tr><th>#</th><th>التاريخ</th><th>اليوم</th><th>Check-In</th><th>Break-In</th><th>Break-Out</th><th>Check-Out</th><th>الحالة</th></tr></thead><tbody>${rr}</tbody></table></div>
+class="att-detail-table"><thead><tr><th>#</th><th>التاريخ</th><th>Check-In</th><th>Break-In</th><th>Break-Out</th><th>Check-Out</th><th>الحالة</th></tr></thead><tbody>${rr}</tbody></table></div>
 
       </div>`;
 
@@ -2686,7 +2666,7 @@ class="warn"><span>تأخر
 +15</span><b>${late}</b></div><div
 class="bad"><span>عدم تحضير</span><b>${absent}</b></div></div>
 
-      <table><thead><tr><th>#</th><th>التاريخ</th><th>اليوم</th><th>دخول</th><th>بداية البريك</th><th>نهاية البريك</th><th>خروج</th><th>الجهاز</th><th>الحالة</th></tr></thead><tbody>${rows}</tbody></table>
+      <table><thead><tr><th>#</th><th>التاريخ</th><th>دخول</th><th>بداية البريك</th><th>نهاية البريك</th><th>خروج</th><th>الجهاز</th><th>الحالة</th></tr></thead><tbody>${rows}</tbody></table>
 
     </section>`;
 
