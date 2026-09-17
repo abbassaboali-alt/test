@@ -513,11 +513,15 @@ async function exportOneCourseAttendancePortraitPDF(courseId){
     const d=det.map.get(date)||null;
     const a=attendanceAlertInfo(c,date,d);
     if(a.danger){if(!d?.startTS)absent++;else late++;}else ok++;
-    return `<tr class="${a.danger?"danger":""}">
+    const noLogin=!d?.startTS;
+    const noLogout=!!d?.startTS&&!d?.endTS;
+    const rowClass=noLogin?"no-login":(a.danger?"late":(noLogout?"no-logout":"complete"));
+    const label=noLogin?"لم يسجل الدخول":(noLogout&&!a.danger?"لم يسجل الخروج":a.label);
+    return `<tr class="${rowClass}">
       <td>${i+1}</td><td>${esc(displayDate(date))}</td>
       <td>${fmt(d?.startTS)}</td><td>${fmt(d?.breakStartTS)}</td>
       <td>${fmt(d?.breakEndTS)}</td><td>${fmt(d?.endTS)}</td>
-      <td>${esc(attendanceDeviceName(d))}</td><td>${esc(a.label)}</td>
+      <td>${esc(attendanceDeviceName(d))}</td><td><span class="status-pill ${rowClass}">${esc(label)}</span></td>
     </tr>`;
   }).join("");
   const rate=det.dates.length?Math.round(ok/det.dates.length*100):0;
@@ -528,7 +532,7 @@ async function exportOneCourseAttendancePortraitPDF(courseId){
   body{font-family:Arial,Tahoma,sans-serif;margin:0;color:#17324d;font-size:9px}.head{background:#164478;color:#fff;border-radius:12px;padding:13px 15px;display:flex;justify-content:space-between;align-items:center}.brand{display:flex;align-items:center;gap:11px}.logo{width:58px;height:58px;background:#fff;border-radius:10px;padding:5px;object-fit:contain}.head h1{margin:0 0 3px;font-size:18px}.en{font-size:7px;letter-spacing:.6px;opacity:.9}.meta{text-align:left;line-height:1.8;font-size:7px}
   .course{margin-top:9px;border:1px solid #d8e4ee;border-radius:10px;overflow:hidden}.course-title{background:#eaf4fd;color:#164478;padding:8px 10px;font-size:14px;font-weight:bold}.info{display:grid;grid-template-columns:repeat(2,1fr);background:#fff}.info div{padding:7px 9px;border-bottom:1px solid #e5ecf2}.info span{display:block;color:#74879a;font-size:7px}.info b{font-size:9px}
   .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:9px 0}.stats div{border:1px solid #dbe5ee;border-radius:9px;padding:7px;text-align:center;background:#f8fbfd}.stats span{display:block;color:#718397;font-size:7px}.stats b{font-size:15px;color:#164478}.stats .bad b{color:#b91c1c}.stats .warn b{color:#c2410c}
-  table{width:100%;border-collapse:collapse;table-layout:fixed}th{background:#164478;color:#fff;padding:6px 3px;font-size:7px}td{padding:6px 3px;border:1px solid #e1e8ef;text-align:center;font-size:7px;word-break:break-word}.danger td{background:#fff0f0;color:#b91c1c;font-weight:bold}tbody tr:nth-child(even):not(.danger){background:#f8fbfd}.foot{margin-top:8px;border-top:1px solid #dce5ed;padding-top:6px;color:#718397;font-size:7px;display:flex;justify-content:space-between}
+  table{width:100%;border-collapse:collapse;table-layout:fixed}th{background:#164478;color:#fff;padding:6px 3px;font-size:7px}td{padding:6px 3px;border:1px solid #e1e8ef;text-align:center;font-size:7px;word-break:break-word}.no-login td{background:#fff0f0;color:#a61b1b}.late td{background:#fff7e8;color:#9a4d00}.no-logout td{background:#fff3dc;color:#8a4b08}.complete td{background:#f4fbf7;color:#285744}.status-pill{display:inline-block;padding:3px 5px;border-radius:999px;font-weight:bold}.status-pill.no-login{background:#fde2e2;color:#b91c1c}.status-pill.late{background:#ffedcc;color:#b45309}.status-pill.no-logout{background:#fff0c9;color:#92400e}.status-pill.complete{background:#dcf4e5;color:#167344}.foot{margin-top:8px;border-top:1px solid #dce5ed;padding-top:6px;color:#718397;font-size:7px;display:flex;justify-content:space-between}
   </style></head><body><div class="head"><div class="brand"><img class="logo" src="${PRUDLE_LOGO}"><div><h1>تقرير حضور المدرب – جميع أيام الدورة</h1><div class="en">PRUDLE INSTITUTE · TRAINER ATTENDANCE DETAIL</div></div></div><div class="meta">التقرير: ${now.toLocaleDateString("ar-SA")}<br>أعد بواسطة: ${esc(USER||"Admin")}</div></div>
   <div class="course"><div class="course-title">${esc(name(c))} · ${esc(period(c)||"-")}</div><div class="info"><div><span>المدرب</span><b>${esc(trainer(c)||"-")}</b></div><div><span>الفرع / القسم</span><b>${esc(branch(c)||"-")} · ${esc(section(c)||"-")}</b></div><div><span>رقم الفصل</span><b>${esc(roomNumber(c))}</b></div><div><span>تاريخ بدء الدورة</span><b>${esc(displayCourseStartDate(c))}</b></div></div></div>
   <div class="stats"><div><span>الأيام</span><b>${det.dates.length}</b></div><div><span>الانتظام</span><b>${rate}%</b></div><div class="warn"><span>تأخر +15</span><b>${late}</b></div><div class="bad"><span>عدم تحضير</span><b>${absent}</b></div></div>
@@ -1093,8 +1097,26 @@ async function exportSelectedCoursesAttendancePDF(){
     let absent=0,late=0,ok=0;
     const rows=det.dates.map((date,i)=>{
       const d=det.map.get(date)||null,a=attendanceAlertInfo(det.course,date,d);
-      if(a.danger){if(!d?.startTS)absent++;else late++;}else ok++;
-      return `<tr class="${a.danger?"danger":""}"><td>${i+1}</td><td>${esc(displayDate(date))}</td><td>${fmt(d?.startTS)}</td><td>${fmt(d?.breakStartTS)}</td><td>${fmt(d?.breakEndTS)}</td><td>${fmt(d?.endTS)}</td><td>${esc(attendanceDeviceName(d))}</td><td>${esc(a.label)}</td></tr>`;
+      const noLogin=!d?.startTS;
+      const noLogout=!!d?.startTS && !d?.endTS;
+      const lateRow=!!d?.startTS && a.danger && !noLogin;
+      let rowClass="";
+      let statusLabel=a.label;
+      if(noLogin){rowClass="no-login";statusLabel="لم يسجل الدخول";}
+      else if(lateRow){rowClass="late";statusLabel=a.label;}
+      else if(noLogout){rowClass="no-logout";statusLabel="لم يسجل الخروج";}
+      else{rowClass="complete";}
+      if(noLogin)absent++; else if(lateRow)late++; else ok++;
+      return `<tr class="${rowClass}">
+        <td>${i+1}</td>
+        <td>${esc(displayDate(date))}</td>
+        <td>${fmt(d?.startTS)}</td>
+        <td>${fmt(d?.breakStartTS)}</td>
+        <td>${fmt(d?.breakEndTS)}</td>
+        <td>${fmt(d?.endTS)}</td>
+        <td>${esc(attendanceDeviceName(d))}</td>
+        <td><span class="status-pill ${rowClass}">${esc(statusLabel)}</span></td>
+      </tr>`;
     }).join("");
     totalDays+=det.dates.length;totalOk+=ok;totalLate+=late;totalAbsent+=absent;
     const rate=det.dates.length?Math.round(ok/det.dates.length*100):0;
@@ -1114,10 +1136,19 @@ async function exportSelectedCoursesAttendancePDF(){
   .executive{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:8px 0}.executive div{border:1px solid #dce6ee;border-radius:8px;padding:6px;text-align:center;background:#f7fafc}.executive span{display:block;color:#75879a;font-size:6.5px}.executive b{font-size:13px;color:#164478}.executive .warn b{color:#c2410c}.executive .bad b{color:#b91c1c}
   .course{border:1px solid #d7e2eb;border-radius:10px;overflow:hidden;margin:0 0 9px;break-inside:avoid}.course-head{background:#eaf4fd;color:#164478;padding:7px 8px;display:flex;align-items:center;gap:7px}.num{width:22px;height:22px;background:#164478;color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:bold}.ct{flex:1}.ct b{display:block;font-size:12px}.ct small{font-size:7px;color:#526b83}.rate{border:1px solid #cbddea;background:#fff;border-radius:999px;padding:4px 7px;font-weight:bold}
   .meta-grid{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid #e2e9ef}.meta-grid div{padding:5px 7px;border-left:1px solid #e2e9ef}.meta-grid span{display:block;color:#7a8c9e;font-size:6px}.meta-grid b{font-size:7.5px}.mini{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:5px;background:#f8fafc}.mini div{border:1px solid #e0e8ef;background:#fff;border-radius:6px;padding:4px 6px;display:flex;justify-content:space-between}.mini span{color:#718397;font-size:6.5px}.mini b{color:#164478;font-size:9px}.mini .ok b{color:#15803d}.mini .warn b{color:#c2410c}.mini .bad b{color:#b91c1c}
-  table{width:100%;border-collapse:collapse;table-layout:fixed}th{background:#164478;color:#fff;padding:5px 2px;font-size:6.4px}td{text-align:center;padding:5px 2px;border:1px solid #e2e9ef;font-size:6.4px;word-break:break-word}tbody tr:nth-child(even):not(.danger){background:#f9fbfd}.danger td{background:#fff0f0;color:#b91c1c;font-weight:bold}.footer{margin-top:7px;padding-top:5px;border-top:1px solid #dce5ed;color:#748698;font-size:6.5px;display:flex;justify-content:space-between}
+  table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed;border:1px solid #d5e1eb;border-radius:8px;overflow:hidden}th{background:#123f70;color:#fff;padding:6px 2px;font-size:6.5px;border-left:1px solid rgba(255,255,255,.14)}td{text-align:center;padding:5.5px 2px;border-left:1px solid #e1e8ef;border-bottom:1px solid #e1e8ef;font-size:6.5px;word-break:break-word;color:#263f57}tbody tr:last-child td{border-bottom:0}tbody tr:nth-child(even){background:#f8fbfd}
+tr.no-login td{background:#fff0f0;color:#a61b1b}tr.late td{background:#fff7e8;color:#9a4d00}tr.no-logout td{background:#fff3dc;color:#8a4b08}tr.complete td{background:#f4fbf7;color:#285744}
+.status-pill{display:inline-block;min-width:62px;padding:3px 5px;border-radius:999px;font-weight:bold;border:1px solid transparent}.status-pill.no-login{background:#fde2e2;color:#b91c1c;border-color:#f7bcbc}.status-pill.late{background:#ffedcc;color:#b45309;border-color:#ffd28a}.status-pill.no-logout{background:#fff0c9;color:#92400e;border-color:#f5cf73}.status-pill.complete{background:#dcf4e5;color:#167344;border-color:#b7e4c8}
+.footer{margin-top:7px;padding-top:5px;border-top:1px solid #dce5ed;color:#748698;font-size:6.5px;display:flex;justify-content:space-between}
   </style></head><body>
   <div class="hero"><div class="brand"><img class="logo" src="${PRUDLE_LOGO}"><div><h1>التقرير الإداري التفصيلي لحضور الدورات</h1><div class="en">PRUDLE INSTITUTE · TRAINERS ATTENDANCE REPORT</div></div></div><div class="hero-meta">إدارة التدريب<br>${now.toLocaleDateString("ar-SA")} · ${now.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"})}<br>أعد بواسطة: ${esc(USER||"Admin")}</div></div>
   <div class="executive"><div><span>الدورات</span><b>${details.length}</b></div><div><span>الأيام</span><b>${totalDays}</b></div><div><span>الانتظام</span><b>${overall}%</b></div><div class="warn"><span>تأخر +15</span><b>${totalLate}</b></div><div class="bad"><span>عدم تحضير</span><b>${totalAbsent}</b></div></div>
+  <div style="display:flex;gap:5px;flex-wrap:wrap;margin:-2px 0 8px;font-size:6.5px">
+    <span class="status-pill complete">مكتمل</span>
+    <span class="status-pill late">تأخير</span>
+    <span class="status-pill no-login">لم يسجل الدخول</span>
+    <span class="status-pill no-logout">لم يسجل الخروج</span>
+  </div>
   ${sections}
   <div class="footer"><span>Prudle Institute · Training & Academic Administration</span><span>الجهاز يظهر عند حفظه في سجل الحضور</span><span>${now.toLocaleString("en-GB")}</span></div><script>window.onload=()=>setTimeout(()=>window.print(),500)<\/script></body></html>`);
   w.document.close();
