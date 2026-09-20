@@ -107,6 +107,20 @@ tbody tr:nth-child(even){background:#f8fbff}
 .section-actions button{border:0;border-radius:7px;padding:6px 8px;font-family:Tajawal;font-size:11px;font-weight:900;cursor:pointer}
 .section-actions .all{background:#164478;color:#fff}.section-actions .clear{background:#eef2f6;color:#52667a}
 
+
+/* ===== واجهة تعديل أوقات البريك بشكل مطابق للتقرير ===== */
+.break-editor-btn{width:100%;border:0;border-radius:11px;padding:12px;background:#164478;color:#fff;font-family:Tajawal;font-weight:900;cursor:pointer;margin-bottom:10px}
+.break-editor-modal{display:none;position:fixed;inset:0;z-index:10050;background:rgba(8,29,52,.68);padding:14px;align-items:flex-start;justify-content:center;overflow:auto}
+.break-editor-modal.open{display:flex}
+.break-editor-sheet{width:min(1180px,98vw);background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 25px 70px rgba(0,0,0,.3);direction:rtl}
+.break-editor-header{background:linear-gradient(135deg,#0f355f,#164478,#2469ad);color:#fff;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.break-editor-brand{display:flex;align-items:center;gap:12px}.break-editor-brand img{width:66px;height:66px;object-fit:contain;background:#fff;border-radius:13px;padding:5px}.break-editor-brand h2{margin:0;color:#fff;font-size:23px}.break-editor-brand p{margin:4px 0 0;color:#dceaf7;font-size:10px;font-weight:800;letter-spacing:.5px}
+.break-editor-close{border:0;background:#fff;color:#164478;border-radius:9px;padding:8px 12px;font-family:Tajawal;font-weight:900;cursor:pointer}
+.break-editor-content{padding:14px 16px 18px;background:#fff}
+.break-editor-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:14px}.break-editor-stat{border:1px solid #dbe5ee;background:#f7fafd;border-radius:12px;padding:10px;text-align:center}.break-editor-stat strong{display:block;color:#164478;font-size:21px}.break-editor-stat span{font-size:10px;color:#708297;font-weight:800}
+.break-edit-period{margin:0 0 15px;border:1px solid #d4e0eb;border-radius:14px;overflow:hidden}.break-edit-period-head{min-height:48px;background:#eaf4fd;border-bottom:1px solid #cbdbe9;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 13px}.break-edit-title{display:flex;align-items:center;gap:8px;color:#164478}.break-edit-title small{color:#6f8093;font-weight:800}.break-edit-title strong{font-size:16px}.break-edit-pill{min-width:155px;background:#164478;color:#fff;border-radius:999px;padding:7px 13px;text-align:center;font-weight:900}.break-editor-table-wrap{overflow:auto}.break-editor-table{width:100%;min-width:920px;border-collapse:collapse}.break-editor-table th{position:static;background:#164478;color:#fff;padding:8px 5px;font-size:10px}.break-editor-table td{text-align:center;padding:7px 5px;font-size:10px;font-weight:700;border-bottom:1px solid #e2e9f0;border-left:1px solid #e2e9f0}.break-editor-table tbody tr:nth-child(even) td{background:#f8fbfe}.break-editor-table input{height:34px;border-radius:8px;font-size:11px;padding:0 7px}.break-editor-table .edit-time{width:115px;direction:ltr;text-align:center;background:#fff6df;border-color:#efd99e}.break-editor-table .edit-duration{width:78px;direction:ltr;text-align:center}.break-editor-actions{position:sticky;bottom:0;background:#fff;border-top:1px solid #dce5ed;padding:12px 16px;display:flex;gap:8px;justify-content:flex-start}.break-editor-saveall{border:0;border-radius:10px;padding:11px 18px;background:#16a34a;color:#fff;font-family:Tajawal;font-weight:900;cursor:pointer}.break-editor-cancel{border:0;border-radius:10px;padding:11px 18px;background:#eef2f6;color:#52667a;font-family:Tajawal;font-weight:900;cursor:pointer}.period-ltr{direction:ltr;unicode-bidi:isolate;display:inline-block;text-align:left}
+@media(max-width:700px){.break-editor-summary{grid-template-columns:repeat(2,1fr)}.break-editor-modal{padding:5px}.break-editor-header{padding:12px}.break-editor-brand img{width:48px;height:48px}.break-editor-brand h2{font-size:17px}}
+
 </style>
 </head>
 <body>
@@ -130,6 +144,7 @@ tbody tr:nth-child(even){background:#f8fbff}
     <div class="card">
       <h2>إعداد وقت البريك</h2>
       <div class="sub">يتم تحديد وقت البريك لكل دورة بشكل مستقل. اختيار دورة واحدة وتعديلها لا يغيّر أي دورة أخرى.</div>
+      <button type="button" class="break-editor-btn" onclick="openBreakEditor()"><i class="fa-solid fa-pen-to-square"></i> فتح واجهة تعديل أوقات البريك</button>
 
       <div class="field">
         <label>الفرع</label>
@@ -242,6 +257,24 @@ tbody tr:nth-child(even){background:#f8fbff}
   </section>
 </main>
 
+
+
+<div id="breakEditorModal" class="break-editor-modal" onclick="if(event.target===this)closeBreakEditor()">
+  <div class="break-editor-sheet">
+    <div class="break-editor-header">
+      <div class="break-editor-brand">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJprpZXU4pTSCYXKhzWCpqdZ_mnPHMwqsACA&s" alt="Prudle">
+        <div><h2>تعديل أوقات البريك للمدربين</h2><p>PRUDLE INSTITUTE · TRAINERS BREAK SCHEDULE</p></div>
+      </div>
+      <button type="button" class="break-editor-close" onclick="closeBreakEditor()">إغلاق ×</button>
+    </div>
+    <div id="breakEditorBody" class="break-editor-content">جاري التحميل...</div>
+    <div class="break-editor-actions">
+      <button type="button" class="break-editor-saveall" onclick="saveAllBreakEditor()"><i class="fa-solid fa-floppy-disk"></i> حفظ جميع التعديلات</button>
+      <button type="button" class="break-editor-cancel" onclick="closeBreakEditor()">إلغاء</button>
+    </div>
+  </div>
+</div>
 
 <div id="attendanceDetailModal" class="att-modal" onclick="if(event.target===this)closeAttendanceDetails()">
   <div class="att-modal-card">
@@ -1153,6 +1186,120 @@ tr.no-login td{background:#fff0f0;color:#a61b1b}tr.late td{background:#fff7e8;co
   <div class="footer"><span>Prudle Institute · Training & Academic Administration</span><span>الجهاز يظهر عند حفظه في سجل الحضور</span><span>${now.toLocaleString("en-GB")}</span></div><script>window.onload=()=>setTimeout(()=>window.print(),500)<\/script></body></html>`);
   w.document.close();
 }
+let BREAK_EDITOR_ROWS=[];
+
+async function openBreakEditor(){
+  const modal=document.getElementById("breakEditorModal");
+  const body=document.getElementById("breakEditorBody");
+  if(!modal||!body)return;
+  modal.classList.add("open");
+  document.body.style.overflow="hidden";
+  body.innerHTML='<div style="padding:35px;text-align:center;font-weight:900;color:#164478">جاري تحميل أوقات البريك...</div>';
+
+  let rows=[];
+  try{ rows=getFilteredRows(); }catch(e){ rows=[...COURSES]; }
+  if(!rows.length) rows=[...COURSES];
+
+  const settings=await Promise.all(rows.map(c=>db.collection("BreakSettings").doc("course_"+c.id).get()));
+  BREAK_EDITOR_ROWS=rows.map((c,i)=>({course:c,setting:settings[i].exists?settings[i].data():{}}));
+  renderBreakEditor();
+}
+
+function closeBreakEditor(){
+  document.getElementById("breakEditorModal")?.classList.remove("open");
+  document.body.style.overflow="";
+}
+
+function renderBreakEditor(){
+  const body=document.getElementById("breakEditorBody");
+  if(!body)return;
+  if(!BREAK_EDITOR_ROWS.length){body.innerHTML='<div style="padding:30px;text-align:center">لا توجد دورات لعرضها.</div>';return;}
+
+  const sorted=[...BREAK_EDITOR_ROWS].sort((a,b)=>
+    period(a.course).localeCompare(period(b.course),"en",{numeric:true,sensitivity:"base"}) ||
+    name(a.course).localeCompare(name(b.course),"ar",{numeric:true,sensitivity:"base"}) ||
+    courseStartDate(b.course).localeCompare(courseStartDate(a.course)) ||
+    trainer(a.course).localeCompare(trainer(b.course),"ar",{sensitivity:"base"})
+  );
+  const groups=[];
+  sorted.forEach(x=>{
+    const p=period(x.course)||"-";
+    let g=groups.find(y=>y.period===p);
+    if(!g){g={period:p,rows:[]};groups.push(g)}
+    g.rows.push(x);
+  });
+
+  const configured=sorted.filter(x=>clean(x.setting?.breakStart)).length;
+  const trainersCount=new Set(sorted.map(x=>trainer(x.course)).filter(Boolean)).size;
+  const coursesCount=new Set(sorted.map(x=>name(x.course)).filter(Boolean)).size;
+
+  const groupsHTML=groups.map(g=>{
+    const trs=g.rows.map((x,i)=>{
+      const st=x.setting||{};
+      const start=clean(st.breakStart)||"";
+      const dur=Number(st.duration)>0?Number(st.duration):10;
+      return `<tr data-course-id="${esc(x.course.id)}">
+        <td>${i+1}</td>
+        <td><b>${esc(name(x.course)||"-")}</b></td>
+        <td>${esc(roomNumber(x.course))}</td>
+        <td style="color:#164478;font-weight:900">${esc(trainer(x.course)||"-")}</td>
+        <td>${esc(branch(x.course)||"-")}</td>
+        <td>${esc(section(x.course)||"-")}</td>
+        <td>${esc(displayCourseStartDate(x.course)||"-")}</td>
+        <td><input class="edit-time" type="time" value="${esc(start)}" data-field="breakStart"></td>
+        <td><input class="edit-duration" type="number" min="1" max="180" value="${esc(String(dur))}" data-field="duration"></td>
+      </tr>`;
+    }).join("");
+    return `<section class="break-edit-period">
+      <div class="break-edit-period-head">
+        <div class="break-edit-title"><small>جميع الدورات والتواريخ ضمن</small><strong>الفترة <bdi class="period-ltr" dir="ltr">${esc(g.period)}</bdi></strong></div>
+        <div class="break-edit-pill">عدد السجلات &nbsp; ${g.rows.length}</div>
+      </div>
+      <div class="break-editor-table-wrap"><table class="break-editor-table">
+        <thead><tr><th>#</th><th>الدورة</th><th>رقم الفصل</th><th>المدرب</th><th>الفرع</th><th>القسم</th><th>تاريخ بدء الدورة</th><th>وقت البريك</th><th>المدة بالدقائق</th></tr></thead>
+        <tbody>${trs}</tbody>
+      </table></div>
+    </section>`;
+  }).join("");
+
+  body.innerHTML=`<div class="break-editor-summary">
+    <div class="break-editor-stat"><strong>${coursesCount}</strong><span>عدد الدورات</span></div>
+    <div class="break-editor-stat"><strong>${groups.length}</strong><span>عدد الفترات</span></div>
+    <div class="break-editor-stat"><strong>${trainersCount}</strong><span>عدد المدربين</span></div>
+    <div class="break-editor-stat"><strong>${configured}</strong><span>أوقات البريك المسجلة</span></div>
+  </div>${groupsHTML}`;
+}
+
+async function saveAllBreakEditor(){
+  const trs=[...document.querySelectorAll('#breakEditorBody tr[data-course-id]')];
+  if(!trs.length)return;
+  const btn=document.querySelector('.break-editor-saveall');
+  const old=btn?.innerHTML;
+  if(btn){btn.disabled=true;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> جاري الحفظ...'}
+  try{
+    const batch=db.batch();
+    let count=0;
+    trs.forEach(tr=>{
+      const id=clean(tr.dataset.courseId);
+      const c=COURSES.find(x=>x.id===id);
+      if(!c)return;
+      const breakStart=clean(tr.querySelector('[data-field="breakStart"]')?.value);
+      const duration=Number(tr.querySelector('[data-field="duration"]')?.value);
+      if(!breakStart || !Number.isFinite(duration) || duration<1)return;
+      batch.set(db.collection("BreakSettings").doc("course_"+id),{
+        courseId:id,courseName:name(c),period:period(c),trainer:trainer(c),branch:branch(c),section:section(c),startDate:courseStartDate(c),
+        breakStart,duration,enabled:true,updatedBy:USER,updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      },{merge:true});
+      count++;
+    });
+    if(!count){alert("حدد وقت بريك صحيحًا لدورة واحدة على الأقل.");return;}
+    await batch.commit();
+    alert(`تم حفظ ${count} وقت بريك بنجاح.`);
+    closeBreakEditor();
+  }catch(error){console.error(error);alert("تعذر حفظ التعديلات. حاول مرة أخرى.");}
+  finally{if(btn){btn.disabled=false;btn.innerHTML=old}}
+}
+
 async function exportTrainerBreakTimesPDF(){
 
   const rows=getFilteredRows();
