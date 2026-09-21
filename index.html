@@ -6,7 +6,8 @@
 <title>لوحة الإشراف الأكاديمي – برودل</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"></noscript>
 <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore-compat.js"></script>
 <style>
@@ -4231,6 +4232,19 @@
 firebase.initializeApp({apiKey:"AIzaSyCCFBvZosI8dwShZjxvZzI-SU5igEbcOKk",authDomain:"prudle-system.firebaseapp.com",projectId:"prudle-system"});
 const db=firebase.firestore();
 
+/* ===== Fast startup: persistent Firestore cache =====
+   يعرض آخر بيانات محفوظة فوراً عند فتح الصفحة، ثم يحدثها من السيرفر بالخلفية.
+*/
+try{
+  db.enablePersistence({synchronizeTabs:true}).catch(error=>{
+    if(error?.code!=="failed-precondition" && error?.code!=="unimplemented"){
+      console.warn("Firestore persistence:",error);
+    }
+  });
+}catch(error){
+  console.warn("Firestore persistence unavailable:",error);
+}
+
 let DATA={courses:[],students:[],tasks:[],alerts:[],sessions:[],plans:[],progress:[],skillEvaluations:[]};
 const SUPERVISION_SKILLS=["Listening","Speaking","Reading","Writing","Grammar","Vocabulary"];
 let FILTERED=[];
@@ -4684,70 +4698,120 @@ function sameStudent(result,student){return[result.studentId,result.studentDocId
 function kindClass(kind){return kind==="واجب"?"homework":kind==="كويز"?"quiz":kind==="نشاط"?"activity":kind==="درجات"?"grade":kind==="مهارة"?"activity":"comment"}
 function progress(value,tone=""){return`<div class="progress"><i class="${tone}" style="width:${Math.max(0,Math.min(100,value))}%"></i></div>`}
 
-async function readCollection(name,limit=5000){const snap=await db.collection(name).limit(limit).get();return snap.docs.map(doc=>({id:doc.id,...doc.data()}))}
-async function safeReadCollection(name,limit=5000){
+async function readCollection(name,limit=5000,source="default"){
+  const query=db.collection(name).limit(limit);
+  const snap=source==="cache"
+    ? await query.get({source:"cache"})
+    : await query.get();
+  return snap.docs.map(doc=>({id:doc.id,...doc.data()}));
+}
+async function safeReadCollection(name,limit=5000,source="default"){
   try{
-    return await readCollection(name,limit);
+    return await readCollection(name,limit,source);
   }catch(error){
-    console.warn("Optional collection could not be read:",name,error);
+    if(source!=="cache") console.warn("Optional collection could not be read:",name,error);
     return [];
   }
 }
 
-async function loadAll(){
-  $("notice").className="notice loading";$("notice").textContent="جاري تحديث البيانات...";$("notice").classList.remove("hidden");
-  $("connection").classList.remove("error");$("connectionTitle").textContent="جاري الاتصال";$("connectionText").textContent="يتم تحميل بيانات برودل...";
-  try{
-    const [
-      courses,
-      students,
-      exams,
-      results,
-      activities,
-      activityResults,
-      activityUsage,
-      activityLiveSessions,
-      plans,
-      studyProgress,
-      skillEvaluations,
-      logs,
-      absenceCommunications
-    ]=await Promise.all([
-      readCollection("Courses"),
-      readCollection("students"),
-      readCollection("exams"),
-      readCollection("results"),
-      readCollection("FunActivities"),
-      readCollection("FunActivityResults"),
-      safeReadCollection("FunActivityUsage"),
-      safeReadCollection("FunActivityLiveSessions"),
-      readCollection("StudyPlans"),
-      safeReadCollection("StudyPlanProgress"),
-      safeReadCollection("EnglishActivities"),
-      readCollection("DeviceLoginLogs",1000),
-      safeReadCollection("AbsenceCommunications",2000)
-    ]);
+const FAST_COLLECTIONS=[
+  ["Courses",5000,false],
+  ["students",5000,false],
+  ["exams",5000,false],
+  ["results",5000,false],
+  ["FunActivities",5000,false],
+  ["FunActivityResults",5000,false],
+  ["FunActivityUsage",5000,true],
+  ["FunActivityLiveSessions",5000,true],
+  ["StudyPlans",5000,false],
+  ["StudyPlanProgress",5000,true],
+  ["EnglishActivities",5000,true],
+  ["DeviceLoginLogs",1000,false],
+  ["AbsenceCommunications",2000,true]
+];
 
-    DATA=derive(
-      courses,
-      students,
-      exams,
-      results,
-      activities,
-      activityResults,
-      activityUsage,
-      activityLiveSessions,
-      plans,
-      studyProgress,
-      skillEvaluations,
-      logs
-    );
-    DATA.absenceCommunications=absenceCommunications||[];
-    buildFilters();applyFilters();
-    $("notice").classList.add("hidden");$("connectionTitle").textContent="البيانات متصلة";$("connectionText").textContent="آخر تحديث: "+new Date().toLocaleTimeString("ar-SA",{hour:"2-digit",minute:"2-digit"});
-  }catch(error){console.error(error);$("notice").className="notice error";$("notice").textContent="تعذر تحميل البيانات. تحقق من صلاحيات القراءة في Firestore.";$("connection").classList.add("error");$("connectionTitle").textContent="تعذر الاتصال";$("connectionText").textContent="راجع صلاحيات Firestore ثم حدّث الصفحة"}
+async function fetchDashboardCollections(source="default"){
+  return Promise.all(
+    FAST_COLLECTIONS.map(([name,limit,optional])=>
+      optional
+        ? safeReadCollection(name,limit,source)
+        : (source==="cache"
+            ? safeReadCollection(name,limit,"cache")
+            : readCollection(name,limit))
+    )
+  );
 }
 
+function applyLoadedCollections(values){
+  const [
+    courses,students,exams,results,activities,activityResults,
+    activityUsage,activityLiveSessions,plans,studyProgress,
+    skillEvaluations,logs,absenceCommunications
+  ]=values;
+
+  /* لا نعرض Cache ناقصاً إذا لم توجد البيانات الأساسية بعد */
+  if(!courses?.length && !students?.length) return false;
+
+  DATA=derive(
+    courses||[],students||[],exams||[],results||[],activities||[],activityResults||[],
+    activityUsage||[],activityLiveSessions||[],plans||[],studyProgress||[],
+    skillEvaluations||[],logs||[]
+  );
+  DATA.absenceCommunications=absenceCommunications||[];
+  buildFilters();
+  applyFilters();
+  return true;
+}
+
+let LOAD_SEQUENCE=0;
+async function loadAll(){
+  const seq=++LOAD_SEQUENCE;
+  $("notice").className="notice loading";
+  $("notice").textContent="جاري تحديث البيانات...";
+  $("notice").classList.remove("hidden");
+  $("connection").classList.remove("error");
+  $("connectionTitle").textContent="جاري الاتصال";
+  $("connectionText").textContent="يتم تحميل بيانات برودل...";
+
+  /* 1) Cache أولاً: لا ننتظر الشبكة لعرض الصفحة */
+  try{
+    const cached=await fetchDashboardCollections("cache");
+    if(seq!==LOAD_SEQUENCE) return;
+    if(applyLoadedCollections(cached)){
+      $("notice").textContent="تم عرض البيانات المحفوظة · جاري جلب آخر تحديث...";
+      $("connectionTitle").textContent="عرض سريع";
+      $("connectionText").textContent="يتم تحديث البيانات في الخلفية...";
+    }
+  }catch(error){
+    /* أول زيارة قد لا تحتوي Cache؛ نكمل مباشرة من السيرفر */
+  }
+
+  /* 2) أحدث بيانات من Firestore بالخلفية */
+  try{
+    const fresh=await fetchDashboardCollections("default");
+    if(seq!==LOAD_SEQUENCE) return;
+    applyLoadedCollections(fresh);
+    $("notice").classList.add("hidden");
+    $("connectionTitle").textContent="البيانات متصلة";
+    $("connectionText").textContent="آخر تحديث: "+new Date().toLocaleTimeString("ar-SA",{hour:"2-digit",minute:"2-digit"});
+  }catch(error){
+    console.error(error);
+    /* إذا كان Cache معروضاً فلا نخفي الصفحة بسبب مشكلة الشبكة */
+    if(DATA?.courses?.length){
+      $("notice").className="notice loading";
+      $("notice").textContent="تم عرض آخر بيانات محفوظة؛ تعذر جلب التحديث الحالي.";
+      $("connection").classList.add("error");
+      $("connectionTitle").textContent="وضع البيانات المحفوظة";
+      $("connectionText").textContent="تحقق من الاتصال للتحديث";
+    }else{
+      $("notice").className="notice error";
+      $("notice").textContent="تعذر تحميل البيانات. تحقق من صلاحيات القراءة في Firestore.";
+      $("connection").classList.add("error");
+      $("connectionTitle").textContent="تعذر الاتصال";
+      $("connectionText").textContent="راجع صلاحيات Firestore ثم حدّث الصفحة";
+    }
+  }
+}
 
 function numericValue(value){
   if(
@@ -7231,35 +7295,7 @@ tr.danger{background:#fff0f1!important}
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:8px 0}
 .kpi{border:1px solid #d8e3ec;border-radius:9px;padding:8px} .kpi span{display:block;font-size:7px;color:#71839a} .kpi b{font-size:17px;color:#0b2d4f}
 .note{padding:8px;border:1px solid #dbe4ec;background:#f7fafc;border-radius:8px;font-size:8px;line-height:1.7}
-
-.footer{position:fixed;bottom:0;left:0;right:0;text-align:center;border-top:1px solid #d6e0e8;padding-top:3px;font-size:7px;color:#8190a0}
-
-/* ===== Colorful management PDF: trainer missing ===== */
-.trainer-missing-pdf{direction:rtl;color:#18354f}
-.trainer-missing-pdf .exec-report-intro{display:grid;grid-template-columns:1.55fr .45fr;gap:10px;margin:10px 0 12px}
-.trainer-missing-pdf .exec-summary-box{padding:11px 14px;font-size:9px;line-height:1.8;border-radius:12px;background:linear-gradient(135deg,#f7fbfe,#eef6fb);border:1px solid #cddfea;border-right:6px solid #164478;color:#36566f}
-.trainer-missing-pdf .exec-summary-box b{font-size:10px;color:#164478}
-.trainer-missing-pdf .exec-mode-box{padding:11px 12px;border-radius:12px;display:flex;flex-direction:column;justify-content:center;text-align:center;background:linear-gradient(135deg,#164478,#2b78b2);color:#fff;box-shadow:0 4px 12px rgba(22,68,120,.15)}
-.trainer-missing-pdf .exec-mode-box span{font-size:8px;color:#d9e9f5}.trainer-missing-pdf .exec-mode-box b{font-size:13px;margin-top:4px;color:#fff}
-.trainer-missing-pdf .print-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:0 0 12px}
-.trainer-missing-pdf .print-stat{position:relative;overflow:hidden;min-height:61px;padding:10px 12px;border:1px solid #d8e3ec;border-radius:12px;background:#fff;box-shadow:0 3px 10px rgba(15,51,82,.06)}
-.trainer-missing-pdf .print-stat:before{content:"";position:absolute;right:0;top:0;bottom:0;width:6px;background:#164478}.trainer-missing-pdf .print-stat:nth-child(2):before{background:#7357c5}.trainer-missing-pdf .print-stat:nth-child(3):before{background:#dc9413}.trainer-missing-pdf .print-stat:nth-child(4):before{background:#149b70}
-.trainer-missing-pdf .print-stat span{display:block;font-size:8px;color:#71839a;font-weight:bold}.trainer-missing-pdf .print-stat b{display:block;font-size:21px;color:#0b2d4f;margin-top:4px}
-.trainer-missing-pdf .manager-trainer{margin:0 0 14px;border:1px solid #cbd9e4;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 4px 14px rgba(15,51,82,.07)}
-.trainer-missing-pdf .manager-trainer+.manager-trainer{break-before:page;page-break-before:always}
-.trainer-missing-pdf .manager-trainer-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 14px;background:linear-gradient(135deg,#164478,#23689d 62%,#2b78b2);color:#fff}
-.trainer-missing-pdf .manager-trainer-name b{display:block;color:#fff;font-size:15px}.trainer-missing-pdf .manager-trainer-name span{display:block;margin-top:3px;color:#d8e8f4;font-size:8px}
-.trainer-missing-pdf .manager-trainer-kpis{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.trainer-missing-pdf .manager-trainer-kpis span{padding:5px 9px;border-radius:14px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.24);color:#fff;font-size:8px;font-weight:bold;white-space:nowrap}
-.trainer-missing-pdf .manager-table{width:100%;border-collapse:collapse;table-layout:fixed}.trainer-missing-pdf .manager-table thead{display:table-header-group}
-.trainer-missing-pdf .manager-table th{padding:8px 6px;background:#e7f1f8;color:#164478;border:1px solid #cfdee8;font-size:8.5px;font-weight:bold;text-align:center}
-.trainer-missing-pdf .manager-table td{padding:8px 6px;border:1px solid #dce5ec;font-size:8.5px;line-height:1.55;text-align:center;vertical-align:middle;word-break:break-word}
-.trainer-missing-pdf .manager-table tbody tr:nth-child(even){background:#f8fbfd}.trainer-missing-pdf .manager-table tbody tr.danger-row{background:#fff1f2!important}.trainer-missing-pdf .manager-table tr{break-inside:avoid;page-break-inside:avoid}
-.trainer-missing-pdf .manager-table .detail{text-align:right;font-size:9px}.trainer-missing-pdf .manager-table .course{text-align:right}.trainer-missing-pdf .manager-table .course b{font-size:9.5px;color:#123d66}.trainer-missing-pdf .manager-table .course small{font-size:7.5px;color:#71839a}
-.trainer-missing-pdf .manager-kind{display:inline-block;padding:4px 8px;border-radius:12px;background:#e7f2fa;color:#165d91;font-size:7.5px;font-weight:bold}.trainer-missing-pdf .manager-kind.skill{background:#eee9fb;color:#6748b6}
-.trainer-missing-pdf .manager-count{display:inline-flex;min-width:32px;height:29px;align-items:center;justify-content:center;border-radius:15px;background:#fff2d7;color:#a56808;font-size:10px;font-weight:bold}.trainer-missing-pdf .manager-count.bad{background:#ffe5e8;color:#bd3540}
-.trainer-missing-pdf .print-badge{display:inline-block;padding:4px 8px;border-radius:12px;font-size:7.5px;font-weight:bold}.trainer-missing-pdf .print-badge.bad{background:#ffe4e7;color:#b62f3b;border:1px solid #f4c6cb}.trainer-missing-pdf .print-badge.good{background:#fff3da!important;color:#9f6508!important;border:1px solid #ecd6a7!important}
-.trainer-missing-pdf .exec-report-footer-note{margin-top:12px;padding:9px 12px;border-radius:9px;background:#f3f8fb;border:1px solid #d6e3ec;border-right:5px solid #164478;color:#5f7588;font-size:8px;line-height:1.8}
-
+.footer{position:fixed;bottom:0;left:0;right:0;text-align:center;border-top:1px solid #d6e0e8;padding-top:3px;font-size:6px;color:#8190a0}
 </style>
 </head>
 <body>
