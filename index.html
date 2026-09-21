@@ -10034,38 +10034,7 @@ doneIds:doneStudents.map(s=>s.id)
     /* ===== English skill
 evaluation completeness ===== */
 
-    
-    /* ===== Skills due according to StudyPlans ===== */
-    const plannedSkillsDue = new Set();
-    const plannedSkillDates = {};
-
-    const skillPlanKeywords = {
-      Listening:["listening","listen","استماع","الاستماع"],
-      Speaking:["speaking","speak","تحدث","التحدث","محادثة","speaking activity"],
-      Reading:["reading","read","قراءة","القراءة"],
-      Writing:["writing","write","كتابة","الكتابة"],
-      Grammar:["grammar","قواعد","القواعد"],
-      Vocabulary:["vocabulary","vocab","مفردات","المفردات"]
-    };
-
-    (coursePlans||[]).forEach(p=>{
-      const activityText=clean(p.activity).toLowerCase();
-      const dueDate=planDate(start,p.week,p.day);
-      if(!activityText || !dueDate || dueDate>today) return;
-
-      SUPERVISION_SKILLS.forEach(skill=>{
-        const words=skillPlanKeywords[skill]||[skill.toLowerCase()];
-        if(words.some(word=>activityText.includes(String(word).toLowerCase()))){
-          plannedSkillsDue.add(skill);
-          if(!plannedSkillDates[skill]) plannedSkillDates[skill]=[];
-          if(!plannedSkillDates[skill].includes(dueDate)){
-            plannedSkillDates[skill].push(dueDate);
-          }
-        }
-      });
-    });
-
-const skillSummary={};
+    const skillSummary={};
 
    
 SUPERVISION_SKILLS.forEach(skill=>{
@@ -10345,19 +10314,7 @@ missingAttendanceStudentsTotal,
 
       skillSummary,
 
-      plannedSkillsDue:[...plannedSkillsDue],
-      plannedSkillDates,
-      plannedSkillSummary:Object.fromEntries(
-        [...plannedSkillsDue].map(skill=>[
-          skill,
-          {
-            ...(skillSummary[skill]||{}),
-            dueDates:[...(plannedSkillDates[skill]||[])].sort()
-          }
-        ])
-      ),
-
-            alerts:
+      alerts:
 
         missingAttendanceStudentsTotal+
 
@@ -14665,178 +14622,281 @@ class="empty">
 function trainerMissingSummary(){
 
   const groups=new Map();
+  const today=todayIso();
+
+  const skillKeywords={
+    Listening:["listening","listen","استماع","الاستماع"],
+    Speaking:["speaking","speak","تحدث","التحدث","محادثة"],
+    Reading:["reading","read","قراءة","القراءة"],
+    Writing:["writing","write","كتابة","الكتابة"],
+    Grammar:["grammar","قواعد","القواعد"],
+    Vocabulary:["vocabulary","vocab","مفردات","المفردات"]
+  };
+
+  function dueSkillsForCourse(course){
+
+    const due=new Map();
+
+    const coursePlans=(DATA.plans||[]).filter(
+      p=>clean(p.courseId)===clean(course.id)
+    );
+
+    coursePlans.forEach(p=>{
+
+      const activity=clean(
+        first(p,[
+          "activity","Activity",
+          "title","Title",
+          "task","Task",
+          "content","Content",
+          "description","Description"
+        ],"")
+      ).toLowerCase();
+
+      if(!activity) return;
+
+      const week=Number(
+        first(p,["week","Week"],0)
+      );
+
+      const day=clean(
+        first(p,["day","Day"],"")
+      );
+
+      const date=planDate(
+        course.start,
+        week,
+        day
+      );
+
+      if(!date || date>today) return;
+
+      SUPERVISION_SKILLS.forEach(skill=>{
+
+        const words=skillKeywords[skill]||[
+          skill.toLowerCase()
+        ];
+
+        if(
+          words.some(word=>
+            activity.includes(
+              String(word).toLowerCase()
+            )
+          )
+        ){
+          if(!due.has(skill)){
+            due.set(skill,[]);
+          }
+
+          if(!due.get(skill).includes(date)){
+            due.get(skill).push(date);
+          }
+        }
+
+      });
+
+    });
+
+    return due;
+  }
 
   FILTERED.forEach(course=>{
 
-    const trainer=clean(course.trainer)||"غير محدد";
+    const trainer=
+      clean(course.trainer)||
+      "غير محدد";
 
     if(!groups.has(trainer)){
       groups.set(trainer,{
         trainer,
         courses:[],
         items:[],
-        score:0,
-        urgent:0,
-        followup:0,
-        totalMissing:0
+        score:0
       });
     }
 
     const g=groups.get(trainer);
     g.courses.push(course);
 
-    const add=(kind,text,count=1,severity="warn",meta={})=>{
-      const n=Number(count||0);
-      if(n<=0) return;
+    const add=(
+      kind,
+      text,
+      count=1,
+      severity="warn",
+      extra={}
+    )=>{
 
-      const item={
-        course,
-        kind,
-        text,
-        count:n,
-        severity,
-        skill:meta.skill||"",
-        due:meta.due||"",
-        expected:meta.expected??"",
-        completed:meta.completed??"",
-        missing:meta.missing??n
-      };
+      if(Number(count)>0){
 
-      g.items.push(item);
-      g.totalMissing+=n;
+        g.items.push({
+          course,
+          kind,
+          text,
+          count:Number(count),
+          severity,
+          skill:extra.skill||"",
+          due:extra.due||""
+        });
 
-      if(severity==="bad"){
-        g.urgent++;
-        g.score+=n*3;
-      }else{
-        g.followup++;
-        g.score+=n;
+        g.score +=
+          severity==="bad"
+            ? Number(count)*3
+            : Number(count);
       }
+
     };
 
     add(
       "التحضير",
-      `حالات عدم تحضير الطلاب`,
+      `حالات عدم تحضير: ${course.missingAttendanceStudentsTotal||0}`,
       course.missingAttendanceStudentsTotal||0,
-      "bad",
-      {
-        expected:(course.expectedAttendanceDates||[]).length,
-        completed:Math.max(
-          0,
-          (course.expectedAttendanceDates||[]).length-
-          Number(course.attendanceMissing||0)
-        ),
-        missing:course.missingAttendanceStudentsTotal||0
-      }
+      "bad"
     );
 
     add(
       "Midterm",
-      "درجات Midterm ناقصة",
+      `درجات Midterm ناقصة: ${course.midtermMissing||0}`,
       course.midtermMissing||0,
       "bad",
-      {
-        due:course.midtermDue||"",
-        expected:course.students||0,
-        completed:Math.max(0,(course.students||0)-(course.midtermMissing||0)),
-        missing:course.midtermMissing||0
-      }
+      {due:course.midtermDue||""}
     );
 
     add(
       "Final",
-      "درجات Final ناقصة",
+      `درجات Final ناقصة: ${course.finalMissing||0}`,
       course.finalMissing||0,
       "bad",
-      {
-        due:course.finalDue||"",
-        expected:course.students||0,
-        completed:Math.max(0,(course.students||0)-(course.finalMissing||0)),
-        missing:course.finalMissing||0
-      }
+      {due:course.finalDue||""}
     );
 
-    const commentTask=DATA.tasks.find(
-      t=>t.courseId===course.id&&t.kind==="تعليقات"
-    );
+    const commentTask=
+      DATA.tasks.find(
+        t=>
+          t.courseId===course.id &&
+          t.kind==="تعليقات"
+      );
 
-    const commentsMissing=commentTask
-      ?Math.max(0,(commentTask.total||0)-(commentTask.completed||0))
-      :0;
+    const commentsMissing=
+      commentTask
+        ? Math.max(
+            0,
+            (commentTask.total||0)-
+            (commentTask.completed||0)
+          )
+        : 0;
 
     add(
       "التعليقات",
-      "تعليقات الطلاب الناقصة",
+      `تعليقات الطلاب الناقصة: ${commentsMissing}`,
       commentsMissing,
-      "warn",
-      {
-        expected:commentTask?.total||course.students||0,
-        completed:commentTask?.completed||0,
-        missing:commentsMissing
-      }
+      "warn"
     );
 
-    const overduePlan=buildAllCourseDays(course).filter(row=>{
-      const date=trainerPlanDate(course,row);
-      const rec=getProgressRecord(course.id,row.week,row.day);
-      return date && date<todayIso() && rec?.completed!==true;
-    }).length;
+    const overduePlan=
+      buildAllCourseDays(course)
+        .filter(row=>{
+
+          const date=
+            trainerPlanDate(
+              course,
+              row
+            );
+
+          const rec=
+            getProgressRecord(
+              course.id,
+              row.week,
+              row.day
+            );
+
+          return (
+            date &&
+            date<today &&
+            rec?.completed!==true
+          );
+
+        }).length;
 
     add(
       "الخطة",
-      "أيام الخطة المتأخرة",
+      `أيام الخطة المتأخرة: ${overduePlan}`,
       overduePlan,
-      "bad",
-      {missing:overduePlan}
+      "bad"
     );
 
-    const pendingAcademic=DATA.tasks.filter(
-      t=>t.courseId===course.id &&
-      ["نشاط","كويز","واجب"].includes(t.kind) &&
-      Number(t.completed||0)<Number(t.total||0)
-    );
+    const pendingAcademic=
+      DATA.tasks.filter(
+        t=>
+          t.courseId===course.id &&
+          ["نشاط","كويز","واجب"].includes(t.kind) &&
+          Number(t.completed||0)<
+          Number(t.total||0)
+      );
 
     add(
       "المهام الأكاديمية",
-      "أنشطة / كويزات / واجبات غير مكتملة",
+      `أنشطة/كويزات/واجبات غير مكتملة: ${pendingAcademic.length}`,
       pendingAcademic.length,
-      "warn",
-      {missing:pendingAcademic.length}
+      "warn"
     );
 
-    /* المهارات: فقط المهارات التي حل موعدها في StudyPlans */
-    const plannedSkillEntries=Object.entries(
-      course.plannedSkillSummary||{}
+    /*
+      FIX:
+      Do not combine all skills into one number.
+      Show each required skill separately.
+      A skill is considered required here only when it appears
+      in StudyPlans and its planned date is today or earlier.
+    */
+    const dueSkills=
+      dueSkillsForCourse(course);
+
+    dueSkills.forEach(
+      (dates,skill)=>{
+
+        const info=
+          course.skillSummary?.[skill]||
+          {};
+
+        const missing=
+          Number(info.missing||0);
+
+        if(!missing) return;
+
+        const sortedDates=
+          [...dates].sort();
+
+        const lastDue=
+          sortedDates.length
+            ? sortedDates[
+                sortedDates.length-1
+              ]
+            : "";
+
+        add(
+          "المهارات",
+          `مهارة ${skill} ناقصة: ${missing}`,
+          missing,
+          "warn",
+          {
+            skill,
+            due:lastDue
+          }
+        );
+
+      }
     );
-
-    plannedSkillEntries.forEach(([skill,data])=>{
-      const missing=Number(data?.missing||0);
-      if(!missing) return;
-
-      const dueDates=Array.isArray(data?.dueDates)
-        ? data.dueDates.filter(Boolean).sort()
-        : [];
-
-      add(
-        "المهارات",
-        `رصد مهارة ${skill} ناقص`,
-        missing,
-        "warn",
-        {
-          skill,
-          due:dueDates.length ? dueDates[dueDates.length-1] : "",
-          expected:Number(data?.total||course.students||0),
-          completed:Number(data?.done||0),
-          missing
-        }
-      );
-    });
 
   });
 
-  return [...groups.values()].sort(
-    (a,b)=>b.score-a.score||a.trainer.localeCompare(b.trainer,"ar")
-  );
+  return [...groups.values()]
+    .sort(
+      (a,b)=>
+        b.score-a.score ||
+        a.trainer.localeCompare(
+          b.trainer,
+          "ar"
+        )
+    );
 
 }
 
@@ -15071,327 +15131,803 @@ visibleSelected<groups.length;
 
 function exportTrainerMissingPDF(selectedOnly=true){
 
-  let groups=trainerMissingSummary();
+  let groups=
+    trainerMissingSummary();
 
   if(selectedOnly){
-    groups=groups.filter(g=>
-      TRAINER_MISSING_PDF_SELECTED.has(g.trainer)
-    );
+
+    groups=
+      groups.filter(
+        g=>
+          TRAINER_MISSING_PDF_SELECTED.has(
+            g.trainer
+          )
+      );
 
     if(!groups.length){
-      alert("حدد مدربًا واحدًا على الأقل من مربعات الاختيار قبل إنشاء PDF.");
+
+      alert(
+        "حدد مدربًا واحدًا على الأقل من مربعات الاختيار قبل إنشاء PDF."
+      );
+
       return;
     }
+
   }
 
   if(!groups.length){
-    alert("لا توجد بيانات حسب الفلاتر الحالية.");
+
+    alert(
+      "لا توجد بيانات حسب الفلاتر الحالية."
+    );
+
     return;
   }
 
-  const totalItems=groups.reduce((s,g)=>s+g.items.length,0);
-  const urgent=groups.reduce((s,g)=>s+g.urgent,0);
-  const followup=groups.reduce((s,g)=>s+g.followup,0);
+  const totalItems=
+    groups.reduce(
+      (sum,g)=>
+        sum+g.items.length,
+      0
+    );
+
+  const urgentItems=
+    groups.reduce(
+      (sum,g)=>
+        sum+
+        g.items.filter(
+          x=>x.severity==="bad"
+        ).length,
+      0
+    );
+
+  const skillItems=
+    groups.reduce(
+      (sum,g)=>
+        sum+
+        g.items.filter(
+          x=>x.kind==="المهارات"
+        ).length,
+      0
+    );
+
+  const totalCourses=
+    new Set(
+      groups.flatMap(
+        g=>
+          g.courses.map(
+            c=>c.id
+          )
+      )
+    ).size;
 
   const body=`
-    <div class="admin-summary">
-      <div><span>المدربون</span><b>${groups.length}</b></div>
-      <div><span>عناصر المتابعة</span><b>${totalItems}</b></div>
-      <div class="redbox"><span>عاجل</span><b>${urgent}</b></div>
-      <div class="amberbox"><span>متابعة</span><b>${followup}</b></div>
+
+    <div class="kpis">
+
+      <div class="kpi"
+        style="border-right:5px solid #164478;background:#f7fbfe">
+        <span>المدربون</span>
+        <b>${groups.length}</b>
+      </div>
+
+      <div class="kpi"
+        style="border-right:5px solid #7357c5;background:#faf8ff">
+        <span>الدورات</span>
+        <b>${totalCourses}</b>
+      </div>
+
+      <div class="kpi"
+        style="border-right:5px solid #dc9413;background:#fffaf0">
+        <span>عناصر المتابعة</span>
+        <b>${totalItems}</b>
+      </div>
+
+      <div class="kpi"
+        style="border-right:5px solid #dc4d57;background:#fff7f8">
+        <span>العاجل / المهارات</span>
+        <b>${urgentItems} / ${skillItems}</b>
+      </div>
+
+    </div>
+
+    <div class="note"
+      style="
+        margin-bottom:10px;
+        border-right:5px solid #164478;
+        background:#f5f9fc
+      ">
+      <b style="color:#164478">
+        تقرير إداري حسب الفلاتر الحالية
+      </b>
+      · المهارات تظهر كل مهارة باسمها بشكل مستقل،
+      ولا تظهر إلا إذا كانت مطلوبة في StudyPlans
+      وحل موعدها حتى تاريخ التقرير.
     </div>
 
     ${groups.map(g=>`
-      <div class="section trainer-admin-section">
-        <div class="trainer-admin-title">
-          <div>
-            <strong>${esc(g.trainer)}</strong>
-            <small>${g.courses.length} دورة حسب الفلاتر الحالية</small>
-          </div>
-          <div class="trainer-admin-kpis">
-            <span>عناصر: ${g.items.length}</span>
-            <span>عاجل: ${g.urgent}</span>
-            <span>متابعة: ${g.followup}</span>
-          </div>
-        </div>
 
-        <table class="admin-table">
+      <div class="section"
+        style="
+          border:1px solid #d8e3ec;
+          border-radius:10px;
+          overflow:hidden;
+          margin-bottom:12px
+        ">
+
+        <h2
+          style="
+            margin:0;
+            border-radius:0;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            background:linear-gradient(90deg,#164478,#2b78b2)
+          ">
+          <span>${esc(g.trainer)}</span>
+          <span
+            style="
+              font-size:8px;
+              font-weight:normal
+            ">
+            ${g.courses.length} دورة
+            · ${g.items.length} عنصر متابعة
+          </span>
+        </h2>
+
+        <table>
           <thead>
             <tr>
               <th style="width:4%">#</th>
-              <th style="width:13%">الدورة</th>
-              <th style="width:12%">الفترة</th>
-              <th style="width:11%">القسم</th>
+              <th style="width:15%">الدورة</th>
+              <th style="width:11%">الفترة</th>
               <th style="width:12%">نوع المتابعة</th>
-              <th style="width:13%">المهارة / البيان</th>
-              <th style="width:8%">المطلوب</th>
-              <th style="width:8%">المنجز</th>
-              <th style="width:8%">الناقص</th>
-              <th style="width:7%">الموعد</th>
-              <th style="width:8%">الحالة</th>
+              <th style="width:25%">التفاصيل</th>
+              <th style="width:8%">العدد</th>
+              <th style="width:12%">الموعد</th>
+              <th style="width:13%">الحالة</th>
             </tr>
           </thead>
+
           <tbody>
+
             ${
               g.items.length
-              ? g.items.map((x,i)=>`
-                <tr class="${x.severity==="bad"?"danger":""}">
-                  <td>${i+1}</td>
-                  <td><b>${esc(x.course.name)}</b></td>
-                  <td>${esc(x.course.period)}</td>
-                  <td>${esc(x.course.section||"—")}</td>
-                  <td>${esc(x.kind)}</td>
-                  <td class="detail-cell">
-                    ${
-                      x.skill
-                        ? `<span class="skill-label">${esc(x.skill)}</span>`
-                        : esc(x.text)
-                    }
-                  </td>
-                  <td>${x.expected!==""?x.expected:"—"}</td>
-                  <td>${x.completed!==""?x.completed:"—"}</td>
-                  <td><b class="missing-number">${x.missing}</b></td>
-                  <td>${x.due?esc(x.due):"—"}</td>
-                  <td>
-                    ${
-                      x.severity==="bad"
-                        ? '<span class="badge bad">عاجل</span>'
-                        : '<span class="badge warn">متابعة</span>'
-                    }
-                  </td>
-                </tr>
-              `).join("")
-              : `<tr><td colspan="11">لا توجد مهام ناقصة</td></tr>`
+                ? g.items.map(
+                    (x,i)=>`
+
+                      <tr
+                        class="${
+                          x.severity==="bad"
+                            ?"danger"
+                            :""
+                        }"
+                        style="${
+                          x.kind==="المهارات"
+                            ?"background:#faf8ff"
+                            :""
+                        }">
+
+                        <td>${i+1}</td>
+
+                        <td>
+                          <b style="color:#164478">
+                            ${esc(x.course.name)}
+                          </b>
+                          <div
+                            style="
+                              margin-top:2px;
+                              font-size:6.5px;
+                              color:#71839a
+                            ">
+                            ${esc(x.course.section||"—")}
+                          </div>
+                        </td>
+
+                        <td>
+                          ${esc(x.course.period)}
+                        </td>
+
+                        <td>
+                          ${
+                            x.kind==="المهارات"
+                              ? `<span
+                                  class="badge"
+                                  style="
+                                    background:#eee9fb;
+                                    color:#6748b6
+                                  ">
+                                  المهارات
+                                </span>`
+                              : esc(x.kind)
+                          }
+                        </td>
+
+                        <td style="text-align:right">
+
+                          ${
+                            x.skill
+                              ? `
+                                <span
+                                  style="
+                                    display:inline-block;
+                                    min-width:82px;
+                                    text-align:center;
+                                    padding:4px 8px;
+                                    border-radius:11px;
+                                    background:#7357c5;
+                                    color:#fff;
+                                    font-weight:bold
+                                  ">
+                                  ${esc(x.skill)}
+                                </span>
+
+                                <div
+                                  style="
+                                    margin-top:4px;
+                                    color:#526b7f
+                                  ">
+                                  ${esc(x.text)}
+                                </div>
+                              `
+                              : esc(x.text)
+                          }
+
+                        </td>
+
+                        <td>
+                          <b
+                            style="
+                              display:inline-block;
+                              min-width:30px;
+                              padding:4px 7px;
+                              border-radius:12px;
+                              background:${
+                                x.severity==="bad"
+                                  ?"#ffe4e7"
+                                  :"#fff3da"
+                              };
+                              color:${
+                                x.severity==="bad"
+                                  ?"#b62f3b"
+                                  :"#9f6508"
+                              }
+                            ">
+                            ${x.count}
+                          </b>
+                        </td>
+
+                        <td>
+                          ${x.due?esc(x.due):"—"}
+                        </td>
+
+                        <td>
+
+                          ${
+                            x.severity==="bad"
+                              ? '<span class="badge bad">عاجل</span>'
+                              : '<span class="badge warn">متابعة</span>'
+                          }
+
+                        </td>
+
+                      </tr>
+
+                    `
+                  ).join("")
+                : `
+                    <tr>
+                      <td colspan="8">
+                        <span class="badge good">
+                          لا توجد مهام ناقصة
+                        </span>
+                      </td>
+                    </tr>
+                  `
             }
+
           </tbody>
         </table>
+
       </div>
+
     `).join("")}
+
   `;
 
   printWindow(
     selectedOnly
-      ? `تقرير إداري — نقص ومهام المدربين المحددين (${groups.length})`
-      : "تقرير إداري — نقص ومهام جميع المدربين المعروضين",
-    body
+      ? `تقرير إداري - نقص ومهام المدربين المحددين (${groups.length})`
+      : "تقرير إداري - نقص ومهام جميع المدربين المعروضين",
+    body,
+    "landscape"
   );
 
 }
 
 function renderTrainerMissing(){
 
-  if(!FILTERED.length){
-    return `
-      <section class="panel full-panel">
-        <div class="empty">اختر الفلاتر لعرض مهام ونقص المدربين.</div>
-      </section>
-    `;
-  }
+  if(!FILTERED.length){
 
-  const groups=trainerMissingSummary();
-  const visibleNames=new Set(groups.map(g=>g.trainer));
+    return `
 
-  [...TRAINER_MISSING_PDF_SELECTED].forEach(name=>{
-    if(!visibleNames.has(name)){
-      TRAINER_MISSING_PDF_SELECTED.delete(name);
-    }
-  });
+      <section
+class="panel full-panel">
 
-  const selectedVisible=groups.filter(g=>
-    TRAINER_MISSING_PDF_SELECTED.has(g.trainer)
-  ).length;
+        <div
+class="empty">
 
-  const allVisibleSelected=
-    groups.length>0 &&
-    selectedVisible===groups.length;
+          اختر الفلاتر لعرض مهام ونقص المدربين.
 
-  const totalItems=groups.reduce((s,g)=>s+g.items.length,0);
-  const urgent=groups.reduce((s,g)=>s+g.urgent,0);
-  const followup=groups.reduce((s,g)=>s+g.followup,0);
+        </div>
 
-  return `
-  <section class="panel full-panel trainer-admin-panel">
+      </section>
 
-    <div class="panel-head">
-      <div>
-        <h2>نقص ومهام المدربين — تقرير إداري</h2>
-        <p>
-          عرض جدولي حسب الدورة والخطة الدراسية
-          · المهارات تظهر بالاسم فقط عندما تكون مطلوبة وحل موعدها في StudyPlans
-        </p>
-      </div>
+    `;
 
-      <button
-        class="session-pdf-btn trainer-admin-pdf"
-        onclick="exportTrainerMissingPDF(true)">
-        PDF المحددين
-      </button>
-    </div>
+  }
 
-    <div class="trainer-admin-overview">
-      <article>
-        <span>المدربون المعروضون</span>
-        <b>${groups.length}</b>
-      </article>
-      <article>
-        <span>إجمالي عناصر المتابعة</span>
-        <b>${totalItems}</b>
-      </article>
-      <article class="danger">
-        <span>عناصر عاجلة</span>
-        <b>${urgent}</b>
-      </article>
-      <article class="warning">
-        <span>تحتاج متابعة</span>
-        <b>${followup}</b>
-      </article>
-    </div>
+  const groups=
 
-    <div class="pdf-selectbar trainer-admin-actions">
-      <label class="trainer-admin-selectall">
-        <input
-          id="trainerMissingSelectAll"
-          class="pdf-check"
-          type="checkbox"
-          ${allVisibleSelected?"checked":""}
-          onchange="toggleAllVisibleTrainerMissing(this.checked)">
-        تحديد كل المدربين المعروضين
-      </label>
+    trainerMissingSummary();
 
-      <span
-        id="trainerMissingSelectedCount"
-        class="selection-count">
-        المحدد: ${TRAINER_MISSING_PDF_SELECTED.size}
-      </span>
+  const visibleNames=
 
-      <button type="button" onclick="selectTrainerMissingWithIssues()">
-        تحديد من لديهم نقص
-      </button>
+    new Set(
 
-      <button type="button" onclick="toggleAllVisibleTrainerMissing(true)">
-        تحديد الكل
-      </button>
+      groups.map(g=>g.trainer)
 
-      <button type="button" onclick="clearTrainerMissingPdfSelection()">
-        إلغاء التحديد
-      </button>
+    );
 
-      <button type="button" class="primary" onclick="exportTrainerMissingPDF(false)">
-        PDF الكل
-      </button>
-    </div>
+ 
+[...TRAINER_MISSING_PDF_SELECTED]
 
-    <div class="trainer-admin-groups">
+    .forEach(name=>{
 
-      ${groups.map(g=>`
-        <article class="trainer-admin-card trainer-missing-card ${
-          TRAINER_MISSING_PDF_SELECTED.has(g.trainer)?"selected":""
-        }">
+      if(!visibleNames.has(name)){
 
-          <div class="trainer-admin-head">
-            <div class="trainer-admin-person">
-              <input
-                class="trainer-select-check trainer-missing-check"
-                type="checkbox"
-                data-trainer="${esc(g.trainer)}"
-                ${
-                  TRAINER_MISSING_PDF_SELECTED.has(g.trainer)
-                    ?"checked":""
-                }
-                onchange="
-                  toggleTrainerMissingPdf('${esc(g.trainer)}',this.checked);
-                  this.closest('.trainer-missing-card')
-                    .classList.toggle('selected',this.checked);
-                ">
+       
+TRAINER_MISSING_PDF_SELECTED.delete(name);
 
-              <img src="${PRUDLE_REPORT_LOGO}" alt="Prudle">
+      }
 
-              <div>
-                <h3>${esc(g.trainer)}</h3>
-                <p>${g.courses.length} دورة حسب الفلاتر الحالية</p>
-              </div>
-            </div>
+    });
 
-            <div class="trainer-admin-head-kpis">
-              <span>العناصر <b>${g.items.length}</b></span>
-              <span class="urgent">عاجل <b>${g.urgent}</b></span>
-              <span class="follow">متابعة <b>${g.followup}</b></span>
-            </div>
-          </div>
+  const selectedVisible=
 
-          ${
-            g.items.length
-            ? `
-              <div class="table-wrap trainer-admin-table-wrap">
-                <table class="trainer-admin-table">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>الدورة</th>
-                      <th>الفترة</th>
-                      <th>نوع المتابعة</th>
-                      <th>المهارة / البيان</th>
-                      <th>المطلوب</th>
-                      <th>المنجز</th>
-                      <th>الناقص</th>
-                      <th>الموعد</th>
-                      <th>الحالة</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    ${g.items.map((x,i)=>`
-                      <tr class="${x.severity==="bad"?"admin-danger-row":""}">
-                        <td>${i+1}</td>
-                        <td>
-                          <b>${esc(x.course.name)}</b>
-                          <small>${esc(x.course.branch||"")} · ${esc(x.course.section||"")}</small>
-                        </td>
-                        <td>${esc(x.course.period)}</td>
-                        <td>
-                          <span class="admin-kind ${x.kind==="المهارات"?"skill":""}">
-                            ${esc(x.kind)}
-                          </span>
-                        </td>
-                        <td class="admin-detail-cell">
-                          ${
-                            x.skill
-                              ? `<span class="admin-skill-name">${esc(x.skill)}</span>
-                                 <small>رصد المهارة ناقص حسب الخطة</small>`
-                              : `<b>${esc(x.text)}</b>`
-                          }
-                        </td>
-                        <td>${x.expected!==""?x.expected:"—"}</td>
-                        <td>${x.completed!==""?x.completed:"—"}</td>
-                        <td>
-                          <span class="admin-missing-count">${x.missing}</span>
-                        </td>
-                        <td>${x.due?esc(x.due):"—"}</td>
-                        <td>
-                          <span class="admin-status ${x.severity==="bad"?"bad":"warn"}">
-                            ${x.severity==="bad"?"عاجل":"متابعة"}
-                          </span>
-                        </td>
-                      </tr>
-                    `).join("")}
-                  </tbody>
-                </table>
-              </div>
-            `
-            : `
-              <div class="trainer-admin-clear">
-                <b>✓ لا توجد مهام ناقصة</b>
-                <span>جميع العناصر المطلوبة ضمن الفلاتر الحالية مكتملة.</span>
-              </div>
-            `
-          }
+    groups.filter(
 
-        </article>
-      `).join("")}
+      g=>
 
-    </div>
+       
+TRAINER_MISSING_PDF_SELECTED.has(
 
-  </section>
-  `;
+          g.trainer
+
+        )
+
+    ).length;
+
+  const
+allVisibleSelected=
+
+    groups.length>0 &&
+
+   
+selectedVisible===groups.length;
+
+  return `
+
+  <section class="panel
+full-panel">
+
+    <div
+class="panel-head">
+
+      <div>
+
+        <h2>
+
+          تفاصيل نقص ومهام كل مدرب
+
+        </h2>
+
+        <p>
+
+          حدد مدربًا واحدًا أو أكثر ثم اطبع PDF للمحددين فقط
+
+          · حسب الفلاتر الحالية
+
+          · التحضير والدرجات والتعليقات والخطة والمهارات
+والأنشطة
+
+        </p>
+
+      </div>
+
+      <button
+
+        class="session-pdf-btn"
+
+       
+onclick="exportTrainerMissingPDF(true)">
+
+        PDF المحددين
+
+      </button>
+
+    </div>
+
+    <div
+class="pdf-selectbar">
+
+      <label
+
+        style="
+
+          display:flex;
+
+          align-items:center;
+
+          gap:6px;
+
+          font-size:8px;
+
+          font-weight:900;
+
+          color:#164478
+
+        ">
+
+        <input
+
+         
+id="trainerMissingSelectAll"
+
+         
+class="pdf-check"
+
+         
+type="checkbox"
+
+         
+${allVisibleSelected?"checked":""}
+
+          onchange="
+
+           
+toggleAllVisibleTrainerMissing(
+
+              this.checked
+
+            )
+
+          ">
+
+        تحديد كل المدربين المعروضين
+
+      </label>
+
+      <span
+
+       
+id="trainerMissingSelectedCount"
+
+       
+class="selection-count">
+
+        المحدد:
+
+       
+${TRAINER_MISSING_PDF_SELECTED.size}
+
+      </span>
+
+      <button
+
+        type="button"
+
+       
+onclick="selectTrainerMissingWithIssues()">
+
+        تحديد
+من لديهم نقص فقط
+
+      </button>
+
+      <button
+
+        type="button"
+
+        onclick="toggleAllVisibleTrainerMissing(true)">
+
+        تحديد
+الكل
+
+      </button>
+
+      <button
+
+        type="button"
+
+       
+onclick="clearTrainerMissingPdfSelection()">
+
+        إلغاء
+التحديد
+
+      </button>
+
+      <button
+
+        type="button"
+
+        onclick="exportTrainerMissingPDF(false)">
+
+        PDF الكل
+
+      </button>
+
+    </div>
+
+    <div
+class="trainer-missing-grid">
+
+      ${
+
+        groups.map(g=>`
+
+          <article
+
+            class="
+
+              trainer-missing-card
+
+              ${
+
+               
+TRAINER_MISSING_PDF_SELECTED.has(
+
+                  g.trainer
+
+                )
+
+                 
+?"selected"
+
+                  :""
+
+              }
+
+            ">
+
+            <div
+class="trainer-missing-head">
+
+              <div
+
+               
+class="trainer-missing-person">
+
+                <input
+
+                  class="
+
+                   
+trainer-select-check
+
+                   
+trainer-missing-check
+
+                  "
+
+                 
+type="checkbox"
+
+                 
+data-trainer="${esc(g.trainer)}"
+
+                  ${
+
+                   
+TRAINER_MISSING_PDF_SELECTED.has(
+
+                      g.trainer
+
+                    )
+
+                      ?"checked"
+
+                     
+:""
+
+                  }
+
+                 
+onchange="
+
+                   
+toggleTrainerMissingPdf(
+
+                     
+'${esc(g.trainer)}',
+
+                      this.checked
+
+                    );
+
+                    this
+
+                      .closest(
+
+                       
+'.trainer-missing-card'
+
+                      )
+
+                     
+.classList
+
+                      .toggle(
+
+                       
+'selected',
+
+                       
+this.checked
+
+                      );
+
+                 
+">
+
+                <img
+
+                 
+src="${PRUDLE_REPORT_LOGO}"
+
+                 
+alt="Prudle">
+
+               
+<div>
+
+                  <h3>
+
+                   
+${esc(g.trainer)}
+
+                  </h3>
+
+                 
+<p>
+
+                   
+${g.courses.length}
+
+                    دورة حسب الفلتر
+
+                 
+</p>
+
+                </div>
+
+              </div>
+
+              <div
+
+               
+class="trainer-missing-kpis">
+
+               
+<span>
+
+                  عناصر متابعة:
+
+                 
+${g.items.length}
+
+                </span>
+
+               
+<span>
+
+                  درجة الأولوية:
+
+                 
+${g.score}
+
+                </span>
+
+              </div>
+
+            </div>
+
+            <div
+
+             
+class="trainer-missing-body">
+
+              ${
+
+               
+g.items.length
+
+                  ?
+
+                 
+g.items.map(x=>`
+
+                    <span
+
+                      class="
+
+                       
+missing-chip
+
+                        ${
+
+                         
+x.severity==="bad"
+
+                           
+?"bad"
+
+                           
+:"warn"
+
+                        }
+
+                     
+">
+
+                      ${esc(x.course.name)}
+
+                      ·
+
+                     
+${esc(x.text)}
+
+                    </span>
+
+                 
+`).join("")
+
+                  :
+
+                  `
+
+                   
+<span
+
+                     
+class="missing-chip good">
+
+                      ✓
+لا توجد مهام ناقصة ضمن الفلاتر الحالية
+
+                   
+</span>
+
+                  `
+
+              }
+
+            </div>
+
+          </article>
+
+       
+`).join("")
+
+      }
+
+    </div>
+
+  </section>
+
+  `;
+
 }
 
 function parseJsDate(value){
@@ -15591,136 +16127,6 @@ class="badge warn">معلق</span>'}</td><td>${esc(rec.updatedAt?formatDateTime(
 
 }
 
-
-/* ===== Trainer attendance audit: days + missing student cells ===== */
-function attendanceAuditDates(){
-  const set=new Set();
-  FILTERED.forEach(c=>(c.expectedAttendanceDates||[]).forEach(d=>{if(d)set.add(String(d))}));
-  return [...set].sort();
-}
-function attendanceMissingMap(c){
-  const m=new Map();
-  (c.incompleteAttendanceDetails||[]).forEach(x=>m.set(String(x.date),{
-    missingCount:Number(x.missingCount||0),
-    missingStudentIds:Array.isArray(x.missingStudentIds)?x.missingStudentIds:[]
-  }));
-  return m;
-}
-function attendanceDateLabel(date){
-  const d=new Date(date+"T12:00:00");
-  if(Number.isNaN(d.getTime()))return {day:"",date};
-  return {
-    day:d.toLocaleDateString("en-US",{weekday:"short"}),
-    date
-  };
-}
-function renderAttendanceAudit(){
-  if(!FILTERED.length){
-    return `<section class="panel full-panel"><div class="empty">اختر فلترًا واحدًا على الأقل لعرض متابعة التحضير.</div></section>`;
-  }
-
-  const dates=attendanceAuditDates();
-  const totalMissing=FILTERED.reduce((n,c)=>n+Number(c.missingAttendanceStudentsTotal||0),0);
-  const affectedDays=FILTERED.reduce((n,c)=>n+Number(c.attendanceMissing||0),0);
-  const completeCourses=FILTERED.filter(c=>Number(c.missingAttendanceStudentsTotal||0)===0).length;
-
-  return `<section class="panel full-panel">
-    <div class="panel-head">
-      <div>
-        <h2>متابعة تحضير المدربين</h2>
-        <p>عرض الأيام مثل شاشة الحضور: ✓ اليوم مكتمل، والرقم الأحمر يوضح عدد خانات الطلاب التي لم يرصدها المدرب في ذلك اليوم</p>
-      </div>
-      <button class="att-pdf-btn" type="button" onclick="exportAttendanceAuditPDF()">PDF الحضور والتحضير</button>
-    </div>
-
-    <div class="att-audit-summary">
-      <article><span>الدورات المعروضة</span><b>${FILTERED.length}</b></article>
-      <article><span>دورات مكتملة التحضير</span><b>${completeCourses}</b></article>
-      <article><span>إجمالي الأيام التي لم يكتمل فيها تحضير المدرب</span><b>${affectedDays}</b></article>
-      <article><span>إجمالي خانات الطلاب غير المحضّرة</span><b>${totalMissing}</b></article>
-    </div>
-
-    <div class="table-wrap">
-      <table class="att-audit-table">
-        <thead><tr>
-          <th class="att-sticky-course">الدورة</th>
-          <th class="att-sticky-trainer">المدرب</th>
-          <th>الفترة</th>
-          ${dates.map(d=>{const x=attendanceDateLabel(d);return `<th class="att-day-head"><b>${esc(x.day)}</b><small>${esc(x.date)}</small></th>`}).join("")}
-          <th>الأيام غير المكتملة</th>
-          <th>الخانات غير المحضّرة</th>
-        </tr></thead>
-        <tbody>
-          ${FILTERED.map(c=>{
-            const expected=new Set((c.expectedAttendanceDates||[]).map(String));
-            const missing=attendanceMissingMap(c);
-            return `<tr>
-              <td class="att-sticky-course"><b>${esc(c.name)}</b><small class="td-sub">${esc(c.branch)} · ${esc(c.section)}</small></td>
-              <td class="att-sticky-trainer"><b>${esc(c.trainer)}</b></td>
-              <td>${esc(c.period)}</td>
-              ${dates.map(d=>{
-                if(!expected.has(String(d)))return `<td class="att-day-cell"><span class="att-mark na">—</span></td>`;
-                const item=missing.get(String(d));
-                if(item&&item.missingCount>0){
-                  return `<td class="att-day-cell" title="${item.missingCount} خانة غير محضّرة"><span class="att-mark missing">${item.missingCount}</span><small>ناقص</small></td>`;
-                }
-                return `<td class="att-day-cell"><span class="att-mark complete">✓</span><small>مكتمل</small></td>`;
-              }).join("")}
-              <td><b class="${Number(c.attendanceMissing||0)>0?"att-total-bad":"att-total-good"}">${Number(c.attendanceMissing||0)}</b><small class="td-sub">من ${(c.expectedAttendanceDates||[]).length} يوم</small></td>
-              <td><b class="${Number(c.missingAttendanceStudentsTotal||0)>0?"att-total-bad":"att-total-good"}">${Number(c.missingAttendanceStudentsTotal||0)}</b><small class="td-sub">${Number(c.missingAttendanceStudentsTotal||0)>0?"خانة ناقصة":"مكتمل"}</small></td>
-            </tr>`;
-          }).join("")}
-        </tbody>
-      </table>
-    </div>
-  </section>`;
-}
-
-function exportAttendanceAuditPDF(){
-  if(!FILTERED.length){alert("لا توجد دورات حسب الفلاتر الحالية.");return}
-
-  const totalMissing=FILTERED.reduce((n,c)=>n+Number(c.missingAttendanceStudentsTotal||0),0);
-  const affectedDays=FILTERED.reduce((n,c)=>n+Number(c.attendanceMissing||0),0);
-
-  const rows=FILTERED.map((c,i)=>{
-    const details=(c.incompleteAttendanceDetails||[]);
-    const detailText=details.length
-      ? details.map(x=>`${x.date}: ${Number(x.missingCount||0)} خانة`).join(" · ")
-      : "✓ جميع الأيام مكتملة";
-    return `<tr class="${Number(c.missingAttendanceStudentsTotal||0)>0?"danger":""}">
-      <td>${i+1}</td>
-      <td>${esc(c.name||"—")}</td>
-      <td>${esc(c.trainer||"—")}</td>
-      <td>${esc(c.branch||"—")}</td>
-      <td>${esc(c.section||"—")}</td>
-      <td>${esc(c.period||"—")}</td>
-      <td>${(c.expectedAttendanceDates||[]).length}</td>
-      <td><b>${Number(c.attendanceMissing||0)}</b></td>
-      <td><b>${Number(c.missingAttendanceStudentsTotal||0)}</b></td>
-      <td style="white-space:normal;text-align:right">${esc(detailText)}</td>
-    </tr>`;
-  }).join("");
-
-  printWindow(
-    "تقرير حضور وتحضير المدربين",
-    `<div class="kpis">
-      <div class="kpi"><span>الدورات المعروضة</span><b>${FILTERED.length}</b></div>
-      <div class="kpi"><span>الأيام غير مكتملة التحضير</span><b>${affectedDays}</b></div>
-      <div class="kpi"><span>الخانات غير المحضّرة</span><b>${totalMissing}</b></div>
-      <div class="kpi"><span>الدورات المكتملة</span><b>${FILTERED.filter(c=>Number(c.missingAttendanceStudentsTotal||0)===0).length}</b></div>
-    </div>
-    <div class="section">
-      <h2>تفاصيل الأيام والخانات التي لم يرصدها المدرب</h2>
-      <table>
-        <thead><tr><th>#</th><th>الدورة</th><th>المدرب</th><th>الفرع</th><th>القسم</th><th>الفترة</th><th>الأيام المطلوبة</th><th>الأيام غير المكتملة</th><th>الخانات الناقصة</th><th>التفاصيل حسب التاريخ</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>`,
-    "landscape"
-  );
-}
-
-
 function render(){renderStats();const titles={overview:"نظرة عامة",courses:"متابعة الدورات",attendance:"الحضور",grades:"رصد الدرجات",skills:"رصد المهارات",comments:"تعليقات المدربين",trainerProgress:"متابعة تقدم المدرب",sessions:"الدخول والخروج",studentAbsences:"غيابات الطلاب",trainerMissing:"نقص ومهام المدربين"};$("pageTitle").textContent=titles[ACTIVE_VIEW];document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===ACTIVE_VIEW));
 
  
@@ -15774,7 +16180,108 @@ class="panel full-panel"><div class="panel-head"><div><h2>جميع الدورا�
 class="count-chip">${FILTERED.length} دورة</span></div>${coursesTable()}</section>`;
 
  
-if(ACTIVE_VIEW==="attendance")$("viewBox").innerHTML=renderAttendanceAudit();
+if(ACTIVE_VIEW==="attendance")$("viewBox").innerHTML=`<section
+class="panel full-panel"><div
+class="panel-head"><div><h2>متابعة
+تحضير المدربين</h2><p>يحسب كل خانة
+طالب غير مرصودة في يوم دراسي فعلي كحالة عدم تحضير مستقلة</p></div></div><div
+class="table-wrap"><table
+class="data-table"><thead><tr><th>الدورة</th><th>المدرب</th><th>الفترة</th><th>نسبة الحضور</th><th>حالات عدم التحضير</th><th>الحالة</th></tr></thead><tbody>${FILTERED.map(c=>`<tr><td><b>${esc(c.name)}</b><small
+class="td-sub">${esc(c.branch)} ·
+${esc(c.section)}</small></td><td>${esc(c.trainer)}</td><td>${esc(c.period)}</td><td><div
+class="progress-label"><b>${c.attendance}%</b>${progress(c.attendance,c.attendance<90?"red":"green")}</div></td><td>
+
+  <b
+class="${c.missingAttendanceStudentsTotal?"red":"green"}">
+
+   
+${c.missingAttendanceStudentsTotal||0}
+
+  </b>
+
+  <small
+class="td-sub">
+
+    الأيام
+المتأثرة:
+
+   
+${c.attendanceMissing||0}
+
+    من
+
+   
+${(c.expectedAttendanceDates||[]).length}
+
+    يوم
+دراسي مطلوب حتى الآن
+
+  </small>
+
+  ${
+
+   
+c.missingAttendanceStudentsTotal
+
+      ? `
+
+        <small
+class="td-sub">
+
+          ${
+
+           
+(c.incompleteAttendanceDetails||[])
+
+              .map(item=>
+
+               
+`${esc(item.date)}: ${item.missingCount} حالة
+ناقصة`
+
+              )
+
+              .join("
+· ")
+
+          }
+
+        </small>
+
+      `
+
+      : `
+
+        <small
+class="td-sub">
+
+          ✓ تم رصد جميع الطلاب في كل الأيام المطلوبة
+
+        </small>
+
+      `
+
+  }
+
+</td>
+
+<td>
+
+  ${
+
+   
+c.missingAttendanceStudentsTotal
+
+      ? '<span
+class="badge bad">! تحضير غير مكتمل</span>'
+
+      : '<span
+class="badge good">✓ التحضير
+مكتمل</span>'
+
+  }
+
+</td></tr>`).join("")}</tbody></table></div></section>`;
 
  
 if(ACTIVE_VIEW==="grades")$("viewBox").innerHTML=`
@@ -17970,245 +18477,6 @@ tr{
 
   }
 
-}
-
-
-
-/* ===== Attendance audit grid - same Prudle dashboard design ===== */
-.att-audit-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
-.att-audit-summary article{border:1px solid var(--line);background:#f8fbfd;border-radius:12px;padding:10px 12px}
-.att-audit-summary span{display:block;color:var(--muted);font-size:8px;font-weight:800}
-.att-audit-summary b{display:block;color:var(--navy);font-size:20px;margin-top:2px}
-.att-audit-table{width:max-content;min-width:100%;border-collapse:separate;border-spacing:0}
-.att-audit-table th,.att-audit-table td{padding:6px 5px;border-left:1px solid #e4eaf1;border-bottom:1px solid #e4eaf1;text-align:center;white-space:nowrap;font-size:8px}
-.att-audit-table thead th{position:sticky;top:0;z-index:4;background:linear-gradient(180deg,#164478,#123b6a);color:#fff}
-.att-audit-table .att-sticky-course{position:sticky;right:0;z-index:3;min-width:155px;max-width:155px;background:#fff;text-align:right}
-.att-audit-table .att-sticky-trainer{position:sticky;right:155px;z-index:3;min-width:100px;background:#fff}
-.att-audit-table thead .att-sticky-course,.att-audit-table thead .att-sticky-trainer{z-index:7;background:#164478}
-.att-audit-table tbody tr:nth-child(even) .att-sticky-course,.att-audit-table tbody tr:nth-child(even) .att-sticky-trainer{background:#f8fbfd}
-.att-day-head{min-width:76px}
-.att-day-head b,.att-day-head small{display:block}.att-day-head small{font-size:6.5px;opacity:.85;margin-top:2px}
-.att-day-cell{min-width:76px}
-.att-mark{width:30px;height:30px;margin:auto;border-radius:8px;display:grid;place-items:center;font-size:10px;font-weight:900}
-.att-mark.complete{background:#e8f8f2;color:#11805b}.att-mark.missing{background:#fff0f1;color:#cf444e}.att-mark.na{background:#edf1f5;color:#93a2b1}
-.att-day-cell small{display:block;font-size:6.5px;color:var(--muted);margin-top:3px}
-.att-total-bad{font-size:13px;color:var(--red);font-weight:900}.att-total-good{font-size:13px;color:var(--green);font-weight:900}
-.att-pdf-btn{border:0;background:#e7f7f1;color:#107a58;border-radius:10px;padding:8px 11px;font-size:8px;font-weight:900}
-@media(max-width:850px){.att-audit-summary{grid-template-columns:repeat(2,1fr)}.att-audit-table .att-sticky-course{min-width:130px;max-width:130px}.att-audit-table .att-sticky-trainer{right:130px;min-width:90px}}
-
-
-
-/* ===== Administrative Trainer Missing Report v3 ===== */
-.trainer-admin-panel{background:#f8fafc}
-.trainer-admin-overview{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:10px;
-  margin:0 0 14px
-}
-.trainer-admin-overview article{
-  background:#fff;
-  border:1px solid #dce6ef;
-  border-right:5px solid #164478;
-  border-radius:14px;
-  padding:12px 14px;
-  box-shadow:0 6px 18px rgba(15,51,82,.05)
-}
-.trainer-admin-overview article.warning{border-right-color:#dc9413;background:#fffdf8}
-.trainer-admin-overview article.danger{border-right-color:#dc4d57;background:#fffafb}
-.trainer-admin-overview span{display:block;font-size:9px;color:#71839a;font-weight:800}
-.trainer-admin-overview b{display:block;margin-top:4px;font-size:23px;color:#0b2d4f}
-.trainer-admin-actions{
-  background:#fff;
-  border:1px solid #e0e8ef;
-  border-radius:12px;
-  padding:8px 10px;
-  margin-bottom:14px
-}
-.trainer-admin-selectall{
-  display:flex;
-  align-items:center;
-  gap:7px;
-  margin-left:auto;
-  color:#164478;
-  font-size:9px;
-  font-weight:900
-}
-.trainer-admin-groups{display:flex;flex-direction:column;gap:14px}
-.trainer-admin-card{
-  border:1px solid #d8e3ec;
-  border-radius:16px;
-  overflow:hidden;
-  background:#fff;
-  box-shadow:0 8px 24px rgba(15,51,82,.065)
-}
-.trainer-admin-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  padding:12px 14px;
-  background:linear-gradient(135deg,#10395f,#164478 60%,#2b78b2);
-  color:#fff
-}
-.trainer-admin-person{display:flex;align-items:center;gap:10px}
-.trainer-admin-person img{
-  width:42px;height:42px;object-fit:contain;background:#fff;
-  border-radius:11px;padding:3px
-}
-.trainer-admin-person h3{margin:0;color:#fff;font-size:13px}
-.trainer-admin-person p{margin:3px 0 0;color:#d7e7f3;font-size:8px}
-.trainer-admin-head-kpis{display:flex;gap:6px;flex-wrap:wrap}
-.trainer-admin-head-kpis span{
-  display:flex;align-items:center;gap:5px;
-  padding:5px 8px;border-radius:13px;
-  background:rgba(255,255,255,.13);
-  border:1px solid rgba(255,255,255,.18);
-  font-size:7.5px;font-weight:800
-}
-.trainer-admin-head-kpis b{font-size:10px;color:#fff}
-.trainer-admin-head-kpis .urgent{background:rgba(220,77,87,.28)}
-.trainer-admin-head-kpis .follow{background:rgba(220,148,19,.25)}
-.trainer-admin-table-wrap{padding:0}
-.trainer-admin-table{
-  width:100%;
-  min-width:1050px;
-  border-collapse:collapse;
-  table-layout:auto
-}
-.trainer-admin-table th{
-  padding:9px 7px;
-  background:#eaf1f6;
-  color:#164478;
-  border:1px solid #d4e0e9;
-  font-size:8.5px;
-  text-align:center;
-  white-space:nowrap
-}
-.trainer-admin-table td{
-  padding:9px 7px;
-  border:1px solid #e2e9ef;
-  font-size:9px;
-  text-align:center;
-  vertical-align:middle
-}
-.trainer-admin-table tbody tr:nth-child(even){background:#fafcfd}
-.trainer-admin-table tbody tr:hover{background:#f0f7fc}
-.trainer-admin-table .admin-danger-row{background:#fff7f7}
-.trainer-admin-table td:nth-child(2),
-.trainer-admin-table .admin-detail-cell{text-align:right}
-.trainer-admin-table td>b{color:#173d5e;font-size:9.5px}
-.trainer-admin-table td>small,
-.admin-detail-cell small{
-  display:block;margin-top:3px;color:#7b8d9e;font-size:7.5px
-}
-.admin-kind{
-  display:inline-flex;padding:4px 7px;border-radius:10px;
-  background:#edf4f9;color:#164478;font-size:7px;font-weight:900
-}
-.admin-kind.skill{background:#efeafb;color:#6748b6}
-.admin-skill-name{
-  display:inline-flex;
-  min-width:82px;
-  justify-content:center;
-  padding:5px 9px;
-  border-radius:10px;
-  background:linear-gradient(135deg,#7357c5,#8b73d3);
-  color:#fff;
-  font-size:8px;
-  font-weight:900
-}
-.admin-missing-count{
-  display:inline-flex;
-  min-width:34px;height:27px;
-  align-items:center;justify-content:center;
-  border-radius:14px;
-  background:#fff0f1;color:#c83f49;
-  font-weight:900
-}
-.admin-status{
-  display:inline-flex;padding:5px 8px;border-radius:12px;
-  font-size:7px;font-weight:900
-}
-.admin-status.bad{background:#ffe8ea;color:#bd3944}
-.admin-status.warn{background:#fff3dc;color:#a76a08}
-.trainer-admin-clear{
-  padding:24px;text-align:center;background:#f2fbf7;color:#107a58
-}
-.trainer-admin-clear b,.trainer-admin-clear span{display:block}
-.trainer-admin-clear b{font-size:12px}
-.trainer-admin-clear span{font-size:8px;margin-top:4px;color:#658878}
-.trainer-admin-pdf{
-  background:linear-gradient(135deg,#164478,#2b78b2)!important;
-  color:#fff!important
-}
-
-@media(max-width:850px){
-  .trainer-admin-overview{grid-template-columns:repeat(2,1fr)}
-  .trainer-admin-head{align-items:flex-start;flex-direction:column}
-  .trainer-admin-head-kpis{width:100%}
-}
-@media(max-width:520px){
-  .trainer-admin-overview{grid-template-columns:1fr 1fr}
-}
-
-/* Styles injected into printWindow are inherited only if printWindow copies page styles.
-   These selectors also improve browser print when the same document is used. */
-@media print{
-  .admin-summary{
-    display:grid!important;
-    grid-template-columns:repeat(4,1fr)!important;
-    gap:6px!important;
-    margin:0 0 9px!important
-  }
-  .admin-summary>div{
-    border:1px solid #d4e0e9!important;
-    border-right:4px solid #164478!important;
-    border-radius:8px!important;
-    padding:7px 9px!important;
-    background:#f8fbfd!important
-  }
-  .admin-summary .redbox{border-right-color:#dc4d57!important;background:#fff3f4!important}
-  .admin-summary .amberbox{border-right-color:#dc9413!important;background:#fff8e9!important}
-  .admin-summary span{display:block!important;font-size:6px!important;color:#71839a!important}
-  .admin-summary b{display:block!important;margin-top:2px!important;font-size:13px!important;color:#0b2d4f!important}
-  .trainer-admin-section{margin-bottom:10px!important;break-inside:auto!important}
-  .trainer-admin-title{
-    display:flex!important;align-items:center!important;justify-content:space-between!important;
-    gap:8px!important;padding:7px 9px!important;
-    background:linear-gradient(135deg,#10395f,#164478 60%,#2b78b2)!important;
-    color:#fff!important;border-radius:8px 8px 0 0!important
-  }
-  .trainer-admin-title strong{display:block!important;font-size:9px!important;color:#fff!important}
-  .trainer-admin-title small{display:block!important;margin-top:2px!important;font-size:5.5px!important;color:#d7e7f3!important}
-  .trainer-admin-kpis{display:flex!important;gap:4px!important}
-  .trainer-admin-kpis span{
-    padding:3px 5px!important;border-radius:8px!important;
-    background:rgba(255,255,255,.14)!important;
-    border:1px solid rgba(255,255,255,.18)!important;
-    color:#fff!important;font-size:5px!important
-  }
-  .admin-table{
-    width:100%!important;border-collapse:collapse!important;table-layout:fixed!important
-  }
-  .admin-table thead{display:table-header-group!important}
-  .admin-table th{
-    background:#dfeaf2!important;color:#123a5e!important;
-    border:1px solid #c6d4df!important;padding:5px 3px!important;
-    font-size:5.4px!important;text-align:center!important
-  }
-  .admin-table td{
-    border:1px solid #dce5ec!important;padding:4px 3px!important;
-    font-size:5.3px!important;text-align:center!important;vertical-align:middle!important
-  }
-  .admin-table tbody tr:nth-child(even){background:#f8fbfd!important}
-  .admin-table tr.danger{background:#fff1f2!important}
-  .admin-table .detail-cell{text-align:right!important}
-  .admin-table .skill-label{
-    display:inline-block!important;padding:2px 5px!important;border-radius:7px!important;
-    background:#7357c5!important;color:#fff!important;font-weight:900!important
-  }
-  .admin-table .missing-number{color:#c83f49!important;font-size:7px!important}
 }
 
 </style>
