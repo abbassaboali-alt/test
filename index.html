@@ -10034,7 +10034,38 @@ doneIds:doneStudents.map(s=>s.id)
     /* ===== English skill
 evaluation completeness ===== */
 
-    const skillSummary={};
+    
+    /* ===== Skills due according to StudyPlans ===== */
+    const plannedSkillsDue = new Set();
+    const plannedSkillDates = {};
+
+    const skillPlanKeywords = {
+      Listening:["listening","listen","استماع","الاستماع"],
+      Speaking:["speaking","speak","تحدث","التحدث","محادثة","speaking activity"],
+      Reading:["reading","read","قراءة","القراءة"],
+      Writing:["writing","write","كتابة","الكتابة"],
+      Grammar:["grammar","قواعد","القواعد"],
+      Vocabulary:["vocabulary","vocab","مفردات","المفردات"]
+    };
+
+    (coursePlans||[]).forEach(p=>{
+      const activityText=clean(p.activity).toLowerCase();
+      const dueDate=planDate(start,p.week,p.day);
+      if(!activityText || !dueDate || dueDate>today) return;
+
+      SUPERVISION_SKILLS.forEach(skill=>{
+        const words=skillPlanKeywords[skill]||[skill.toLowerCase()];
+        if(words.some(word=>activityText.includes(String(word).toLowerCase()))){
+          plannedSkillsDue.add(skill);
+          if(!plannedSkillDates[skill]) plannedSkillDates[skill]=[];
+          if(!plannedSkillDates[skill].includes(dueDate)){
+            plannedSkillDates[skill].push(dueDate);
+          }
+        }
+      });
+    });
+
+const skillSummary={};
 
    
 SUPERVISION_SKILLS.forEach(skill=>{
@@ -10314,7 +10345,19 @@ missingAttendanceStudentsTotal,
 
       skillSummary,
 
-      alerts:
+      plannedSkillsDue:[...plannedSkillsDue],
+      plannedSkillDates,
+      plannedSkillSummary:Object.fromEntries(
+        [...plannedSkillsDue].map(skill=>[
+          skill,
+          {
+            ...(skillSummary[skill]||{}),
+            dueDates:[...(plannedSkillDates[skill]||[])].sort()
+          }
+        ])
+      ),
+
+            alerts:
 
         missingAttendanceStudentsTotal+
 
@@ -14621,90 +14664,179 @@ class="empty">
 
 function trainerMissingSummary(){
 
-  const groups=new Map();
+  const groups=new Map();
 
- 
-FILTERED.forEach(course=>{
+  FILTERED.forEach(course=>{
 
-    const
-trainer=clean(course.trainer)||"غير محدد";
+    const trainer=clean(course.trainer)||"غير محدد";
 
-   
-if(!groups.has(trainer))groups.set(trainer,{trainer,courses:[],items:[],score:0});
+    if(!groups.has(trainer)){
+      groups.set(trainer,{
+        trainer,
+        courses:[],
+        items:[],
+        score:0,
+        urgent:0,
+        followup:0,
+        totalMissing:0
+      });
+    }
 
-    const g=groups.get(trainer);
+    const g=groups.get(trainer);
+    g.courses.push(course);
 
-    g.courses.push(course);
+    const add=(kind,text,count=1,severity="warn",meta={})=>{
+      const n=Number(count||0);
+      if(n<=0) return;
 
-    const
-add=(kind,text,count=1,severity="warn")=>{
+      const item={
+        course,
+        kind,
+        text,
+        count:n,
+        severity,
+        skill:meta.skill||"",
+        due:meta.due||"",
+        expected:meta.expected??"",
+        completed:meta.completed??"",
+        missing:meta.missing??n
+      };
 
-      if(Number(count)>0){
+      g.items.push(item);
+      g.totalMissing+=n;
 
-       
-g.items.push({course,kind,text,count:Number(count),severity});
+      if(severity==="bad"){
+        g.urgent++;
+        g.score+=n*3;
+      }else{
+        g.followup++;
+        g.score+=n;
+      }
+    };
 
-        g.score +=
-severity==="bad"?Number(count)*3:Number(count);
+    add(
+      "التحضير",
+      `حالات عدم تحضير الطلاب`,
+      course.missingAttendanceStudentsTotal||0,
+      "bad",
+      {
+        expected:(course.expectedAttendanceDates||[]).length,
+        completed:Math.max(
+          0,
+          (course.expectedAttendanceDates||[]).length-
+          Number(course.attendanceMissing||0)
+        ),
+        missing:course.missingAttendanceStudentsTotal||0
+      }
+    );
 
-      }
+    add(
+      "Midterm",
+      "درجات Midterm ناقصة",
+      course.midtermMissing||0,
+      "bad",
+      {
+        due:course.midtermDue||"",
+        expected:course.students||0,
+        completed:Math.max(0,(course.students||0)-(course.midtermMissing||0)),
+        missing:course.midtermMissing||0
+      }
+    );
 
-    };
+    add(
+      "Final",
+      "درجات Final ناقصة",
+      course.finalMissing||0,
+      "bad",
+      {
+        due:course.finalDue||"",
+        expected:course.students||0,
+        completed:Math.max(0,(course.students||0)-(course.finalMissing||0)),
+        missing:course.finalMissing||0
+      }
+    );
 
-    add("التحضير",`حالات عدم تحضير:
-${course.missingAttendanceStudentsTotal||0}`,course.missingAttendanceStudentsTotal||0,"bad");
+    const commentTask=DATA.tasks.find(
+      t=>t.courseId===course.id&&t.kind==="تعليقات"
+    );
 
-   
-add("Midterm",`درجات
-Midterm ناقصة:
-${course.midtermMissing||0}`,course.midtermMissing||0,"bad");
+    const commentsMissing=commentTask
+      ?Math.max(0,(commentTask.total||0)-(commentTask.completed||0))
+      :0;
 
-   
-add("Final",`درجات Final ناقصة: ${course.finalMissing||0}`,course.finalMissing||0,"bad");
+    add(
+      "التعليقات",
+      "تعليقات الطلاب الناقصة",
+      commentsMissing,
+      "warn",
+      {
+        expected:commentTask?.total||course.students||0,
+        completed:commentTask?.completed||0,
+        missing:commentsMissing
+      }
+    );
 
-    const
-commentTask=DATA.tasks.find(t=>t.courseId===course.id&&t.kind==="تعليقات");
+    const overduePlan=buildAllCourseDays(course).filter(row=>{
+      const date=trainerPlanDate(course,row);
+      const rec=getProgressRecord(course.id,row.week,row.day);
+      return date && date<todayIso() && rec?.completed!==true;
+    }).length;
 
-    const
-commentsMissing=commentTask?Math.max(0,(commentTask.total||0)-(commentTask.completed||0)):0;
+    add(
+      "الخطة",
+      "أيام الخطة المتأخرة",
+      overduePlan,
+      "bad",
+      {missing:overduePlan}
+    );
 
-    add("التعليقات",`تعليقات الطلاب الناقصة:
-${commentsMissing}`,commentsMissing,"warn");
+    const pendingAcademic=DATA.tasks.filter(
+      t=>t.courseId===course.id &&
+      ["نشاط","كويز","واجب"].includes(t.kind) &&
+      Number(t.completed||0)<Number(t.total||0)
+    );
 
-    const
-overduePlan=buildAllCourseDays(course).filter(row=>{
+    add(
+      "المهام الأكاديمية",
+      "أنشطة / كويزات / واجبات غير مكتملة",
+      pendingAcademic.length,
+      "warn",
+      {missing:pendingAcademic.length}
+    );
 
-      const
-date=trainerPlanDate(course,row);
+    /* المهارات: فقط المهارات التي حل موعدها في StudyPlans */
+    const plannedSkillEntries=Object.entries(
+      course.plannedSkillSummary||{}
+    );
 
-      const
-rec=getProgressRecord(course.id,row.week,row.day);
+    plannedSkillEntries.forEach(([skill,data])=>{
+      const missing=Number(data?.missing||0);
+      if(!missing) return;
 
-      return date && date<todayIso()
-&& rec?.completed!==true;
+      const dueDates=Array.isArray(data?.dueDates)
+        ? data.dueDates.filter(Boolean).sort()
+        : [];
 
-    }).length;
+      add(
+        "المهارات",
+        `رصد مهارة ${skill} ناقص`,
+        missing,
+        "warn",
+        {
+          skill,
+          due:dueDates.length ? dueDates[dueDates.length-1] : "",
+          expected:Number(data?.total||course.students||0),
+          completed:Number(data?.done||0),
+          missing
+        }
+      );
+    });
 
-    add("الخطة",`أيام الخطة المتأخرة:
-${overduePlan}`,overduePlan,"bad");
+  });
 
-    const
-pendingAcademic=DATA.tasks.filter(t=>t.courseId===course.id&&["نشاط","كويز","واجب"].includes(t.kind)&&Number(t.completed||0)<Number(t.total||0));
-
-    add("المهام الأكاديمية",`أنشطة/كويزات/واجبات
-غير مكتملة:
-${pendingAcademic.length}`,pendingAcademic.length,"warn");
-
-    const
-skillMissing=Object.values(course.skillSummary||{}).reduce((sum,x)=>sum+Number(x.missing||0),0);
-
-    add("المهارات",`رصد مهارات ناقص:
-${skillMissing}`,skillMissing,"warn");
-
-  });
-
-  return
-[...groups.values()].sort((a,b)=>b.score-a.score||a.trainer.localeCompare(b.trainer,"ar"));
+  return [...groups.values()].sort(
+    (a,b)=>b.score-a.score||a.trainer.localeCompare(b.trainer,"ar")
+  );
 
 }
 
@@ -14939,700 +15071,327 @@ visibleSelected<groups.length;
 
 function exportTrainerMissingPDF(selectedOnly=true){
 
-  let groups=
-
-    trainerMissingSummary();
-
-  if(selectedOnly){
-
-    groups=
-
-      groups.filter(
-
-        g=>
-
-         
-TRAINER_MISSING_PDF_SELECTED.has(
-
-            g.trainer
-
-          )
-
-      );
-
-    if(!groups.length){
-
-      alert(
-
-        "حدد مدربًا واحدًا على الأقل من مربعات الاختيار قبل إنشاء
-PDF."
-
-      );
-
-      return;
-
-    }
-
-  }
-
-  if(!groups.length){
-
-    alert(
-
-      "لا توجد بيانات حسب الفلاتر الحالية."
-
-    );
-
-    return;
-
-  }
-
-  const body=
-
-    groups.map(g=>`
-
-      <div
-class="section">
-
-        <h2>
-
-          ${esc(g.trainer)}
-
-          ·
-
-         
-${g.items.length}
-
-          نوع متابعة
-
-        </h2>
-
-        <table>
-
-          <thead>
-
-            <tr>
-
-              <th>#</th>
-
-              <th>الدورة</th>
-
-              <th>الفترة</th>
-
-              <th>المهمة / النقص</th>
-
-              <th>العدد</th>
-
-              <th>الأولوية</th>
-
-            </tr>
-
-          </thead>
-
-          <tbody>
-
-            ${
-
-             
-g.items.map((x,i)=>`
-
-                <tr
-class="${
-
-                 
-x.severity==="bad"
-
-                   
-?"danger"
-
-                    :""
-
-               
-}">
-
-                 
-<td>${i+1}</td>
-
-                 
-<td>
-
-                    ${esc(x.course.name)}
-
-                  </td>
-
-                 
-<td>
-
-                   
-${esc(x.course.period)}
-
-                  </td>
-
-                 
-<td>
-
-                    ${esc(x.text)}
-
-                  </td>
-
-                 
-<td>
-
-                    ${x.count}
-
-                  </td>
-
-                 
-<td>
-
-                    ${
-
-                     
-x.severity==="bad"
-
-                        ?'<span
-class="badge bad">عاجل</span>'
-
-                       
-:'<span class="badge warn">متابعة</span>'
-
-                    }
-
-                 
-</td>
-
-               
-</tr>
-
-             
-`).join("")
-
-              ||
-
-              `
-
-                <tr>
-
-                  <td
-colspan="6">
-
-                    لا توجد مهام ناقصة
-
-                 
-</td>
-
-                </tr>
-
-              `
-
-            }
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-    `).join("");
-
-  printWindow(
-
-    selectedOnly
-
-      ? `تفاصيل
-نقص ومهام المدربين المحددين (${groups.length})`
-
-      : "تفاصيل نقص ومهام جميع المدربين المعروضين",
-
-    body
-
-  );
+  let groups=trainerMissingSummary();
+
+  if(selectedOnly){
+    groups=groups.filter(g=>
+      TRAINER_MISSING_PDF_SELECTED.has(g.trainer)
+    );
+
+    if(!groups.length){
+      alert("حدد مدربًا واحدًا على الأقل من مربعات الاختيار قبل إنشاء PDF.");
+      return;
+    }
+  }
+
+  if(!groups.length){
+    alert("لا توجد بيانات حسب الفلاتر الحالية.");
+    return;
+  }
+
+  const totalItems=groups.reduce((s,g)=>s+g.items.length,0);
+  const urgent=groups.reduce((s,g)=>s+g.urgent,0);
+  const followup=groups.reduce((s,g)=>s+g.followup,0);
+
+  const body=`
+    <div class="admin-summary">
+      <div><span>المدربون</span><b>${groups.length}</b></div>
+      <div><span>عناصر المتابعة</span><b>${totalItems}</b></div>
+      <div class="redbox"><span>عاجل</span><b>${urgent}</b></div>
+      <div class="amberbox"><span>متابعة</span><b>${followup}</b></div>
+    </div>
+
+    ${groups.map(g=>`
+      <div class="section trainer-admin-section">
+        <div class="trainer-admin-title">
+          <div>
+            <strong>${esc(g.trainer)}</strong>
+            <small>${g.courses.length} دورة حسب الفلاتر الحالية</small>
+          </div>
+          <div class="trainer-admin-kpis">
+            <span>عناصر: ${g.items.length}</span>
+            <span>عاجل: ${g.urgent}</span>
+            <span>متابعة: ${g.followup}</span>
+          </div>
+        </div>
+
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th style="width:4%">#</th>
+              <th style="width:13%">الدورة</th>
+              <th style="width:12%">الفترة</th>
+              <th style="width:11%">القسم</th>
+              <th style="width:12%">نوع المتابعة</th>
+              <th style="width:13%">المهارة / البيان</th>
+              <th style="width:8%">المطلوب</th>
+              <th style="width:8%">المنجز</th>
+              <th style="width:8%">الناقص</th>
+              <th style="width:7%">الموعد</th>
+              <th style="width:8%">الحالة</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${
+              g.items.length
+              ? g.items.map((x,i)=>`
+                <tr class="${x.severity==="bad"?"danger":""}">
+                  <td>${i+1}</td>
+                  <td><b>${esc(x.course.name)}</b></td>
+                  <td>${esc(x.course.period)}</td>
+                  <td>${esc(x.course.section||"—")}</td>
+                  <td>${esc(x.kind)}</td>
+                  <td class="detail-cell">
+                    ${
+                      x.skill
+                        ? `<span class="skill-label">${esc(x.skill)}</span>`
+                        : esc(x.text)
+                    }
+                  </td>
+                  <td>${x.expected!==""?x.expected:"—"}</td>
+                  <td>${x.completed!==""?x.completed:"—"}</td>
+                  <td><b class="missing-number">${x.missing}</b></td>
+                  <td>${x.due?esc(x.due):"—"}</td>
+                  <td>
+                    ${
+                      x.severity==="bad"
+                        ? '<span class="badge bad">عاجل</span>'
+                        : '<span class="badge warn">متابعة</span>'
+                    }
+                  </td>
+                </tr>
+              `).join("")
+              : `<tr><td colspan="11">لا توجد مهام ناقصة</td></tr>`
+            }
+          </tbody>
+        </table>
+      </div>
+    `).join("")}
+  `;
+
+  printWindow(
+    selectedOnly
+      ? `تقرير إداري — نقص ومهام المدربين المحددين (${groups.length})`
+      : "تقرير إداري — نقص ومهام جميع المدربين المعروضين",
+    body
+  );
 
 }
 
 function renderTrainerMissing(){
 
-  if(!FILTERED.length){
-
-    return `
-
-      <section
-class="panel full-panel">
-
-        <div
-class="empty">
-
-          اختر الفلاتر لعرض مهام ونقص المدربين.
-
-        </div>
-
-      </section>
-
-    `;
-
-  }
-
-  const groups=
-
-    trainerMissingSummary();
-
-  const visibleNames=
-
-    new Set(
-
-      groups.map(g=>g.trainer)
-
-    );
-
- 
-[...TRAINER_MISSING_PDF_SELECTED]
-
-    .forEach(name=>{
-
-      if(!visibleNames.has(name)){
-
-       
-TRAINER_MISSING_PDF_SELECTED.delete(name);
-
-      }
-
-    });
-
-  const selectedVisible=
-
-    groups.filter(
-
-      g=>
-
-       
-TRAINER_MISSING_PDF_SELECTED.has(
-
-          g.trainer
-
-        )
-
-    ).length;
-
-  const
-allVisibleSelected=
-
-    groups.length>0 &&
-
-   
-selectedVisible===groups.length;
-
-  return `
-
-  <section class="panel
-full-panel">
-
-    <div
-class="panel-head">
-
-      <div>
-
-        <h2>
-
-          تفاصيل نقص ومهام كل مدرب
-
-        </h2>
-
-        <p>
-
-          حدد مدربًا واحدًا أو أكثر ثم اطبع PDF للمحددين فقط
-
-          · حسب الفلاتر الحالية
-
-          · التحضير والدرجات والتعليقات والخطة والمهارات
-والأنشطة
-
-        </p>
-
-      </div>
-
-      <button
-
-        class="session-pdf-btn"
-
-       
-onclick="exportTrainerMissingPDF(true)">
-
-        PDF المحددين
-
-      </button>
-
-    </div>
-
-    <div
-class="pdf-selectbar">
-
-      <label
-
-        style="
-
-          display:flex;
-
-          align-items:center;
-
-          gap:6px;
-
-          font-size:8px;
-
-          font-weight:900;
-
-          color:#164478
-
-        ">
-
-        <input
-
-         
-id="trainerMissingSelectAll"
-
-         
-class="pdf-check"
-
-         
-type="checkbox"
-
-         
-${allVisibleSelected?"checked":""}
-
-          onchange="
-
-           
-toggleAllVisibleTrainerMissing(
-
-              this.checked
-
-            )
-
-          ">
-
-        تحديد كل المدربين المعروضين
-
-      </label>
-
-      <span
-
-       
-id="trainerMissingSelectedCount"
-
-       
-class="selection-count">
-
-        المحدد:
-
-       
-${TRAINER_MISSING_PDF_SELECTED.size}
-
-      </span>
-
-      <button
-
-        type="button"
-
-       
-onclick="selectTrainerMissingWithIssues()">
-
-        تحديد
-من لديهم نقص فقط
-
-      </button>
-
-      <button
-
-        type="button"
-
-        onclick="toggleAllVisibleTrainerMissing(true)">
-
-        تحديد
-الكل
-
-      </button>
-
-      <button
-
-        type="button"
-
-       
-onclick="clearTrainerMissingPdfSelection()">
-
-        إلغاء
-التحديد
-
-      </button>
-
-      <button
-
-        type="button"
-
-        onclick="exportTrainerMissingPDF(false)">
-
-        PDF الكل
-
-      </button>
-
-    </div>
-
-    <div
-class="trainer-missing-grid">
-
-      ${
-
-        groups.map(g=>`
-
-          <article
-
-            class="
-
-              trainer-missing-card
-
-              ${
-
-               
-TRAINER_MISSING_PDF_SELECTED.has(
-
-                  g.trainer
-
-                )
-
-                 
-?"selected"
-
-                  :""
-
-              }
-
-            ">
-
-            <div
-class="trainer-missing-head">
-
-              <div
-
-               
-class="trainer-missing-person">
-
-                <input
-
-                  class="
-
-                   
-trainer-select-check
-
-                   
-trainer-missing-check
-
-                  "
-
-                 
-type="checkbox"
-
-                 
-data-trainer="${esc(g.trainer)}"
-
-                  ${
-
-                   
-TRAINER_MISSING_PDF_SELECTED.has(
-
-                      g.trainer
-
-                    )
-
-                      ?"checked"
-
-                     
-:""
-
-                  }
-
-                 
-onchange="
-
-                   
-toggleTrainerMissingPdf(
-
-                     
-'${esc(g.trainer)}',
-
-                      this.checked
-
-                    );
-
-                    this
-
-                      .closest(
-
-                       
-'.trainer-missing-card'
-
-                      )
-
-                     
-.classList
-
-                      .toggle(
-
-                       
-'selected',
-
-                       
-this.checked
-
-                      );
-
-                 
-">
-
-                <img
-
-                 
-src="${PRUDLE_REPORT_LOGO}"
-
-                 
-alt="Prudle">
-
-               
-<div>
-
-                  <h3>
-
-                   
-${esc(g.trainer)}
-
-                  </h3>
-
-                 
-<p>
-
-                   
-${g.courses.length}
-
-                    دورة حسب الفلتر
-
-                 
-</p>
-
-                </div>
-
-              </div>
-
-              <div
-
-               
-class="trainer-missing-kpis">
-
-               
-<span>
-
-                  عناصر متابعة:
-
-                 
-${g.items.length}
-
-                </span>
-
-               
-<span>
-
-                  درجة الأولوية:
-
-                 
-${g.score}
-
-                </span>
-
-              </div>
-
-            </div>
-
-            <div
-
-             
-class="trainer-missing-body">
-
-              ${
-
-               
-g.items.length
-
-                  ?
-
-                 
-g.items.map(x=>`
-
-                    <span
-
-                      class="
-
-                       
-missing-chip
-
-                        ${
-
-                         
-x.severity==="bad"
-
-                           
-?"bad"
-
-                           
-:"warn"
-
-                        }
-
-                     
-">
-
-                      ${esc(x.course.name)}
-
-                      ·
-
-                     
-${esc(x.text)}
-
-                    </span>
-
-                 
-`).join("")
-
-                  :
-
-                  `
-
-                   
-<span
-
-                     
-class="missing-chip good">
-
-                      ✓
-لا توجد مهام ناقصة ضمن الفلاتر الحالية
-
-                   
-</span>
-
-                  `
-
-              }
-
-            </div>
-
-          </article>
-
-       
-`).join("")
-
-      }
-
-    </div>
-
-  </section>
-
-  `;
-
+  if(!FILTERED.length){
+    return `
+      <section class="panel full-panel">
+        <div class="empty">اختر الفلاتر لعرض مهام ونقص المدربين.</div>
+      </section>
+    `;
+  }
+
+  const groups=trainerMissingSummary();
+  const visibleNames=new Set(groups.map(g=>g.trainer));
+
+  [...TRAINER_MISSING_PDF_SELECTED].forEach(name=>{
+    if(!visibleNames.has(name)){
+      TRAINER_MISSING_PDF_SELECTED.delete(name);
+    }
+  });
+
+  const selectedVisible=groups.filter(g=>
+    TRAINER_MISSING_PDF_SELECTED.has(g.trainer)
+  ).length;
+
+  const allVisibleSelected=
+    groups.length>0 &&
+    selectedVisible===groups.length;
+
+  const totalItems=groups.reduce((s,g)=>s+g.items.length,0);
+  const urgent=groups.reduce((s,g)=>s+g.urgent,0);
+  const followup=groups.reduce((s,g)=>s+g.followup,0);
+
+  return `
+  <section class="panel full-panel trainer-admin-panel">
+
+    <div class="panel-head">
+      <div>
+        <h2>نقص ومهام المدربين — تقرير إداري</h2>
+        <p>
+          عرض جدولي حسب الدورة والخطة الدراسية
+          · المهارات تظهر بالاسم فقط عندما تكون مطلوبة وحل موعدها في StudyPlans
+        </p>
+      </div>
+
+      <button
+        class="session-pdf-btn trainer-admin-pdf"
+        onclick="exportTrainerMissingPDF(true)">
+        PDF المحددين
+      </button>
+    </div>
+
+    <div class="trainer-admin-overview">
+      <article>
+        <span>المدربون المعروضون</span>
+        <b>${groups.length}</b>
+      </article>
+      <article>
+        <span>إجمالي عناصر المتابعة</span>
+        <b>${totalItems}</b>
+      </article>
+      <article class="danger">
+        <span>عناصر عاجلة</span>
+        <b>${urgent}</b>
+      </article>
+      <article class="warning">
+        <span>تحتاج متابعة</span>
+        <b>${followup}</b>
+      </article>
+    </div>
+
+    <div class="pdf-selectbar trainer-admin-actions">
+      <label class="trainer-admin-selectall">
+        <input
+          id="trainerMissingSelectAll"
+          class="pdf-check"
+          type="checkbox"
+          ${allVisibleSelected?"checked":""}
+          onchange="toggleAllVisibleTrainerMissing(this.checked)">
+        تحديد كل المدربين المعروضين
+      </label>
+
+      <span
+        id="trainerMissingSelectedCount"
+        class="selection-count">
+        المحدد: ${TRAINER_MISSING_PDF_SELECTED.size}
+      </span>
+
+      <button type="button" onclick="selectTrainerMissingWithIssues()">
+        تحديد من لديهم نقص
+      </button>
+
+      <button type="button" onclick="toggleAllVisibleTrainerMissing(true)">
+        تحديد الكل
+      </button>
+
+      <button type="button" onclick="clearTrainerMissingPdfSelection()">
+        إلغاء التحديد
+      </button>
+
+      <button type="button" class="primary" onclick="exportTrainerMissingPDF(false)">
+        PDF الكل
+      </button>
+    </div>
+
+    <div class="trainer-admin-groups">
+
+      ${groups.map(g=>`
+        <article class="trainer-admin-card trainer-missing-card ${
+          TRAINER_MISSING_PDF_SELECTED.has(g.trainer)?"selected":""
+        }">
+
+          <div class="trainer-admin-head">
+            <div class="trainer-admin-person">
+              <input
+                class="trainer-select-check trainer-missing-check"
+                type="checkbox"
+                data-trainer="${esc(g.trainer)}"
+                ${
+                  TRAINER_MISSING_PDF_SELECTED.has(g.trainer)
+                    ?"checked":""
+                }
+                onchange="
+                  toggleTrainerMissingPdf('${esc(g.trainer)}',this.checked);
+                  this.closest('.trainer-missing-card')
+                    .classList.toggle('selected',this.checked);
+                ">
+
+              <img src="${PRUDLE_REPORT_LOGO}" alt="Prudle">
+
+              <div>
+                <h3>${esc(g.trainer)}</h3>
+                <p>${g.courses.length} دورة حسب الفلاتر الحالية</p>
+              </div>
+            </div>
+
+            <div class="trainer-admin-head-kpis">
+              <span>العناصر <b>${g.items.length}</b></span>
+              <span class="urgent">عاجل <b>${g.urgent}</b></span>
+              <span class="follow">متابعة <b>${g.followup}</b></span>
+            </div>
+          </div>
+
+          ${
+            g.items.length
+            ? `
+              <div class="table-wrap trainer-admin-table-wrap">
+                <table class="trainer-admin-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>الدورة</th>
+                      <th>الفترة</th>
+                      <th>نوع المتابعة</th>
+                      <th>المهارة / البيان</th>
+                      <th>المطلوب</th>
+                      <th>المنجز</th>
+                      <th>الناقص</th>
+                      <th>الموعد</th>
+                      <th>الحالة</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${g.items.map((x,i)=>`
+                      <tr class="${x.severity==="bad"?"admin-danger-row":""}">
+                        <td>${i+1}</td>
+                        <td>
+                          <b>${esc(x.course.name)}</b>
+                          <small>${esc(x.course.branch||"")} · ${esc(x.course.section||"")}</small>
+                        </td>
+                        <td>${esc(x.course.period)}</td>
+                        <td>
+                          <span class="admin-kind ${x.kind==="المهارات"?"skill":""}">
+                            ${esc(x.kind)}
+                          </span>
+                        </td>
+                        <td class="admin-detail-cell">
+                          ${
+                            x.skill
+                              ? `<span class="admin-skill-name">${esc(x.skill)}</span>
+                                 <small>رصد المهارة ناقص حسب الخطة</small>`
+                              : `<b>${esc(x.text)}</b>`
+                          }
+                        </td>
+                        <td>${x.expected!==""?x.expected:"—"}</td>
+                        <td>${x.completed!==""?x.completed:"—"}</td>
+                        <td>
+                          <span class="admin-missing-count">${x.missing}</span>
+                        </td>
+                        <td>${x.due?esc(x.due):"—"}</td>
+                        <td>
+                          <span class="admin-status ${x.severity==="bad"?"bad":"warn"}">
+                            ${x.severity==="bad"?"عاجل":"متابعة"}
+                          </span>
+                        </td>
+                      </tr>
+                    `).join("")}
+                  </tbody>
+                </table>
+              </div>
+            `
+            : `
+              <div class="trainer-admin-clear">
+                <b>✓ لا توجد مهام ناقصة</b>
+                <span>جميع العناصر المطلوبة ضمن الفلاتر الحالية مكتملة.</span>
+              </div>
+            `
+          }
+
+        </article>
+      `).join("")}
+
+    </div>
+
+  </section>
+  `;
 }
 
 function parseJsDate(value){
@@ -18236,6 +17995,221 @@ tr{
 .att-total-bad{font-size:13px;color:var(--red);font-weight:900}.att-total-good{font-size:13px;color:var(--green);font-weight:900}
 .att-pdf-btn{border:0;background:#e7f7f1;color:#107a58;border-radius:10px;padding:8px 11px;font-size:8px;font-weight:900}
 @media(max-width:850px){.att-audit-summary{grid-template-columns:repeat(2,1fr)}.att-audit-table .att-sticky-course{min-width:130px;max-width:130px}.att-audit-table .att-sticky-trainer{right:130px;min-width:90px}}
+
+
+
+/* ===== Administrative Trainer Missing Report v3 ===== */
+.trainer-admin-panel{background:#f8fafc}
+.trainer-admin-overview{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin:0 0 14px
+}
+.trainer-admin-overview article{
+  background:#fff;
+  border:1px solid #dce6ef;
+  border-right:5px solid #164478;
+  border-radius:14px;
+  padding:12px 14px;
+  box-shadow:0 6px 18px rgba(15,51,82,.05)
+}
+.trainer-admin-overview article.warning{border-right-color:#dc9413;background:#fffdf8}
+.trainer-admin-overview article.danger{border-right-color:#dc4d57;background:#fffafb}
+.trainer-admin-overview span{display:block;font-size:9px;color:#71839a;font-weight:800}
+.trainer-admin-overview b{display:block;margin-top:4px;font-size:23px;color:#0b2d4f}
+.trainer-admin-actions{
+  background:#fff;
+  border:1px solid #e0e8ef;
+  border-radius:12px;
+  padding:8px 10px;
+  margin-bottom:14px
+}
+.trainer-admin-selectall{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin-left:auto;
+  color:#164478;
+  font-size:9px;
+  font-weight:900
+}
+.trainer-admin-groups{display:flex;flex-direction:column;gap:14px}
+.trainer-admin-card{
+  border:1px solid #d8e3ec;
+  border-radius:16px;
+  overflow:hidden;
+  background:#fff;
+  box-shadow:0 8px 24px rgba(15,51,82,.065)
+}
+.trainer-admin-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px 14px;
+  background:linear-gradient(135deg,#10395f,#164478 60%,#2b78b2);
+  color:#fff
+}
+.trainer-admin-person{display:flex;align-items:center;gap:10px}
+.trainer-admin-person img{
+  width:42px;height:42px;object-fit:contain;background:#fff;
+  border-radius:11px;padding:3px
+}
+.trainer-admin-person h3{margin:0;color:#fff;font-size:13px}
+.trainer-admin-person p{margin:3px 0 0;color:#d7e7f3;font-size:8px}
+.trainer-admin-head-kpis{display:flex;gap:6px;flex-wrap:wrap}
+.trainer-admin-head-kpis span{
+  display:flex;align-items:center;gap:5px;
+  padding:5px 8px;border-radius:13px;
+  background:rgba(255,255,255,.13);
+  border:1px solid rgba(255,255,255,.18);
+  font-size:7.5px;font-weight:800
+}
+.trainer-admin-head-kpis b{font-size:10px;color:#fff}
+.trainer-admin-head-kpis .urgent{background:rgba(220,77,87,.28)}
+.trainer-admin-head-kpis .follow{background:rgba(220,148,19,.25)}
+.trainer-admin-table-wrap{padding:0}
+.trainer-admin-table{
+  width:100%;
+  min-width:1050px;
+  border-collapse:collapse;
+  table-layout:auto
+}
+.trainer-admin-table th{
+  padding:9px 7px;
+  background:#eaf1f6;
+  color:#164478;
+  border:1px solid #d4e0e9;
+  font-size:8.5px;
+  text-align:center;
+  white-space:nowrap
+}
+.trainer-admin-table td{
+  padding:9px 7px;
+  border:1px solid #e2e9ef;
+  font-size:9px;
+  text-align:center;
+  vertical-align:middle
+}
+.trainer-admin-table tbody tr:nth-child(even){background:#fafcfd}
+.trainer-admin-table tbody tr:hover{background:#f0f7fc}
+.trainer-admin-table .admin-danger-row{background:#fff7f7}
+.trainer-admin-table td:nth-child(2),
+.trainer-admin-table .admin-detail-cell{text-align:right}
+.trainer-admin-table td>b{color:#173d5e;font-size:9.5px}
+.trainer-admin-table td>small,
+.admin-detail-cell small{
+  display:block;margin-top:3px;color:#7b8d9e;font-size:7.5px
+}
+.admin-kind{
+  display:inline-flex;padding:4px 7px;border-radius:10px;
+  background:#edf4f9;color:#164478;font-size:7px;font-weight:900
+}
+.admin-kind.skill{background:#efeafb;color:#6748b6}
+.admin-skill-name{
+  display:inline-flex;
+  min-width:82px;
+  justify-content:center;
+  padding:5px 9px;
+  border-radius:10px;
+  background:linear-gradient(135deg,#7357c5,#8b73d3);
+  color:#fff;
+  font-size:8px;
+  font-weight:900
+}
+.admin-missing-count{
+  display:inline-flex;
+  min-width:34px;height:27px;
+  align-items:center;justify-content:center;
+  border-radius:14px;
+  background:#fff0f1;color:#c83f49;
+  font-weight:900
+}
+.admin-status{
+  display:inline-flex;padding:5px 8px;border-radius:12px;
+  font-size:7px;font-weight:900
+}
+.admin-status.bad{background:#ffe8ea;color:#bd3944}
+.admin-status.warn{background:#fff3dc;color:#a76a08}
+.trainer-admin-clear{
+  padding:24px;text-align:center;background:#f2fbf7;color:#107a58
+}
+.trainer-admin-clear b,.trainer-admin-clear span{display:block}
+.trainer-admin-clear b{font-size:12px}
+.trainer-admin-clear span{font-size:8px;margin-top:4px;color:#658878}
+.trainer-admin-pdf{
+  background:linear-gradient(135deg,#164478,#2b78b2)!important;
+  color:#fff!important
+}
+
+@media(max-width:850px){
+  .trainer-admin-overview{grid-template-columns:repeat(2,1fr)}
+  .trainer-admin-head{align-items:flex-start;flex-direction:column}
+  .trainer-admin-head-kpis{width:100%}
+}
+@media(max-width:520px){
+  .trainer-admin-overview{grid-template-columns:1fr 1fr}
+}
+
+/* Styles injected into printWindow are inherited only if printWindow copies page styles.
+   These selectors also improve browser print when the same document is used. */
+@media print{
+  .admin-summary{
+    display:grid!important;
+    grid-template-columns:repeat(4,1fr)!important;
+    gap:6px!important;
+    margin:0 0 9px!important
+  }
+  .admin-summary>div{
+    border:1px solid #d4e0e9!important;
+    border-right:4px solid #164478!important;
+    border-radius:8px!important;
+    padding:7px 9px!important;
+    background:#f8fbfd!important
+  }
+  .admin-summary .redbox{border-right-color:#dc4d57!important;background:#fff3f4!important}
+  .admin-summary .amberbox{border-right-color:#dc9413!important;background:#fff8e9!important}
+  .admin-summary span{display:block!important;font-size:6px!important;color:#71839a!important}
+  .admin-summary b{display:block!important;margin-top:2px!important;font-size:13px!important;color:#0b2d4f!important}
+  .trainer-admin-section{margin-bottom:10px!important;break-inside:auto!important}
+  .trainer-admin-title{
+    display:flex!important;align-items:center!important;justify-content:space-between!important;
+    gap:8px!important;padding:7px 9px!important;
+    background:linear-gradient(135deg,#10395f,#164478 60%,#2b78b2)!important;
+    color:#fff!important;border-radius:8px 8px 0 0!important
+  }
+  .trainer-admin-title strong{display:block!important;font-size:9px!important;color:#fff!important}
+  .trainer-admin-title small{display:block!important;margin-top:2px!important;font-size:5.5px!important;color:#d7e7f3!important}
+  .trainer-admin-kpis{display:flex!important;gap:4px!important}
+  .trainer-admin-kpis span{
+    padding:3px 5px!important;border-radius:8px!important;
+    background:rgba(255,255,255,.14)!important;
+    border:1px solid rgba(255,255,255,.18)!important;
+    color:#fff!important;font-size:5px!important
+  }
+  .admin-table{
+    width:100%!important;border-collapse:collapse!important;table-layout:fixed!important
+  }
+  .admin-table thead{display:table-header-group!important}
+  .admin-table th{
+    background:#dfeaf2!important;color:#123a5e!important;
+    border:1px solid #c6d4df!important;padding:5px 3px!important;
+    font-size:5.4px!important;text-align:center!important
+  }
+  .admin-table td{
+    border:1px solid #dce5ec!important;padding:4px 3px!important;
+    font-size:5.3px!important;text-align:center!important;vertical-align:middle!important
+  }
+  .admin-table tbody tr:nth-child(even){background:#f8fbfd!important}
+  .admin-table tr.danger{background:#fff1f2!important}
+  .admin-table .detail-cell{text-align:right!important}
+  .admin-table .skill-label{
+    display:inline-block!important;padding:2px 5px!important;border-radius:7px!important;
+    background:#7357c5!important;color:#fff!important;font-weight:900!important
+  }
+  .admin-table .missing-number{color:#c83f49!important;font-size:7px!important}
+}
 
 </style>
 
