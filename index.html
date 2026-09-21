@@ -3893,6 +3893,163 @@
   .trainer-admin-head{align-items:flex-start;flex-direction:column}
 }
 
+
+/* ===== Executive Trainer Missing PDF - Management Edition ===== */
+@media print{
+  .trainer-missing-pdf .exec-report-intro{
+    grid-template-columns:1.55fr .45fr;
+    gap:10px;
+    margin:10px 0 12px;
+  }
+  .trainer-missing-pdf .exec-summary-box{
+    padding:12px 14px;
+    font-size:9px;
+    line-height:1.9;
+    border-radius:12px;
+    background:#f5f9fc;
+    border:1px solid #cfdee9;
+    border-right:6px solid #164478;
+    color:#36566f;
+  }
+  .trainer-missing-pdf .exec-summary-box b{font-size:10px}
+  .trainer-missing-pdf .exec-mode-box{
+    padding:11px 12px;
+    border-radius:12px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+  .trainer-missing-pdf .exec-mode-box span{font-size:7.5px}
+  .trainer-missing-pdf .exec-mode-box b{font-size:13px;margin-top:4px}
+
+  .trainer-missing-pdf .print-stats{gap:9px;margin-bottom:12px}
+  .trainer-missing-pdf .print-stat{
+    min-height:62px;
+    padding:10px 12px;
+    border-radius:11px;
+    box-shadow:0 3px 10px rgba(15,51,82,.05);
+  }
+  .trainer-missing-pdf .print-stat span{font-size:8px;font-weight:800}
+  .trainer-missing-pdf .print-stat b{font-size:21px;margin-top:4px}
+
+  .trainer-missing-pdf .manager-trainer{
+    margin:0 0 13px;
+    border:1px solid #cbd9e4;
+    border-radius:12px;
+    overflow:hidden;
+    background:#fff;
+  }
+  .trainer-missing-pdf .manager-trainer + .manager-trainer{
+    break-before:page;
+    page-break-before:always;
+  }
+  .trainer-missing-pdf .manager-trainer-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:10px 13px;
+    background:linear-gradient(135deg,#123d66,#164478 62%,#2b78b2);
+    color:#fff;
+  }
+  .trainer-missing-pdf .manager-trainer-name b{
+    display:block;
+    color:#fff;
+    font-size:14px;
+  }
+  .trainer-missing-pdf .manager-trainer-name span{
+    display:block;
+    margin-top:3px;
+    color:#d8e8f4;
+    font-size:8px;
+  }
+  .trainer-missing-pdf .manager-trainer-kpis{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+  }
+  .trainer-missing-pdf .manager-trainer-kpis span{
+    padding:5px 8px;
+    border-radius:12px;
+    background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.22);
+    color:#fff;
+    font-size:7.5px;
+    font-weight:900;
+    white-space:nowrap;
+  }
+
+  .trainer-missing-pdf .manager-table{
+    width:100%;
+    border-collapse:collapse;
+    table-layout:fixed;
+  }
+  .trainer-missing-pdf .manager-table thead{display:table-header-group}
+  .trainer-missing-pdf .manager-table th{
+    padding:8px 6px;
+    background:#e8f1f7;
+    color:#123d66;
+    border:1px solid #cbd9e4;
+    font-size:8px;
+    font-weight:900;
+    text-align:center;
+  }
+  .trainer-missing-pdf .manager-table td{
+    padding:8px 6px;
+    border:1px solid #dce5ec;
+    font-size:8.3px;
+    line-height:1.55;
+    text-align:center;
+    vertical-align:middle;
+    word-break:break-word;
+  }
+  .trainer-missing-pdf .manager-table tbody tr:nth-child(even){background:#f8fbfd}
+  .trainer-missing-pdf .manager-table tr{break-inside:avoid;page-break-inside:avoid}
+  .trainer-missing-pdf .manager-table .detail{text-align:right;font-size:8.6px}
+  .trainer-missing-pdf .manager-table .course{text-align:right}
+  .trainer-missing-pdf .manager-table .course b{font-size:9px;color:#123d66}
+  .trainer-missing-pdf .manager-table .course small{font-size:7px;color:#71839a}
+
+  .trainer-missing-pdf .manager-kind{
+    display:inline-block;
+    padding:4px 7px;
+    border-radius:10px;
+    background:#eaf3fa;
+    color:#164478;
+    font-size:7px;
+    font-weight:900;
+  }
+  .trainer-missing-pdf .manager-kind.skill{
+    background:#f0edfb;
+    color:#6748b6;
+  }
+  .trainer-missing-pdf .manager-count{
+    display:inline-flex;
+    min-width:30px;
+    height:27px;
+    align-items:center;
+    justify-content:center;
+    border-radius:14px;
+    background:#fff4df;
+    color:#9e6509;
+    font-size:10px;
+    font-weight:900;
+  }
+  .trainer-missing-pdf .manager-count.bad{background:#ffe9eb;color:#b93641}
+  .trainer-missing-pdf .print-badge{
+    padding:4px 8px;
+    font-size:7px;
+  }
+  .trainer-missing-pdf .exec-report-footer-note{
+    margin-top:12px;
+    padding:9px 12px;
+    font-size:7.5px;
+    line-height:1.8;
+    border-right:4px solid #164478;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -7767,65 +7924,95 @@ function exportTrainerMissingPDF(selectedOnly=true){
   const courses=new Set(groups.flatMap(g=>g.courses.map(c=>c.id))).size;
 
   const body=`
-    <div class="exec-report-intro">
-      <div class="exec-summary-box">
-        <b>ملخص إداري:</b>
-        يعرض هذا التقرير عناصر المتابعة غير المكتملة حسب الفلاتر الحالية.
-        قسم المهارات يعرض <b>المهارات المتأخرة فقط</b> التي تجاوز تاريخها المحدد في StudyPlans،
-        ولا يعرض مهارات اليوم أو المهارات المستقبلية.
+    <div class="trainer-missing-pdf">
+      <div class="exec-report-intro">
+        <div class="exec-summary-box">
+          <b>الملخص التنفيذي</b><br>
+          تقرير إداري لمتابعة النواقص والمهام التي تتطلب الإجراء حسب الفلاتر الحالية.
+          تم تنظيم البيانات حسب المدرب والدورة ونوع المتابعة لتسهيل المراجعة واتخاذ الإجراء.
+          المهارات المدرجة هي <b>المهارات المتأخرة فقط</b> حسب التاريخ المحدد في StudyPlans.
+        </div>
+        <div class="exec-mode-box">
+          <span>نطاق التقرير</span>
+          <b>${selectedOnly?"المدربون المحددون":"جميع المدربين"}</b>
+        </div>
       </div>
-      <div class="exec-mode-box">
-        <span>نطاق التقرير</span>
-        <b>${selectedOnly?"المدربون المحددون":"جميع المدربين المعروضين"}</b>
+
+      <div class="print-stats">
+        <div class="print-stat"><span>المدربون</span><b>${groups.length}</b></div>
+        <div class="print-stat"><span>الدورات</span><b>${courses}</b></div>
+        <div class="print-stat"><span>عناصر المتابعة</span><b>${totalIssues}</b></div>
+        <div class="print-stat"><span>العاجل / مهارات متأخرة</span><b>${urgent} / ${lateSkills}</b></div>
       </div>
-    </div>
 
-    <div class="print-stats">
-      <div class="print-stat"><span>المدربون</span><b>${groups.length}</b></div>
-      <div class="print-stat"><span>الدورات</span><b>${courses}</b></div>
-      <div class="print-stat"><span>عناصر المتابعة</span><b>${totalIssues}</b></div>
-      <div class="print-stat"><span>مهارات متأخرة / عاجل</span><b>${lateSkills} / ${urgent}</b></div>
-    </div>
+      ${groups.map(g=>{
+        const trainerUrgent=g.items.filter(x=>x.severity==="bad").length;
+        const trainerSkills=g.items.filter(x=>x.kind==="المهارات").length;
+        return `
+          <section class="manager-trainer">
+            <div class="manager-trainer-head">
+              <div class="manager-trainer-name">
+                <b>${esc(g.trainer)}</b>
+                <span>متابعة تنفيذ المهام والنواقص الأكاديمية</span>
+              </div>
+              <div class="manager-trainer-kpis">
+                <span>${g.courses.length} دورة</span>
+                <span>${g.items.length} عنصر متابعة</span>
+                <span>${trainerUrgent} عاجل</span>
+                <span>${trainerSkills} مهارة متأخرة</span>
+              </div>
+            </div>
 
-    ${groups.map(g=>`
-      <div class="print-section">
-        <h2>${esc(g.trainer)} · ${g.courses.length} دورة · ${g.items.length} عنصر متابعة</h2>
-        <table class="print-table">
-          <thead>
-            <tr>
-              <th style="width:4%">#</th>
-              <th style="width:15%">الدورة</th>
-              <th style="width:12%">الفترة</th>
-              <th style="width:12%">التصنيف</th>
-              <th style="width:31%">البيان الإداري</th>
-              <th style="width:8%">العدد</th>
-              <th style="width:10%">الموعد</th>
-              <th style="width:8%">الحالة</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${g.items.map((x,i)=>`
-              <tr class="${x.severity==="bad"?"danger-row":""}">
-                <td>${i+1}</td>
-                <td><b>${esc(x.course.name)}</b><br><small>${esc(x.course.section||"")}</small></td>
-                <td>${esc(x.course.period||"—")}</td>
-                <td>${x.kind==="المهارات"?`مهارة · ${esc(x.skill)}`:esc(x.kind)}</td>
-                <td style="text-align:right">${esc(x.text)}</td>
-                <td><b>${x.count}</b></td>
-                <td>${x.due?esc(x.due):"—"}</td>
-                <td>${x.severity==="bad"
-                  ?'<span class="print-badge bad">عاجل</span>'
-                  :'<span class="print-badge good" style="background:#fff5df;color:#a86a08;border-color:#f0ddb0">متابعة</span>'}</td>
-              </tr>
-            `).join("") || `<tr><td colspan="8">لا توجد عناصر متابعة ناقصة</td></tr>`}
-          </tbody>
-        </table>
+            <table class="manager-table">
+              <thead>
+                <tr>
+                  <th style="width:4%">#</th>
+                  <th style="width:17%">الدورة</th>
+                  <th style="width:11%">الفترة</th>
+                  <th style="width:13%">التصنيف</th>
+                  <th style="width:31%">تفاصيل المتابعة</th>
+                  <th style="width:7%">العدد</th>
+                  <th style="width:9%">الموعد</th>
+                  <th style="width:8%">الأولوية</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${g.items.map((x,i)=>`
+                  <tr class="${x.severity==="bad"?"danger-row":""}">
+                    <td>${i+1}</td>
+                    <td class="course">
+                      <b>${esc(x.course.name)}</b>
+                      <br><small>${esc(x.course.section||"")}</small>
+                    </td>
+                    <td>${esc(x.course.period||"—")}</td>
+                    <td>
+                      <span class="manager-kind ${x.kind==="المهارات"?"skill":""}">
+                        ${x.kind==="المهارات"?`مهارة · ${esc(x.skill)}`:esc(x.kind)}
+                      </span>
+                    </td>
+                    <td class="detail">${esc(x.text)}</td>
+                    <td>
+                      <span class="manager-count ${x.severity==="bad"?"bad":""}">${x.count}</span>
+                    </td>
+                    <td>${x.due?esc(x.due):"—"}</td>
+                    <td>
+                      ${x.severity==="bad"
+                        ?'<span class="print-badge bad">عاجل</span>'
+                        :'<span class="print-badge good" style="background:#fff5df;color:#9e6509;border-color:#efd9a7">متابعة</span>'}
+                    </td>
+                  </tr>
+                `).join("") || `<tr><td colspan="8">لا توجد عناصر متابعة ناقصة</td></tr>`}
+              </tbody>
+            </table>
+          </section>
+        `;
+      }).join("")}
+
+      <div class="exec-report-footer-note">
+        <b>ملاحظة إدارية:</b>
+        يوضح التقرير عناصر المتابعة الحالية لتسهيل مراجعة الإدارة.
+        الحالات المصنفة «عاجل» تتطلب أولوية في المتابعة، بينما تظهر المهارات فقط عند تجاوز موعدها المحدد في خطة الدراسة.
       </div>
-    `).join("")}
-
-    <div class="exec-report-footer-note">
-      التقرير مخصص للعرض الإداري والمتابعة. ترتيب المدربين يعتمد على درجة الأولوية،
-      والمهارات المدرجة هي المتأخرة زمنيًا فقط حسب خطة الدراسة.
     </div>
   `;
 
