@@ -1412,6 +1412,48 @@ body{padding:0!important}
   box-shadow:0 20px 50px rgba(10,40,70,.18)!important;
 }
 
+
+/* Assigned employees panel */
+
+
+.task-assignees-panel-head h3{
+  margin:0 0 4px;
+  color:var(--p-navy);
+  font-size:17px;
+}
+.task-assignees-panel-head h3 i{color:var(--p-blue2);margin-inline-end:7px}
+.task-assignees-panel-head p{
+  margin:0;
+  color:var(--p-muted);
+  font-size:12px;
+  font-weight:700;
+}
+
+
+.task-assignee-card{
+  display:flex;align-items:center;gap:10px;
+  padding:12px;border:1px solid #e5edf5;border-radius:12px;
+  background:#fbfdff;
+}
+.task-assignee-avatar{
+  width:38px;height:38px;flex:0 0 38px;
+  border-radius:11px;display:flex;align-items:center;justify-content:center;
+  background:#eaf3fb;color:var(--p-blue);font-weight:900;
+}
+.task-assignee-card strong{display:block;color:var(--p-navy);font-size:13px}
+.task-assignee-card small{display:block;color:var(--p-muted);font-size:11px;margin-top:2px}
+.task-assignee-card.priority-high{border-inline-start:4px solid #ef4444}
+.task-assignee-card.priority-medium{border-inline-start:4px solid #f59e0b}
+.task-assignee-card.priority-low{border-inline-start:4px solid #22c55e}
+
+/* Make hover popover easier to read in the redesigned sidebar */
+.task-assignee-popover{
+  right:calc(100% + 8px)!important;
+  top:-6px!important;
+  width:320px!important;
+}
+.task-nav-wrap:hover .task-assignee-popover{display:block!important}
+
 /* Mobile navigation: clean horizontal chips */
 .mobile-menu{
   background:#fff;
@@ -1480,6 +1522,94 @@ body{padding:0!important}
 @media(max-width:390px){
   .cards{grid-template-columns:1fr!important}
   .card{min-height:170px!important}
+}
+</style>
+
+<style>
+/* ===== TASK ASSIGNEES VISIBILITY FIX ===== */
+.sidebar{
+  overflow-y:auto!important;
+  overflow-x:visible!important;
+  z-index:10000!important;
+}
+.task-nav-wrap{
+  position:relative!important;
+  overflow:visible!important;
+  z-index:10020!important;
+}
+.task-assignee-popover{
+  position:fixed!important;
+  right:288px!important;
+  top:auto!important;
+  width:330px!important;
+  max-height:420px!important;
+  overflow-y:auto!important;
+  margin:0!important;
+  padding:14px!important;
+  background:#fff!important;
+  border:1px solid #d9e5f0!important;
+  border-radius:14px!important;
+  box-shadow:0 20px 55px rgba(8,38,66,.28)!important;
+  z-index:999999!important;
+  direction:rtl!important;
+}
+.task-nav-wrap:hover .task-assignee-popover{
+  display:block!important;
+}
+
+/* قائمة المسند إليهم أسفل التقارير */
+#reportsAssigneesPanel{
+  margin-top:20px;
+  background:#fff;
+  border:1px solid #dfe8f1;
+  border-radius:16px;
+  box-shadow:0 10px 30px rgba(15,47,82,.08);
+  overflow:hidden;
+}
+
+.reports-assignees-head h3{
+  margin:0;
+  color:#0b2f52;
+  font-size:17px;
+}
+.reports-assignees-head p{
+  margin:4px 0 0;
+  color:#75869a;
+  font-size:12px;
+  font-weight:700;
+}
+
+
+@media(max-width:980px){
+  .task-assignee-popover{
+    right:12px!important;
+    left:12px!important;
+    width:auto!important;
+    top:70px!important;
+  }
+}
+</style>
+
+<style>
+#reportsAssigneesPanel .task-assignee-card{
+  min-height:72px;
+  background:#fff;
+}
+#reportsAssigneesPanel .task-assignee-card strong{
+  font-size:16px!important;
+  font-weight:900!important;
+  color:#0b2f52!important;
+}
+#reportsAssigneesPanel .task-assignee-card small{
+  font-size:12px!important;
+  margin-top:5px!important;
+}
+#reportsAssigneesPanel .task-assignee-empty{
+  grid-column:1/-1;
+  padding:18px;
+  text-align:center;
+  color:#75869a;
+  font-weight:800;
 }
 </style>
 
@@ -1727,6 +1857,10 @@ body{padding:0!important}
     <!-- ===== CONTENT ===== -->
     <div class="content-wrap">
       <div id="content"></div>
+
+      
+
+      
     </div>
 
   </main>
@@ -2152,6 +2286,8 @@ function toggleDashboardLanguage(){
    High = أحمر | Medium = برتقالي | Low = أخضر
 ========================================================= */
 let TASKS_SNAPSHOT = [];
+let TASK_USERS_LOOKUP = new Map();
+
 let TASKS_LISTENER_READY = false;
 let TASK_FLASH_TIMER = null;
 
@@ -2219,14 +2355,94 @@ function renderTaskAssignmentAlert(){
   const tickerNote = document.getElementById("taskTickerNote");
   const tickerNames = document.getElementById("taskTickerNames");
 
-  const activeTasks = TASKS_SNAPSHOT.filter(t =>
-    t.status === "assigned" || t.status === "in_progress"
-  );
+  function taskStatus(t){
+    return String(t?.status || "assigned").trim().toLowerCase();
+  }
 
-  const waitingTasks = TASKS_SNAPSHOT.filter(t =>
-    t.status === "assigned"
-  );
+  function isActiveTask(t){
+    const st = taskStatus(t);
+    return ![
+      "completed","cancelled","canceled","closed","done",
+      "مكتمل","مكتملة","تم الانتهاء","تم الإنهاء",
+      "ملغاة","ملغي","مغلق","مغلقة"
+    ].includes(st);
+  }
 
+  function isWaitingTask(t){
+    return ["assigned","تم الإسناد","مسند","مسندة"].includes(taskStatus(t));
+  }
+
+  /*
+    كود إسناد المهام يحفظ:
+    employeeName     = اسم الموظف
+    employeeUsername = اسم المستخدم
+    لذلك لا نعتمد على تسجيل دخول المدير لمعرفة المسند إليه.
+  */
+  function getTaskAssignee(t){
+    const employeeName = safeTaskText(t?.employeeName);
+    const employeeUsername = safeTaskText(t?.employeeUsername);
+
+    let username =
+      employeeUsername ||
+      safeTaskText(t?.assignedEmployeeUsername) ||
+      safeTaskText(t?.assigneeUsername) ||
+      safeTaskText(t?.assignedToUsername) ||
+      safeTaskText(t?.receiverUsername) ||
+      safeTaskText(t?.recipientUsername) ||
+      safeTaskText(t?.toUsername) ||
+      safeTaskText(t?.username) ||
+      safeTaskText(t?.userName);
+
+    let name =
+      employeeName ||
+      safeTaskText(t?.assignedEmployeeName) ||
+      safeTaskText(t?.assigneeName) ||
+      safeTaskText(t?.assignedToName) ||
+      safeTaskText(t?.receiverName) ||
+      safeTaskText(t?.recipientName);
+
+    // إذا كان لدينا username نستخدم USERS للحصول على الاسم الكامل.
+    if(username){
+      const resolved = TASK_USERS_LOOKUP.get(username.toLowerCase());
+      if(resolved) name = name || resolved;
+    }
+
+    // دعم السجلات القديمة التي تحفظ قيمة نصية فقط.
+    if(!name){
+      const oldValue =
+        safeTaskText(t?.employee) ||
+        safeTaskText(t?.assignedTo) ||
+        safeTaskText(t?.assignee) ||
+        safeTaskText(t?.receiver) ||
+        safeTaskText(t?.recipient) ||
+        safeTaskText(t?.toUser);
+
+      if(oldValue && oldValue !== "[object Object]"){
+        const resolved = TASK_USERS_LOOKUP.get(oldValue.toLowerCase());
+        name = resolved || oldValue;
+        if(!username && !resolved) username = oldValue;
+      }
+    }
+
+    const userId = safeTaskText(
+      t?.employeeUserId ||
+      t?.userId ||
+      t?.assignedUserId ||
+      t?.receiverUserId
+    );
+
+    if(!name && userId){
+      name = TASK_USERS_LOOKUP.get(userId.toLowerCase()) || "";
+    }
+
+    // لا نخفي السجل أبداً حتى لو كان قديماً جداً.
+    if(!name) name = username || "غير محدد";
+
+    return { name, username };
+  }
+
+  const activeTasks = TASKS_SNAPSHOT.filter(isActiveTask);
+  const waitingTasks = activeTasks.filter(isWaitingTask);
   const alertCount = waitingTasks.length;
 
   if(sideBadge) sideBadge.textContent = alertCount;
@@ -2237,27 +2453,41 @@ function renderTaskAssignmentAlert(){
     btn.classList.toggle("has-task-count",alertCount > 0);
   });
 
-  /* التجميع الآن حسب اسم الموظف فقط — بدون رقم موظف */
   const byEmployee = new Map();
 
   activeTasks.forEach(t=>{
-    const name = safeTaskText(t.employeeName) || "غير محدد";
-    const key = name.toLowerCase();
+    const assignee = getTaskAssignee(t);
+    const key = String(
+      assignee.username || assignee.name || t.id || Math.random()
+    ).trim().toLowerCase();
+
     const priority = normalizeTaskPriority(t.priority);
 
     const current = byEmployee.get(key) || {
-      name,
+      name: assignee.name,
+      username: assignee.username,
       count:0,
       assigned:0,
       progress:0,
       priorities:[]
     };
 
+    // لو ظهر الاسم لاحقاً من سجل أحدث، نحتفظ به.
+    if(
+      (!current.name || current.name === "غير محدد") &&
+      assignee.name
+    ){
+      current.name = assignee.name;
+    }
+    if(!current.username && assignee.username){
+      current.username = assignee.username;
+    }
+
     current.count++;
     current.priorities.push(priority);
 
-    if(t.status === "assigned") current.assigned++;
-    if(t.status === "in_progress") current.progress++;
+    if(isWaitingTask(t)) current.assigned++;
+    else current.progress++;
 
     byEmployee.set(key,current);
   });
@@ -2265,13 +2495,52 @@ function renderTaskAssignmentAlert(){
   const employees = [...byEmployee.values()]
     .map(e=>({
       ...e,
-      priority:highestTaskPriority(e.priorities.map(priority=>({priority})))
+      priority:highestTaskPriority(
+        e.priorities.map(priority=>({priority}))
+      )
     }))
     .sort((a,b)=>
       taskPriorityValue(b.priority)-taskPriorityValue(a.priority) ||
       b.count-a.count ||
-      a.name.localeCompare(b.name,"ar")
+      String(a.name).localeCompare(String(b.name),"ar")
     );
+
+  function employeeIdentityHtml(e){
+    const name = escapeTaskHtml(e.name || "غير محدد");
+    const username = safeTaskText(e.username);
+    return `
+      <strong>${name}</strong>
+      ${username ? `<div style="font-size:11px;color:#64748b;margin-top:3px;direction:ltr;text-align:right">@${escapeTaskHtml(username)}</div>` : ""}
+    `;
+  }
+
+  function cardsHtml(){
+    if(!employees.length){
+      return '<div class="task-assignee-empty">لا توجد مهام مسندة حالياً</div>';
+    }
+
+    return employees.map(e=>{
+      const initial =
+        escapeTaskHtml((e.name || e.username || "?").trim().charAt(0) || "?");
+
+      return `
+        <div class="task-assignee-card priority-${e.priority}">
+          <div class="task-assignee-avatar">${initial}</div>
+          <div>
+            ${employeeIdentityHtml(e)}
+            <small>
+              ${e.count} مهمة • ${priorityArabic(e.priority)}
+              ${e.assigned ? ` • ${e.assigned} بانتظار الاستلام` : ""}
+              ${e.progress ? ` • ${e.progress} قيد الإجراء` : ""}
+            </small>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+
+
 
   if(listBox){
     if(!employees.length){
@@ -2281,7 +2550,7 @@ function renderTaskAssignmentAlert(){
       listBox.className = "";
       listBox.innerHTML = employees.map(e=>`
         <div class="task-assignee-item priority-${e.priority}">
-          ${e.name}
+          ${employeeIdentityHtml(e)}
           <small>
             أولوية ${priorityArabic(e.priority)}
             • ${e.count} مهمة
@@ -2298,20 +2567,81 @@ function renderTaskAssignmentAlert(){
       const topPriority = highestTaskPriority(activeTasks);
 
       tickerNote.style.display = "block";
-      tickerNote.classList.remove("priority-high","priority-medium","priority-low");
+      tickerNote.classList.remove(
+        "priority-high",
+        "priority-medium",
+        "priority-low"
+      );
       tickerNote.classList.add("priority-"+topPriority);
 
       tickerNames.textContent =
         "🔔 مهام مسندة إلى: " +
-        employees.map(e=>`${e.name} — ${priorityArabic(e.priority)} (${e.count})`).join("  •  ") +
+        employees.map(e=>{
+          const who = e.username
+            ? `${e.name} (@${e.username})`
+            : e.name;
+          return `${who} — ${priorityArabic(e.priority)} (${e.count})`;
+        }).join("  •  ") +
         "   —   ";
     }else{
       tickerNote.style.display = "none";
-      tickerNote.classList.remove("priority-high","priority-medium","priority-low");
+      tickerNote.classList.remove(
+        "priority-high",
+        "priority-medium",
+        "priority-low"
+      );
       tickerNames.textContent = "";
     }
   }
 }
+// تحميل أسماء المستخدمين لدعم سجلات المهام القديمة والجديدة
+// حتى لو كان سجل المهمة يحتوي فقط على username أو userId.
+db.collection("USERS").onSnapshot(snapshot=>{
+  const map = new Map();
+  snapshot.forEach(doc=>{
+    const u = doc.data() || {};
+    const displayName = safeTaskText(
+      u.displayName || u.fullName || u.name || u.employeeName ||
+      u.username || u.userName || doc.id
+    );
+    const keys = [
+      doc.id, u.id, u.uid, u.username, u.userName,
+      u.usernameLower, u.email, u.employeeName, u.displayName, u.fullName, u.name
+    ];
+    keys.forEach(key=>{
+      const k = safeTaskText(key).toLowerCase();
+      if(k && displayName) map.set(k,displayName);
+    });
+  });
+  TASK_USERS_LOOKUP = map;
+  renderTaskAssignmentAlert();
+},error=>{
+  console.warn("USERS task-name lookup error:",error);
+});
+
+/* تثبيت نافذة أسماء المسند إليهم بجانب زر إسناد المهام */
+(function setupTaskPopoverPosition(){
+  const wrap = document.querySelector(".task-nav-wrap");
+  const pop = document.getElementById("taskAssigneePopover");
+  const btn = document.getElementById("tasksBtnSide");
+  if(!wrap || !pop || !btn) return;
+
+  function positionPopover(){
+    if(window.innerWidth <= 980) return;
+    const rect = btn.getBoundingClientRect();
+    const popHeight = Math.min(pop.scrollHeight || 340, 420);
+    let top = rect.top;
+    if(top + popHeight > window.innerHeight - 12){
+      top = Math.max(12, window.innerHeight - popHeight - 12);
+    }
+    pop.style.top = top + "px";
+    pop.style.right = (window.innerWidth - rect.left + 10) + "px";
+  }
+
+  wrap.addEventListener("mouseenter", positionPopover);
+  window.addEventListener("resize", positionPopover);
+  window.addEventListener("scroll", positionPopover, true);
+})();
 
 db.collection("EmployeeTasks")
   .onSnapshot(snapshot=>{
@@ -2319,10 +2649,12 @@ db.collection("EmployeeTasks")
     /* أول تحميل لا يسبب وميض للمهام القديمة */
     if(TASKS_LISTENER_READY){
       const justAssigned = snapshot.docChanges()
-        .filter(change =>
-          change.type === "added" &&
-          ((change.doc.data() && change.doc.data().status) || "assigned") === "assigned"
-        )
+        .filter(change => {
+          if(change.type !== "added") return false;
+          const data = change.doc.data() || {};
+          const status = String(data.status || "assigned").trim().toLowerCase();
+          return ["assigned","تم الإسناد","مسند","مسندة"].includes(status);
+        })
         .map(change=>({
           id:change.doc.id,
           ...(change.doc.data() || {})
@@ -2881,6 +3213,13 @@ function openPage(url){
    تحميل القسم
 ========================================================= */
 function load(type){
+  if(assigneesPanel){
+    assigneesPanel.style.display = type === "tasks" ? "block" : "none";
+  }
+  if(reportsAssigneesPanel){
+    reportsAssigneesPanel.style.display = type === "reports" ? "block" : "none";
+  }
+
   window.CURRENT_SECTION = type;
   activateButtons(type);
 
@@ -2914,6 +3253,12 @@ if(type === "online" && LIVE_MEET_LINK){
   });
 
   document.getElementById("content").innerHTML = html;
+
+  /* تحديث أسماء المسند إليهم فور فتح قسم التقارير/المهام */
+  if(type === "reports" || type === "tasks"){
+    renderTaskAssignmentAlert();
+    setTimeout(renderTaskAssignmentAlert, 50);
+  }
 }
 
 /* =========================================================
