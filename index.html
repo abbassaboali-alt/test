@@ -1,1616 +1,2133 @@
 <style>
+
 /* =========================================================
-   PRUDLE — FULL WIDTH / FULL SCREEN + ULTRA NARROW MARGINS
-   Weebly / Caspio Safe + Mobile Friendly
+
+   PRUDLE — FULL WIDTH /
+FULL SCREEN + ULTRA NARROW MARGINS
+
+   Weebly / Caspio Safe + Mobile
+Friendly
+
 ========================================================= */
 
-/* 1) الصفحة بكامل العرض بدون أي هوامش */
+/* 1) الصفحة بكامل العرض بدون أي هوامش
+*/
+
 html, body{
-  margin:0 !important;
-  padding:0 !important;
-  width:100% !important;
-  max-width:100% !important;
-  overflow-x:hidden !important;
+
+  margin:0 !important;
+
+  padding:0 !important;
+
+  width:100% !important;
+
+  max-width:100% !important;
+
+  overflow-x:hidden !important;
+
 }
 
-/* 2) كل العناصر داخل الصفحة لا تكسر العرض */
+/* 2) كل العناصر داخل الصفحة لا تكسر العرض
+*/
+
 *,
+
 *::before,
+
 *::after{
-  box-sizing:border-box !important;
+
+  box-sizing:border-box
+!important;
+
 }
 
-/* 3) كسر أي حاويات من القالب قد تقيد العرض */
+/* 3) كسر أي حاويات من القالب قد تقيد العرض
+*/
+
 .container, .section, .wrapper, .content, .main-content,
+
 #page, #main, #body, #content,
-[class*="container"], [class*="wrapper"], [class*="content"]{
-  width:100% !important;
-  max-width:100% !important;
-  margin:0 !important;
-  padding:0 !important;
+
+[class*="container"], [class*="wrapper"],
+[class*="content"]{
+
+  width:100% !important;
+
+  max-width:100% !important;
+
+  margin:0 !important;
+
+  padding:0 !important;
+
 }
 
-/* 4) هوامش داخلية عامة (تضييق الهوامش) */
+/* 4) هوامش داخلية عامة (تضييق الهوامش)
+*/
+
 :root{
-  --gutter: 6px;          /* ✅ غيّرها 4px أو 8px حسب رغبتك */
-  --radius: 14px;
+
+  --gutter: 6px;          /* ✅ غيّرها
+4px أو 8px حسب رغبتك */
+
+  --radius: 14px;
+
 }
 
-/* أي عنصر رئيسي في الصفحة خليه يستفيد من الـ gutter */
+/* أي عنصر رئيسي في الصفحة خليه يستفيد
+من الـ gutter */
+
 body{
-  font-family:'Tajawal', sans-serif;
-  background:#f4f6fb;
-  padding:var(--gutter) !important;  /* ✅ يديك هامش صغير جدًا حول الصفحة */
+
+  font-family:'Tajawal',
+sans-serif;
+
+  background:#f4f6fb;
+
+  padding:var(--gutter)
+!important;  /* ✅ يديك هامش صغير جدًا حول الصفحة
+*/
+
 }
 
-/* 5) تقليل هوامش عناصر واجهتك (بدون ما تخرب التصميم) */
+/* 5) تقليل هوامش عناصر واجهتك (بدون ما
+تخرب التصميم) */
+
 .logout-badge,
+
 .header,
+
 .actions,
+
 .stats,
+
 .filters,
+
 .wrap{
-  margin:var(--gutter) !important;
+
+  margin:var(--gutter) !important;
+
 }
 
-/* 6) تحسين العرض على الجوال (هوامش أضيق + تكبير لمس) */
+/* 6) تحسين العرض على الجوال (هوامش أضيق +
+تكبير لمس) */
+
 @media (max-width: 768px){
-  :root{ --gutter: 4px; }
-  .header{ font-size:18px !important; }
-  .header img{ width:58px !important; height:58px !important; }
-  .btn{ padding:10px 12px !important; }
+
+  :root{ --gutter: 4px; }
+
+  .header{ font-size:18px
+!important; }
+
+  .header img{ width:58px
+!important; height:58px !important; }
+
+  .btn{ padding:10px 12px
+!important; }
+
 }
 
-/* 7) الجدول: اجعله يتمدد ولا يخرج خارج الشاشة */
+/* 7) الجدول: اجعله يتمدد ولا يخرج خارج
+الشاشة */
+
 table{
-  width:max-content;
-  max-width:100%;
-}
-.course-body{
-  overflow-x:auto !important;
-  -webkit-overflow-scrolling:touch;
+
+  width:max-content;
+
+  max-width:100%;
+
 }
 
-/* 8) منع أي عنصر يسبب سكرول أفقي بالقوة */
-img, video, canvas{
-  max-width:100% !important;
-  height:auto !important;
+.course-body{
+
+  overflow-x:auto !important;
+
+ 
+-webkit-overflow-scrolling:touch;
+
 }
+
+/* 8) منع أي عنصر يسبب سكرول أفقي بالقوة
+*/
+
+img, video, canvas{
+
+  max-width:100% !important;
+
+  height:auto !important;
+
+}
+
 </style>
 
 
 
 <!DOCTYPE html>
+
 <html lang="ar" dir="rtl">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport" content="width=device-width,
+initial-scale=1.0">
 
 <title>Prudle Professional Dashboard</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800;900&display=swap" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800;900&display=swap"
+rel="stylesheet">
+
+<link
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+rel="stylesheet">
 
 <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore-compat.js"></script>
+
+<script
+src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore-compat.js"></script>
+
 <script>
+
 if (!firebase.apps.length) {
-  firebase.initializeApp({
-    apiKey:"AIzaSyCCFBvZosI8dwShZjxvZzI-SU5igEbcOKk",
-    authDomain:"prudle-system.firebaseapp.com",
-    projectId:"prudle-system"
-  });
+
+  firebase.initializeApp({
+
+   
+apiKey:"AIzaSyCCFBvZosI8dwShZjxvZzI-SU5igEbcOKk",
+
+   
+authDomain:"prudle-system.firebaseapp.com",
+
+   
+projectId:"prudle-system"
+
+  });
+
 }
 
 const db = firebase.firestore();
+
 </script>
 
 <style>
+
 *{
-  box-sizing:border-box;
+
+  box-sizing:border-box;
+
 }
 
 html,body{
-  margin:0;
-  padding:0;
-  font-family:'Tajawal',sans-serif;
-  background:linear-gradient(135deg,#eef4ff,#f8fbff,#edf3ff);
-  min-height:100vh;
-  color:#10233f;
+
+  margin:0;
+
+  padding:0;
+
+ 
+font-family:'Tajawal',sans-serif;
+
+ 
+background:linear-gradient(135deg,#eef4ff,#f8fbff,#edf3ff);
+
+  min-height:100vh;
+
+  color:#10233f;
+
 }
 
 /* ===== APP LAYOUT ===== */
+
 .app{
-  display:flex;
-  min-height:100vh;
-  width:100%;
+
+  display:flex;
+
+  min-height:100vh;
+
+  width:100%;
+
 }
 
 /* ===== SIDEBAR ===== */
+
 .sidebar{
-  width:260px;
-  background:linear-gradient(180deg,#164478,#1b568f);
-  color:#fff;
-  padding:24px 16px;
-  box-shadow:0 0 25px rgba(0,0,0,.12);
-  position:relative;
-  z-index:2;
+
+  width:260px;
+
+ 
+background:linear-gradient(180deg,#164478,#1b568f);
+
+  color:#fff;
+
+  padding:24px 16px;
+
+  box-shadow:0 0 25px
+rgba(0,0,0,.12);
+
+  position:relative;
+
+  z-index:2;
+
 }
 
 .brand{
-  text-align:center;
-  margin-bottom:22px;
-  padding-bottom:18px;
-  border-bottom:1px solid rgba(255,255,255,.15);
+
+  text-align:center;
+
+  margin-bottom:22px;
+
+  padding-bottom:18px;
+
+  border-bottom:1px solid
+rgba(255,255,255,.15);
+
 }
 
 .brand h1{
-  margin:0;
-  font-size:26px;
-  font-weight:900;
-  letter-spacing:.5px;
+
+  margin:0;
+
+  font-size:26px;
+
+  font-weight:900;
+
+  letter-spacing:.5px;
+
 }
 
 .brand p{
-  margin:8px 0 0;
-  font-size:13px;
-  opacity:.9;
-  font-weight:700;
+
+  margin:8px 0 0;
+
+  font-size:13px;
+
+  opacity:.9;
+
+  font-weight:700;
+
 }
 
 .menu-title{
-  margin:14px 8px 10px;
-  font-size:13px;
-  opacity:.9;
-  font-weight:800;
+
+  margin:14px 8px 10px;
+
+  font-size:13px;
+
+  opacity:.9;
+
+  font-weight:800;
+
 }
 
 .side-btn{
-  width:100%;
-  border:none;
-  background:rgba(255,255,255,.10);
-  color:#fff;
-  padding:16px 14px;
-  margin-bottom:12px;
-  border-radius:18px;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  font-size:17px;
-  font-weight:900;
-  transition:.25s ease;
-  text-align:right;
-  box-shadow:0 8px 18px rgba(0,0,0,.08);
+
+  width:100%;
+
+  border:none;
+
+ 
+background:rgba(255,255,255,.10);
+
+  color:#fff;
+
+  padding:16px 14px;
+
+  margin-bottom:12px;
+
+  border-radius:18px;
+
+  cursor:pointer;
+
+  display:flex;
+
+  align-items:center;
+
+  gap:12px;
+
+  font-size:17px;
+
+  font-weight:900;
+
+  transition:.25s ease;
+
+  text-align:right;
+
+  box-shadow:0 8px 18px
+rgba(0,0,0,.08);
+
 }
 
 .side-btn i{
-  font-size:20px;
-  min-width:24px;
-  text-align:center;
+
+  font-size:20px;
+
+  min-width:24px;
+
+  text-align:center;
+
 }
 
 .side-btn:hover{
-  transform:translateX(-4px);
-  background:rgba(255,255,255,.18);
+
+  transform:translateX(-4px);
+
+ 
+background:rgba(255,255,255,.18);
+
 }
 
 .side-btn.active{
-  background:#fff;
-  color:#164478;
-  box-shadow:0 12px 24px rgba(0,0,0,.18);
+
+  background:#fff;
+
+  color:#164478;
+
+  box-shadow:0 12px 24px
+rgba(0,0,0,.18);
+
 }
 
 
 /* ===== SIDEBAR BOTTOM UTILITIES ===== */
+
 .sidebar-bottom{
-  margin-top:22px;
-  padding-top:18px;
-  border-top:1px solid rgba(255,255,255,.18);
+
+  margin-top:22px;
+
+  padding-top:18px;
+
+  border-top:1px solid
+rgba(255,255,255,.18);
+
 }
 
 .sidebar-bottom .side-btn{
-  margin-bottom:10px;
+
+  margin-bottom:10px;
+
 }
 
 #supervisoryBtnSide{
-  background:linear-gradient(135deg,#0f766e,#14b8a6);
+
+ 
+background:linear-gradient(135deg,#0f766e,#14b8a6);
+
 }
 
 #newStudentsBtnSide{
-  background:linear-gradient(135deg,#2563eb,#3b82f6);
+
+ 
+background:linear-gradient(135deg,#2563eb,#3b82f6);
+
 }
+
 #backupBtnSide{
-  background:linear-gradient(135deg,#7c3aed,#9333ea);
+
+ 
+background:linear-gradient(135deg,#7c3aed,#9333ea);
+
 }
 
 #credentialsBtnSide{
-  background:linear-gradient(135deg,#334155,#64748b);
+
+ 
+background:linear-gradient(135deg,#334155,#64748b);
+
 }
 
 /* ===== COLORFUL SIDEBAR — SAME DESIGN ===== */
+
 #reportsBtnSide{background:linear-gradient(135deg,#164478,#2f78be);}
+
 #activitiesBtnSide{background:linear-gradient(135deg,#2e5d8d,#3f78aa);}
+
 #placementBtnSide{background:linear-gradient(135deg,#7c3aed,#a855f7)!important;color:#fff!important;}
+
 #examsBtnSide{background:linear-gradient(135deg,#315f8c,#4578a6);}
+
 #certificatesBtnSide{background:linear-gradient(135deg,#315f8c,#4578a6);}
+
 #crmBtnSide{background:linear-gradient(135deg,#f7d27c,#eab308)!important;color:#164478!important;}
+
 #onlineBtnSide{background:linear-gradient(135deg,#0891b2,#06b6d4)!important;color:#fff!important;}
+
 #bookingBtnSide{background:linear-gradient(135deg,#315f8c,#4578a6);}
+
 #tasksBtnSide{background:linear-gradient(135deg,#315f8c,#4578a6);}
+
 #adminBtnSide{background:linear-gradient(135deg,#315f8c,#4578a6);}
+
 #transferBtnSide{background:linear-gradient(135deg,#0f766e,#14b8a6);}
+
 #breakTimeBtnSide{background:linear-gradient(135deg,#ea580c,#f59e0b);}
 
 #reportsBtnSide.active,
+
 #activitiesBtnSide.active,
+
 #placementBtnSide.active,
+
 #examsBtnSide.active,
+
 #certificatesBtnSide.active,
+
 #onlineBtnSide.active,
+
 #bookingBtnSide.active,
+
 #tasksBtnSide.active,
+
 #adminBtnSide.active,
+
 #transferBtnSide.active,
+
 #breakTimeBtnSide.active{
-  background:#fff!important;
-  color:#164478!important;
+
+  background:#fff!important;
+
+  color:#164478!important;
+
 }
 
 @media(max-width:980px){
-  #supervisoryBtnMobile{background:linear-gradient(135deg,#0f766e,#14b8a6);}
-  #newStudentsBtnMobile{background:linear-gradient(135deg,#2563eb,#3b82f6);}
-  #backupBtnMobile{background:linear-gradient(135deg,#7c3aed,#9333ea);}
-  #credentialsBtnMobile{background:linear-gradient(135deg,#334155,#64748b);}
-  #transferBtnMobile{background:linear-gradient(135deg,#0f766e,#14b8a6);}
-  #breakTimeBtnMobile{background:linear-gradient(135deg,#ea580c,#f59e0b);}
+
+ 
+#supervisoryBtnMobile{background:linear-gradient(135deg,#0f766e,#14b8a6);}
+
+ 
+#newStudentsBtnMobile{background:linear-gradient(135deg,#2563eb,#3b82f6);}
+
+ 
+#backupBtnMobile{background:linear-gradient(135deg,#7c3aed,#9333ea);}
+
+ 
+#credentialsBtnMobile{background:linear-gradient(135deg,#334155,#64748b);}
+
+ 
+#transferBtnMobile{background:linear-gradient(135deg,#0f766e,#14b8a6);}
+
+ 
+#breakTimeBtnMobile{background:linear-gradient(135deg,#ea580c,#f59e0b);}
+
 }
 
 /* ===== MAIN ===== */
+
 .main{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  min-width:0;
+
+  flex:1;
+
+  display:flex;
+
+  flex-direction:column;
+
+  min-width:0;
+
 }
 
 /* ===== TOPBAR ===== */
+
 .topbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  padding:18px 24px;
-  background:rgba(255,255,255,.72);
-  backdrop-filter:blur(10px);
-  border-bottom:1px solid rgba(22,68,120,.08);
-  position:sticky;
-  top:0;
-  z-index:5;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:12px;
+
+  padding:18px 24px;
+
+ 
+background:rgba(255,255,255,.72);
+
+  backdrop-filter:blur(10px);
+
+  border-bottom:1px solid
+rgba(22,68,120,.08);
+
+  position:sticky;
+
+  top:0;
+
+  z-index:5;
+
 }
 
 .topbar-left{
-  display:flex;
-  flex-direction:column;
-  gap:4px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:4px;
+
 }
 
 .topbar-left h2{
-  margin:0;
-  color:#164478;
-  font-size:24px;
-  font-weight:900;
+
+  margin:0;
+
+  color:#164478;
+
+  font-size:24px;
+
+  font-weight:900;
+
 }
 
 .topbar-left p{
-  margin:0;
-  color:#5d6f86;
-  font-weight:700;
-  font-size:14px;
+
+  margin:0;
+
+  color:#5d6f86;
+
+  font-weight:700;
+
+  font-size:14px;
+
 }
 
 .logout{
-  border:none;
-  background:linear-gradient(135deg,#164478,#2469ad);
-  color:#fff;
-  padding:12px 20px;
-  border-radius:16px;
-  font-weight:900;
-  cursor:pointer;
-  font-size:15px;
-  box-shadow:0 10px 20px rgba(22,68,120,.2);
-  transition:.25s;
+
+  border:none;
+
+ 
+background:linear-gradient(135deg,#164478,#2469ad);
+
+  color:#fff;
+
+  padding:12px 20px;
+
+  border-radius:16px;
+
+  font-weight:900;
+
+  cursor:pointer;
+
+  font-size:15px;
+
+  box-shadow:0 10px 20px
+rgba(22,68,120,.2);
+
+  transition:.25s;
+
 }
 
 .logout:hover{
-  transform:translateY(-2px);
+
+  transform:translateY(-2px);
+
 }
 
 .lang-toggle{
-  border:none;
-  background:linear-gradient(135deg,#f7d27c,#ffe7a6);
-  color:#164478;
-  padding:12px 18px;
-  border-radius:16px;
-  font-weight:900;
-  cursor:pointer;
-  font-size:15px;
-  box-shadow:0 10px 20px rgba(22,68,120,.14);
-  transition:.25s;
-  margin-inline-end:8px;
+
+  border:none;
+
+ 
+background:linear-gradient(135deg,#f7d27c,#ffe7a6);
+
+  color:#164478;
+
+  padding:12px 18px;
+
+  border-radius:16px;
+
+  font-weight:900;
+
+  cursor:pointer;
+
+  font-size:15px;
+
+  box-shadow:0 10px 20px
+rgba(22,68,120,.14);
+
+  transition:.25s;
+
+  margin-inline-end:8px;
+
 }
+
 .lang-toggle:hover{
-  transform:translateY(-2px);
+
+  transform:translateY(-2px);
+
 }
+
 .topbar-actions{
-  display:flex;
-  align-items:center;
-  gap:8px;
+
+  display:flex;
+
+  align-items:center;
+
+  gap:8px;
+
 }
 
 /* ===== HERO ===== */
+
 .hero{
-  margin:24px;
-  padding:26px 24px;
-  border-radius:28px;
-  background:linear-gradient(135deg,#164478,#1f5f9d,#2f78be);
-  color:#fff;
-  position:relative;
-  overflow:hidden;
-  box-shadow:0 20px 40px rgba(22,68,120,.20);
+
+  margin:24px;
+
+  padding:26px 24px;
+
+  border-radius:28px;
+
+ 
+background:linear-gradient(135deg,#164478,#1f5f9d,#2f78be);
+
+  color:#fff;
+
+  position:relative;
+
+  overflow:hidden;
+
+  box-shadow:0 20px 40px
+rgba(22,68,120,.20);
+
 }
 
 .hero::before{
-  content:"";
-  position:absolute;
-  width:280px;
-  height:280px;
-  border-radius:50%;
-  background:rgba(255,255,255,.08);
-  top:-90px;
-  left:-70px;
+
+  content:"";
+
+  position:absolute;
+
+  width:280px;
+
+  height:280px;
+
+  border-radius:50%;
+
+ 
+background:rgba(255,255,255,.08);
+
+  top:-90px;
+
+  left:-70px;
+
 }
 
 .hero::after{
-  content:"";
-  position:absolute;
-  width:180px;
-  height:180px;
-  border-radius:50%;
-  background:rgba(255,255,255,.08);
-  bottom:-60px;
-  right:-40px;
+
+  content:"";
+
+  position:absolute;
+
+  width:180px;
+
+  height:180px;
+
+  border-radius:50%;
+
+  background:rgba(255,255,255,.08);
+
+  bottom:-60px;
+
+  right:-40px;
+
 }
 
 .hero-content{
-  position:relative;
-  z-index:2;
+
+  position:relative;
+
+  z-index:2;
+
 }
 
 .hero h3{
-  margin:0 0 12px;
-  font-size:30px;
-  font-weight:900;
+
+  margin:0 0 12px;
+
+  font-size:30px;
+
+  font-weight:900;
+
 }
 
 .hero p{
-  margin:0;
-  font-size:17px;
-  line-height:1.8;
-  font-weight:700;
-  opacity:.97;
+
+  margin:0;
+
+  font-size:17px;
+
+  line-height:1.8;
+
+  font-weight:700;
+
+  opacity:.97;
+
 }
 
-/* ===== النص المتحرك الخرافي ===== */
+/* ===== النص المتحرك الخرافي
+===== */
+
 .ticker{
-  margin-top:18px;
-  overflow:hidden;
-  border-radius:30px;
-  position:relative;
-  background:rgba(255,255,255,0.15);
-  backdrop-filter:blur(12px);
+
+  margin-top:18px;
+
+  overflow:hidden;
+
+  border-radius:30px;
+
+  position:relative;
+
+ 
+background:rgba(255,255,255,0.15);
+
+  backdrop-filter:blur(12px);
+
 }
 
 .ticker-track{
-  white-space:nowrap;
-  display:inline-block;
-  padding:14px 0;
-  font-size:22px;
-  font-weight:900;
 
-  background:linear-gradient(90deg,#f7d27c,#fff,#f7d27c);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
+  white-space:nowrap;
 
-  text-shadow:0 0 15px rgba(247,210,124,0.8);
+  display:inline-block;
 
-  animation:tickerMove 75s linear infinite;
+  padding:14px 0;
+
+  font-size:22px;
+
+  font-weight:900;
+
+ 
+background:linear-gradient(90deg,#f7d27c,#fff,#f7d27c);
+
+  -webkit-background-clip:text;
+
+ 
+-webkit-text-fill-color:transparent;
+
+  text-shadow:0 0 15px
+rgba(247,210,124,0.8);
+
+  animation:tickerMove 75s
+linear infinite;
+
 }
 
 @keyframes tickerMove{
-  0%{transform:translateX(0);}
-  100%{transform:translateX(50%);}
+
+  0%{transform:translateX(0);}
+
+  100%{transform:translateX(50%);}
+
 }
+
 .ticker:hover .ticker-track{
-  animation-play-state:paused;
+
+  animation-play-state:paused;
+
 }
+
 /* ===== CONTENT AREA ===== */
+
 .content-wrap{
-  padding:0 24px 28px;
+
+  padding:0 24px 28px;
+
 }
 
 .section-title{
-  font-size:22px;
-  font-weight:900;
-  color:#164478;
-  margin:4px 0 18px;
+
+  font-size:22px;
+
+  font-weight:900;
+
+  color:#164478;
+
+  margin:4px 0 18px;
+
 }
 
 .cards{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:20px;
+
+  display:grid;
+
+ 
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+
+  gap:20px;
+
 }
 
 .card{
-  background:#fff;
-  border-radius:26px;
-  padding:26px 18px;
-  text-align:center;
-  box-shadow:0 14px 28px rgba(0,0,0,.08);
-  border:3px solid transparent;
-  transition:.28s ease;
-  min-height:220px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
+
+  background:#fff;
+
+  border-radius:26px;
+
+  padding:26px 18px;
+
+  text-align:center;
+
+  box-shadow:0 14px 28px
+rgba(0,0,0,.08);
+
+  border:3px solid transparent;
+
+  transition:.28s ease;
+
+  min-height:220px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  justify-content:space-between;
+
 }
 
 .card:hover{
-  transform:translateY(-8px) scale(1.01);
-  box-shadow:0 20px 36px rgba(0,0,0,.12);
+
+  transform:translateY(-8px)
+scale(1.01);
+
+  box-shadow:0 20px 36px
+rgba(0,0,0,.12);
+
 }
 
 .card .icon-box{
-  width:74px;
-  height:74px;
-  margin:0 auto 14px;
-  border-radius:22px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:linear-gradient(135deg,#edf4ff,#dbe9ff);
-  color:#164478;
-  font-size:30px;
+
+  width:74px;
+
+  height:74px;
+
+  margin:0 auto 14px;
+
+  border-radius:22px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+ 
+background:linear-gradient(135deg,#edf4ff,#dbe9ff);
+
+  color:#164478;
+
+  font-size:30px;
+
 }
 
 .card h3{
-  margin:0 0 10px;
-  font-size:20px;
-  color:#164478;
-  font-weight:900;
-  line-height:1.5;
+
+  margin:0 0 10px;
+
+  font-size:20px;
+
+  color:#164478;
+
+  font-weight:900;
+
+  line-height:1.5;
+
 }
 
 .card .desc{
-  margin:0 0 18px;
-  color:#66788e;
-  font-size:14px;
-  font-weight:700;
-  line-height:1.7;
-  min-height:44px;
+
+  margin:0 0 18px;
+
+  color:#66788e;
+
+  font-size:14px;
+
+  font-weight:700;
+
+  line-height:1.7;
+
+  min-height:44px;
+
 }
 
 .card button{
-  border:none;
-  background:linear-gradient(135deg,#164478,#2469ad);
-  color:#fff;
-  padding:13px 18px;
-  border-radius:14px;
-  font-size:15px;
-  font-weight:900;
-  cursor:pointer;
-  transition:.25s;
+
+  border:none;
+
+ 
+background:linear-gradient(135deg,#164478,#2469ad);
+
+  color:#fff;
+
+  padding:13px 18px;
+
+  border-radius:14px;
+
+  font-size:15px;
+
+  font-weight:900;
+
+  cursor:pointer;
+
+  transition:.25s;
+
 }
 
 .card button:hover{
-  transform:translateY(-2px);
+
+  transform:translateY(-2px);
+
 }
 
 /* ===== COLORS ===== */
+
 .green{ border-color:#32d47b; }
+
 .red{ border-color:#ff6b57; }
+
 .gold{ border-color:#f7d27c; }
+
 .blue{ border-color:#4e8cff; }
+
 .purple{ border-color:#9b59b6; }
+
 .orange{ border-color:#f39c12; }
+
 .online{ border-color:#1abc9c; }
+
 .weak-followup{
-  border-color:#e11d48;
-  background:linear-gradient(180deg,#ffffff,#fff1f4);
-  box-shadow:0 14px 30px rgba(225,29,72,.13);
+
+  border-color:#e11d48;
+
+ 
+background:linear-gradient(180deg,#ffffff,#fff1f4);
+
+  box-shadow:0 14px 30px
+rgba(225,29,72,.13);
+
 }
+
 .weak-followup .icon-box{
-  background:linear-gradient(135deg,#ffe4e9,#fecdd6);
-  color:#be123c;
+
+ 
+background:linear-gradient(135deg,#ffe4e9,#fecdd6);
+
+  color:#be123c;
+
 }
+
 .weak-followup h3{color:#be123c;}
+
 .weak-followup button{
-  background:linear-gradient(135deg,#be123c,#e11d48);
+
+ 
+background:linear-gradient(135deg,#be123c,#e11d48);
+
 }
+
 .weak-followup:hover{
-  box-shadow:0 20px 38px rgba(225,29,72,.22);
+
+  box-shadow:0 20px 38px
+rgba(225,29,72,.22);
+
 }
 
 
 /* ===== MOBILE TOP BUTTONS ===== */
+
 .mobile-menu{
-  display:none;
-  padding:14px 16px 0;
-  gap:10px;
-  flex-wrap:wrap;
+
+  display:none;
+
+  padding:14px 16px 0;
+
+  gap:10px;
+
+  flex-wrap:wrap;
+
 }
 
 .mobile-menu button{
-  border:none;
-  background:#e8f0fb;
-  color:#164478;
-  padding:12px 14px;
-  border-radius:14px;
-  font-weight:900;
-  cursor:pointer;
+
+  border:none;
+
+  background:#e8f0fb;
+
+  color:#164478;
+
+  padding:12px 14px;
+
+  border-radius:14px;
+
+  font-weight:900;
+
+  cursor:pointer;
+
 }
 
 .mobile-menu button.active{
-  background:#164478;
-  color:#fff;
+
+  background:#164478;
+
+  color:#fff;
+
 }
 
 /* ===== RESPONSIVE ===== */
+
 @media(max-width:980px){
-  .app{
-    flex-direction:column;
-  }
 
-  .sidebar{
-    display:none;
-  }
+  .app{
 
-  .mobile-menu{
-    display:grid;
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    gap:9px;
-    padding:12px 12px 4px;
-  }
+    flex-direction:column;
 
-  .mobile-menu button{
-    width:100%;
-    min-height:48px;
-    margin:0;
-    padding:10px 8px;
-    color:#fff;
-    border:2px solid rgba(255,255,255,.72);
-    box-shadow:0 7px 16px rgba(22,68,120,.16);
-    line-height:1.35;
-  }
+  }
 
-  #reportsBtnMobile{
-    background:linear-gradient(135deg,#164478,#2f78be);
-  }
+  .sidebar{
 
-  #activitiesBtnMobile{
-    background:linear-gradient(135deg,#0f766e,#14b8a6);
-  }
+    display:none;
 
-  #placementBtnMobile{
-    background:linear-gradient(135deg,#7c3aed,#a855f7);
-  }
+  }
 
-  #examsBtnMobile{
-    background:linear-gradient(135deg,#1d4f91,#3b82f6);
-  }
+  .mobile-menu{
 
-  #certificatesBtnMobile{
-    background:linear-gradient(135deg,#d97706,#f59e0b);
-  }
+    display:grid;
 
-  #onlineBtnMobile{
-    background:linear-gradient(135deg,#0891b2,#06b6d4);
-  }
+   
+grid-template-columns:repeat(3,minmax(0,1fr));
 
-  #crmBtnMobile{
-    background:linear-gradient(135deg,#f7d27c,#eab308);
-    color:#164478;
-  }
+    gap:9px;
 
-  #bookingBtnMobile{
-    background:linear-gradient(135deg,#2563eb,#60a5fa);
-  }
+    padding:12px 12px 4px;
 
-  #adminBtnMobile{
-    background:linear-gradient(135deg,#334155,#64748b);
-  }
+  }
 
-  .mobile-menu button.active{
-    outline:3px solid #fff;
-    box-shadow:0 0 0 3px rgba(22,68,120,.28),0 9px 20px rgba(22,68,120,.22);
-    transform:translateY(-2px);
-  }
+  .mobile-menu button{
 
-  .topbar{
-    padding:16px;
-  }
+    width:100%;
 
-  .hero{
-    margin:16px;
-    padding:22px 18px;
-  }
+    min-height:48px;
 
-  .hero h3{
-    font-size:24px;
-  }
+    margin:0;
 
-  .hero p{
-    font-size:15px;
-  }
+    padding:10px 8px;
 
-  .content-wrap{
-    padding:0 16px 24px;
-  }
+    color:#fff;
+
+    border:2px solid
+rgba(255,255,255,.72);
+
+    box-shadow:0 7px 16px
+rgba(22,68,120,.16);
+
+    line-height:1.35;
+
+  }
+
+  #reportsBtnMobile{
+
+   
+background:linear-gradient(135deg,#164478,#2f78be);
+
+  }
+
+  #activitiesBtnMobile{
+
+   
+background:linear-gradient(135deg,#0f766e,#14b8a6);
+
+  }
+
+  #placementBtnMobile{
+
+   
+background:linear-gradient(135deg,#7c3aed,#a855f7);
+
+  }
+
+  #examsBtnMobile{
+
+   
+background:linear-gradient(135deg,#1d4f91,#3b82f6);
+
+  }
+
+  #certificatesBtnMobile{
+
+   
+background:linear-gradient(135deg,#d97706,#f59e0b);
+
+  }
+
+  #onlineBtnMobile{
+
+   
+background:linear-gradient(135deg,#0891b2,#06b6d4);
+
+  }
+
+  #crmBtnMobile{
+
+   
+background:linear-gradient(135deg,#f7d27c,#eab308);
+
+    color:#164478;
+
+  }
+
+  #bookingBtnMobile{
+
+   
+background:linear-gradient(135deg,#2563eb,#60a5fa);
+
+  }
+
+  #adminBtnMobile{
+
+   
+background:linear-gradient(135deg,#334155,#64748b);
+
+  }
+
+  .mobile-menu
+button.active{
+
+    outline:3px solid #fff;
+
+    box-shadow:0 0 0 3px
+rgba(22,68,120,.28),0 9px 20px rgba(22,68,120,.22);
+
+    transform:translateY(-2px);
+
+  }
+
+  .topbar{
+
+    padding:16px;
+
+  }
+
+  .hero{
+
+    margin:16px;
+
+    padding:22px 18px;
+
+  }
+
+  .hero h3{
+
+    font-size:24px;
+
+  }
+
+  .hero p{
+
+    font-size:15px;
+
+  }
+
+  .content-wrap{
+
+    padding:0 16px 24px;
+
+  }
+
 }
 
 @media(max-width:600px){
-  .mobile-menu{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:8px;
-    padding:10px 8px 4px;
-  }
 
-  .mobile-menu button{
-    min-height:46px;
-    font-size:12px;
-    border-radius:13px;
-  }
+  .mobile-menu{
 
-  .topbar{
-    padding:12px 10px;
-    flex-direction:column;
-    align-items:stretch;
-    gap:10px;
-  }
+   
+grid-template-columns:repeat(2,minmax(0,1fr));
 
-  .topbar-left{
-    text-align:center;
-  }
+    gap:8px;
 
-  .topbar-actions{
-    width:100%;
-    justify-content:center;
-  }
+    padding:10px 8px 4px;
 
-  .logout,
-  .lang-toggle{
-    flex:1;
-    min-width:0;
-    padding:10px 8px;
-    font-size:12px;
-    margin:0;
-  }
+  }
 
-  .hero{
-    margin:10px 8px;
-    padding:18px 14px;
-    border-radius:20px;
-  }
+  .mobile-menu button{
 
-  .hero h3{
-    font-size:20px;
-    line-height:1.55;
-  }
+    min-height:46px;
 
-  .ticker{
-    margin-top:12px;
-  }
+    font-size:12px;
 
-  .ticker-track{
-    padding:10px 0;
-    font-size:15px;
-  }
+    border-radius:13px;
 
-  .content-wrap{
-    padding:0 8px 22px !important;
-  }
+  }
 
-  .section-title{
-    font-size:19px;
-    margin:12px 3px 10px;
-  }
+  .topbar{
 
-  .cards{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:10px;
-  }
+    padding:12px 10px;
 
-  .card{
-    min-width:0;
-    min-height:238px;
-    padding:15px 9px 11px;
-    border-width:2px;
-    border-radius:19px;
-    box-shadow:0 9px 20px rgba(22,68,120,.11);
-  }
+    flex-direction:column;
 
-  .card:hover{
-    transform:none;
-  }
+    align-items:stretch;
 
-  .card .icon-box{
-    width:54px;
-    height:54px;
-    margin-bottom:10px;
-    border-radius:17px;
-    font-size:23px;
-  }
+    gap:10px;
 
-  .card h3{
-    margin-bottom:7px;
-    font-size:15px;
-    line-height:1.45;
-    overflow-wrap:anywhere;
-  }
+  }
 
-  .card .desc{
-    margin-bottom:10px;
-    min-height:46px;
-    font-size:11px;
-    line-height:1.55;
-    overflow-wrap:anywhere;
-  }
+  .topbar-left{
 
-  .card button{
-    width:100%;
-    padding:10px 5px;
-    border-radius:11px;
-    font-size:11.5px;
-    line-height:1.35;
-  }
+    text-align:center;
 
-  .card.green{
-    background:linear-gradient(180deg,#ffffff,#effdf5);
-  }
+  }
 
-  .card.red{
-    background:linear-gradient(180deg,#ffffff,#fff1ef);
-  }
+  .topbar-actions{
 
-  .card.gold{
-    background:linear-gradient(180deg,#ffffff,#fff9e8);
-  }
+    width:100%;
 
-  .card.blue{
-    background:linear-gradient(180deg,#ffffff,#eff6ff);
-  }
+    justify-content:center;
 
-  .card.purple{
-    background:linear-gradient(180deg,#ffffff,#faf2ff);
-  }
+  }
 
-  .card.orange{
-    background:linear-gradient(180deg,#ffffff,#fff7e8);
-  }
+  .logout,
 
-  .card.online{
-    background:linear-gradient(180deg,#ffffff,#edfffb);
-  }
+  .lang-toggle{
 
-  .topbar-left h2{
-    font-size:20px;
-  }
+    flex:1;
 
-  .marquee{
-    font-size:17px;
-  }
+    min-width:0;
+
+    padding:10px 8px;
+
+    font-size:12px;
+
+    margin:0;
+
+  }
+
+  .hero{
+
+    margin:10px 8px;
+
+    padding:18px 14px;
+
+    border-radius:20px;
+
+  }
+
+  .hero h3{
+
+    font-size:20px;
+
+    line-height:1.55;
+
+  }
+
+  .ticker{
+
+    margin-top:12px;
+
+  }
+
+  .ticker-track{
+
+    padding:10px 0;
+
+    font-size:15px;
+
+  }
+
+  .content-wrap{
+
+    padding:0 8px 22px !important;
+
+  }
+
+  .section-title{
+
+    font-size:19px;
+
+    margin:12px 3px 10px;
+
+  }
+
+  .cards{
+
+   
+grid-template-columns:repeat(2,minmax(0,1fr));
+
+    gap:10px;
+
+  }
+
+  .card{
+
+    min-width:0;
+
+    min-height:238px;
+
+    padding:15px 9px 11px;
+
+    border-width:2px;
+
+    border-radius:19px;
+
+    box-shadow:0 9px 20px
+rgba(22,68,120,.11);
+
+  }
+
+  .card:hover{
+
+    transform:none;
+
+  }
+
+  .card .icon-box{
+
+    width:54px;
+
+    height:54px;
+
+    margin-bottom:10px;
+
+    border-radius:17px;
+
+    font-size:23px;
+
+  }
+
+  .card h3{
+
+    margin-bottom:7px;
+
+    font-size:15px;
+
+    line-height:1.45;
+
+    overflow-wrap:anywhere;
+
+  }
+
+  .card .desc{
+
+    margin-bottom:10px;
+
+    min-height:46px;
+
+    font-size:11px;
+
+    line-height:1.55;
+
+    overflow-wrap:anywhere;
+
+  }
+
+  .card button{
+
+    width:100%;
+
+    padding:10px 5px;
+
+    border-radius:11px;
+
+    font-size:11.5px;
+
+    line-height:1.35;
+
+  }
+
+  .card.green{
+
+   
+background:linear-gradient(180deg,#ffffff,#effdf5);
+
+  }
+
+  .card.red{
+
+   
+background:linear-gradient(180deg,#ffffff,#fff1ef);
+
+  }
+
+  .card.gold{
+
+   
+background:linear-gradient(180deg,#ffffff,#fff9e8);
+
+  }
+
+  .card.blue{
+
+   
+background:linear-gradient(180deg,#ffffff,#eff6ff);
+
+  }
+
+  .card.purple{
+
+   
+background:linear-gradient(180deg,#ffffff,#faf2ff);
+
+  }
+
+  .card.orange{
+
+    background:linear-gradient(180deg,#ffffff,#fff7e8);
+
+  }
+
+  .card.online{
+
+   
+background:linear-gradient(180deg,#ffffff,#edfffb);
+
+  }
+
+  .topbar-left h2{
+
+    font-size:20px;
+
+  }
+
+  .marquee{
+
+    font-size:17px;
+
+  }
+
 }
+
 @keyframes liveBlink{
-  0%{opacity:1;}
-  50%{
-    opacity:.4;
-    transform:scale(1.05);
-  }
-  100%{opacity:1;}
+
+  0%{opacity:1;}
+
+  50%{
+
+    opacity:.4;
+
+    transform:scale(1.05);
+
+  }
+
+  100%{opacity:1;}
+
 }
 
 .live-online{
-  animation:liveBlink 1s infinite;
-  border:3px solid #ff3b30 !important;
-  box-shadow:0 0 20px #ff3b30 !important;
-  position:relative;
+
+  animation:liveBlink 1s infinite;
+
+  border:3px solid #ff3b30
+!important;
+
+  box-shadow:0 0 20px #ff3b30
+!important;
+
+  position:relative;
+
 }
 
 .live-online::after{
-  content:"LIVE";
-  position:absolute;
-  top:-8px;
-  left:-8px;
-  background:#ff3b30;
-  color:#fff;
-  padding:4px 8px;
-  border-radius:10px;
-  font-size:11px;
-  font-weight:900;
+
+  content:"LIVE";
+
+  position:absolute;
+
+  top:-8px;
+
+  left:-8px;
+
+  background:#ff3b30;
+
+  color:#fff;
+
+  padding:4px 8px;
+
+  border-radius:10px;
+
+  font-size:11px;
+
+  font-weight:900;
+
 }
 
 /* ===== TASK ASSIGNMENT NOTIFICATION ===== */
+
 .task-nav-wrap{
-  position:relative;
-}
-.task-alert-btn{
-  position:relative;
-}
-.task-count-badge{
-  display:none;
-  min-width:24px;
-  height:24px;
-  padding:0 7px;
-  border-radius:999px;
-  align-items:center;
-  justify-content:center;
-  background:#ff3b30;
-  color:#fff;
-  font-size:11px;
-  font-weight:900;
-  margin-inline-start:auto;
-  box-shadow:0 0 0 3px rgba(255,255,255,.18);
-}
-.task-alert-btn.has-task-count .task-count-badge{
-  display:inline-flex;
+
+  position:relative;
+
 }
 
-/* وميض لحظي حسب أولوية آخر مهمة تم إسنادها */
+.task-alert-btn{
+
+  position:relative;
+
+}
+
+.task-count-badge{
+
+  display:none;
+
+  min-width:24px;
+
+  height:24px;
+
+  padding:0 7px;
+
+  border-radius:999px;
+
+  align-items:center;
+
+  justify-content:center;
+
+  background:#ff3b30;
+
+  color:#fff;
+
+  font-size:11px;
+
+  font-weight:900;
+
+  margin-inline-start:auto;
+
+  box-shadow:0 0 0 3px
+rgba(255,255,255,.18);
+
+}
+
+.task-alert-btn.has-task-count .task-count-badge{
+
+  display:inline-flex;
+
+}
+
+/* وميض لحظي حسب أولوية آخر مهمة تم
+إسنادها */
+
 .task-alert-btn.task-flash-high{
-  animation:taskBlinkHigh .55s ease-in-out 10;
-  border:3px solid #ff3b30 !important;
-  background:linear-gradient(135deg,#b91c1c,#ef4444) !important;
-  color:#fff !important;
-  box-shadow:0 0 0 4px rgba(255,59,48,.20),0 0 28px rgba(255,59,48,.95) !important;
+
+  animation:taskBlinkHigh .55s
+ease-in-out 10;
+
+  border:3px solid #ff3b30
+!important;
+
+ 
+background:linear-gradient(135deg,#b91c1c,#ef4444) !important;
+
+  color:#fff !important;
+
+  box-shadow:0 0 0 4px
+rgba(255,59,48,.20),0 0 28px rgba(255,59,48,.95) !important;
+
 }
+
 .task-alert-btn.task-flash-medium{
-  animation:taskBlinkMedium .55s ease-in-out 10;
-  border:3px solid #f59e0b !important;
-  background:linear-gradient(135deg,#b45309,#f59e0b) !important;
-  color:#fff !important;
-  box-shadow:0 0 0 4px rgba(245,158,11,.20),0 0 28px rgba(245,158,11,.95) !important;
+
+  animation:taskBlinkMedium .55s
+ease-in-out 10;
+
+  border:3px solid #f59e0b
+!important;
+
+ 
+background:linear-gradient(135deg,#b45309,#f59e0b) !important;
+
+  color:#fff !important;
+
+  box-shadow:0 0 0 4px
+rgba(245,158,11,.20),0 0 28px rgba(245,158,11,.95) !important;
+
 }
+
 .task-alert-btn.task-flash-low{
-  animation:taskBlinkLow .55s ease-in-out 10;
-  border:3px solid #22c55e !important;
-  background:linear-gradient(135deg,#15803d,#22c55e) !important;
-  color:#fff !important;
-  box-shadow:0 0 0 4px rgba(34,197,94,.20),0 0 28px rgba(34,197,94,.95) !important;
+
+  animation:taskBlinkLow .55s
+ease-in-out 10;
+
+  border:3px solid #22c55e
+!important;
+
+ 
+background:linear-gradient(135deg,#15803d,#22c55e) !important;
+
+  color:#fff !important;
+
+  box-shadow:0 0 0 4px
+rgba(34,197,94,.20),0 0 28px rgba(34,197,94,.95) !important;
+
 }
+
 .task-alert-btn.task-flash-high .task-count-badge{
-  background:#7f1d1d !important;
+
+  background:#7f1d1d !important;
+
 }
+
 .task-alert-btn.task-flash-medium .task-count-badge{
-  background:#92400e !important;
+
+  background:#92400e !important;
+
 }
+
 .task-alert-btn.task-flash-low .task-count-badge{
-  background:#166534 !important;
+
+  background:#166534 !important;
+
 }
 
 @keyframes taskBlinkHigh{
-  0%,100%{transform:scale(1);filter:brightness(1)}
-  50%{transform:scale(1.045);filter:brightness(1.35)}
+
+ 
+0%,100%{transform:scale(1);filter:brightness(1)}
+
+ 
+50%{transform:scale(1.045);filter:brightness(1.35)}
+
 }
+
 @keyframes taskBlinkMedium{
-  0%,100%{transform:scale(1);filter:brightness(1)}
-  50%{transform:scale(1.045);filter:brightness(1.30)}
+
+ 
+0%,100%{transform:scale(1);filter:brightness(1)}
+
+ 
+50%{transform:scale(1.045);filter:brightness(1.30)}
+
 }
+
 @keyframes taskBlinkLow{
-  0%,100%{transform:scale(1);filter:brightness(1)}
-  50%{transform:scale(1.045);filter:brightness(1.25)}
+
+ 
+0%,100%{transform:scale(1);filter:brightness(1)}
+
+ 
+50%{transform:scale(1.045);filter:brightness(1.25)}
+
 }
 
 .task-assignee-popover{
-  display:none;
-  position:absolute;
-  right:100%;
-  top:0;
-  width:300px;
-  max-height:340px;
-  overflow:auto;
-  margin-right:10px;
-  padding:12px;
-  background:#fff;
-  color:#16324d;
-  border:1px solid #dbe6f2;
-  border-radius:16px;
-  box-shadow:0 18px 44px rgba(0,0,0,.18);
-  z-index:9999;
+
+  display:none;
+
+  position:absolute;
+
+  right:100%;
+
+  top:0;
+
+  width:300px;
+
+  max-height:340px;
+
+  overflow:auto;
+
+  margin-right:10px;
+
+  padding:12px;
+
+  background:#fff;
+
+  color:#16324d;
+
+  border:1px solid #dbe6f2;
+
+  border-radius:16px;
+
+  box-shadow:0 18px 44px
+rgba(0,0,0,.18);
+
+  z-index:9999;
+
 }
+
 .task-nav-wrap:hover .task-assignee-popover{
-  display:block;
+
+  display:block;
+
 }
+
 .task-assignee-popover h4{
-  margin:0 0 9px;
-  color:#164478;
-  font-size:14px;
+
+  margin:0 0 9px;
+
+  color:#164478;
+
+  font-size:14px;
+
 }
+
 .task-assignee-item{
-  padding:9px 10px;
-  border-radius:10px;
-  background:#f6f9fd;
-  margin-bottom:7px;
-  font-size:12px;
-  font-weight:800;
-  line-height:1.55;
-  border-right:4px solid #94a3b8;
+
+  padding:9px 10px;
+
+  border-radius:10px;
+
+  background:#f6f9fd;
+
+  margin-bottom:7px;
+
+  font-size:12px;
+
+  font-weight:800;
+
+  line-height:1.55;
+
+  border-right:4px solid #94a3b8;
+
 }
+
 .task-assignee-item.priority-high{
-  border-right-color:#ef4444;
-  background:#fff1f2;
+
+  border-right-color:#ef4444;
+
+  background:#fff1f2;
+
 }
+
 .task-assignee-item.priority-medium{
-  border-right-color:#f59e0b;
-  background:#fffbeb;
+
+  border-right-color:#f59e0b;
+
+  background:#fffbeb;
+
 }
+
 .task-assignee-item.priority-low{
-  border-right-color:#22c55e;
-  background:#f0fdf4;
+
+  border-right-color:#22c55e;
+
+  background:#f0fdf4;
+
 }
+
 .task-assignee-item small{
-  display:block;
-  color:#718096;
-  font-size:10px;
-  font-weight:700;
+
+  display:block;
+
+  color:#718096;
+
+  font-size:10px;
+
+  font-weight:700;
+
 }
+
 .task-assignee-empty{
-  color:#718096;
-  font-size:12px;
+
+  color:#718096;
+
+  font-size:12px;
+
 }
+
 .task-ticker-note{
-  margin-top:10px;
-  padding:10px 14px;
-  border-radius:14px;
-  background:rgba(255,255,255,.14);
-  border:1px solid rgba(255,255,255,.2);
-  overflow:hidden;
-  white-space:nowrap;
-  font-size:13px;
-  font-weight:900;
-  transition:.25s ease;
+
+  margin-top:10px;
+
+  padding:10px 14px;
+
+  border-radius:14px;
+
+ 
+background:rgba(255,255,255,.14);
+
+  border:1px solid
+rgba(255,255,255,.2);
+
+  overflow:hidden;
+
+  white-space:nowrap;
+
+  font-size:13px;
+
+  font-weight:900;
+
+  transition:.25s ease;
+
 }
+
 .task-ticker-note.priority-high{
-  background:rgba(239,68,68,.24);
-  border-color:rgba(255,255,255,.45);
+
+  background:rgba(239,68,68,.24);
+
+ 
+border-color:rgba(255,255,255,.45);
+
 }
+
 .task-ticker-note.priority-medium{
-  background:rgba(245,158,11,.24);
-  border-color:rgba(255,255,255,.45);
+
+  background:rgba(245,158,11,.24);
+
+ 
+border-color:rgba(255,255,255,.45);
+
 }
+
 .task-ticker-note.priority-low{
-  background:rgba(34,197,94,.24);
-  border-color:rgba(255,255,255,.45);
+
+  background:rgba(34,197,94,.24);
+
+ 
+border-color:rgba(255,255,255,.45);
+
 }
+
 .task-ticker-note span{
-  display:inline-block;
-  min-width:100%;
-  animation:taskNamesMove 22s linear infinite;
+
+  display:inline-block;
+
+  min-width:100%;
+
+  animation:taskNamesMove 22s
+linear infinite;
+
 }
+
 @keyframes taskNamesMove{
-  from{transform:translateX(-15%)}
-  to{transform:translateX(105%)}
+
+  from{transform:translateX(-15%)}
+
+  to{transform:translateX(105%)}
+
 }
+
 @media(max-width:980px){
-  .task-assignee-popover{display:none !important}
-  .task-count-badge{
-    position:absolute;
-    top:-7px;
-    left:-7px;
-    margin:0;
-  }
-  .task-alert-btn{position:relative}
+
+ 
+.task-assignee-popover{display:none !important}
+
+  .task-count-badge{
+
+    position:absolute;
+
+    top:-7px;
+
+    left:-7px;
+
+    margin:0;
+
+  }
+
+ 
+.task-alert-btn{position:relative}
+
 }
 
 /* =========================================================
-   MOBILE STABILITY PATCH — منع اهتزاز الشاشة على الجوال
-   Chrome / Safari / iPhone / Android
+
+   MOBILE STABILITY PATCH
+— منع اهتزاز الشاشة على الجوال
+
+   Chrome / Safari /
+iPhone / Android
+
 ========================================================= */
+
 @media (max-width:980px){
 
-  html,body{
-    overflow-x:hidden !important;
-    width:100% !important;
-    max-width:100% !important;
-    -webkit-text-size-adjust:100%;
-    text-size-adjust:100%;
-  }
+  html,body{
 
-  .app,
-  .main,
-  .content-wrap,
-  #content,
-  .cards,
-  .card,
-  .mobile-menu,
-  .hero,
-  .topbar{
-    width:100% !important;
-    max-width:100% !important;
-    min-width:0 !important;
-  }
+    overflow-x:hidden !important;
 
-  /* لا نستخدم حركة تغيّر حجم العنصر على الجوال */
-  .task-alert-btn.task-flash-high,
-  .task-alert-btn.task-flash-medium,
-  .task-alert-btn.task-flash-low{
-    transform:none !important;
-    will-change:auto !important;
-  }
+    width:100% !important;
 
-  /* وميض لوني فقط بدون scale حتى لا تتحرك الصفحة */
-  @keyframes taskBlinkHigh{
-    0%,100%{filter:brightness(1);opacity:1}
-    50%{filter:brightness(1.28);opacity:.78}
-  }
+    max-width:100% !important;
 
-  @keyframes taskBlinkMedium{
-    0%,100%{filter:brightness(1);opacity:1}
-    50%{filter:brightness(1.22);opacity:.80}
-  }
+    -webkit-text-size-adjust:100%;
 
-  @keyframes taskBlinkLow{
-    0%,100%{filter:brightness(1);opacity:1}
-    50%{filter:brightness(1.18);opacity:.82}
-  }
+    text-size-adjust:100%;
 
-  /* منع القفزة عند الزر النشط */
-  .mobile-menu button.active{
-    transform:none !important;
-  }
+  }
 
-  /* تعطيل تأثيرات hover التي قد يفسرها Safari كلمس */
-  .side-btn:hover,
-  .card:hover,
-  .logout:hover,
-  .lang-toggle:hover,
-  .card button:hover{
-    transform:none !important;
-  }
+  .app,
 
-  /* منع أي حركة من تغيير عرض الصفحة */
-  .task-ticker-note{
-    width:100%;
-    max-width:100%;
-    overflow:hidden !important;
-    contain:layout paint;
-  }
+  .main,
 
-  .task-ticker-note span{
-    min-width:100%;
-    max-width:none;
-    will-change:transform;
-  }
+  .content-wrap,
 
-  .ticker{
-    width:100%;
-    max-width:100%;
-    overflow:hidden !important;
-    contain:layout paint;
-  }
+  #content,
 
-  .ticker-track{
-    will-change:transform;
-  }
+  .cards,
 
-  /* تثبيت الأزرار والبادج */
-  .task-alert-btn{
-    transform:translateZ(0);
-    backface-visibility:hidden;
-    -webkit-backface-visibility:hidden;
-  }
+  .card,
 
-  .task-count-badge{
-    transform:none !important;
-  }
+  .mobile-menu,
+
+  .hero,
+
+  .topbar{
+
+    width:100% !important;
+
+    max-width:100% !important;
+
+    min-width:0 !important;
+
+  }
+
+  /* لا نستخدم حركة تغيّر حجم العنصر على الجوال */
+
+ 
+.task-alert-btn.task-flash-high,
+
+ 
+.task-alert-btn.task-flash-medium,
+
+  .task-alert-btn.task-flash-low{
+
+    transform:none !important;
+
+    will-change:auto !important;
+
+  }
+
+  /* وميض لوني فقط بدون scale حتى
+لا تتحرك الصفحة */
+
+  @keyframes
+taskBlinkHigh{
+
+   
+0%,100%{filter:brightness(1);opacity:1}
+
+   
+50%{filter:brightness(1.28);opacity:.78}
+
+  }
+
+  @keyframes
+taskBlinkMedium{
+
+   
+0%,100%{filter:brightness(1);opacity:1}
+
+   
+50%{filter:brightness(1.22);opacity:.80}
+
+  }
+
+  @keyframes taskBlinkLow{
+
+   
+0%,100%{filter:brightness(1);opacity:1}
+
+    50%{filter:brightness(1.18);opacity:.82}
+
+  }
+
+  /* منع القفزة عند الزر النشط */
+
+  .mobile-menu
+button.active{
+
+    transform:none !important;
+
+  }
+
+  /* تعطيل تأثيرات hover التي
+قد يفسرها Safari كلمس */
+
+  .side-btn:hover,
+
+  .card:hover,
+
+  .logout:hover,
+
+  .lang-toggle:hover,
+
+  .card button:hover{
+
+    transform:none !important;
+
+  }
+
+  /* منع أي حركة من تغيير عرض الصفحة */
+
+  .task-ticker-note{
+
+    width:100%;
+
+    max-width:100%;
+
+    overflow:hidden !important;
+
+    contain:layout paint;
+
+  }
+
+  .task-ticker-note span{
+
+    min-width:100%;
+
+    max-width:none;
+
+    will-change:transform;
+
+  }
+
+  .ticker{
+
+    width:100%;
+
+    max-width:100%;
+
+    overflow:hidden !important;
+
+    contain:layout paint;
+
+  }
+
+  .ticker-track{
+
+    will-change:transform;
+
+  }
+
+  /* تثبيت الأزرار والبادج */
+
+  .task-alert-btn{
+
+    transform:translateZ(0);
+
+    backface-visibility:hidden;
+
+   
+-webkit-backface-visibility:hidden;
+
+  }
+
+  .task-count-badge{
+
+    transform:none !important;
+
+  }
+
 }
 
-/* على الشاشات الصغيرة جدًا نقلل الحركات أكثر */
+/* على الشاشات الصغيرة جدًا نقلل الحركات
+أكثر */
+
 @media (max-width:600px){
-  .task-ticker-note span{
-    animation-duration:28s;
-  }
 
-  .ticker-track{
-    animation-duration:90s;
-  }
+  .task-ticker-note span{
 
-  .mobile-menu button{
-    -webkit-tap-highlight-color:transparent;
-    touch-action:manipulation;
-  }
-}
+    animation-duration:28s;
 
-</style>
+  }
 
-<style id="prudle-redesign-2026">
-:root{
-  --p-navy:#0b2f52;
-  --p-blue:#164478;
-  --p-blue2:#2369a8;
-  --p-cyan:#38bdf8;
-  --p-gold:#e9b949;
-  --p-bg:#f5f8fc;
-  --p-card:#ffffff;
-  --p-text:#172b42;
-  --p-muted:#6f8094;
-  --p-line:#e3eaf2;
-  --p-shadow:0 10px 30px rgba(15,47,82,.08);
-  --p-shadow2:0 18px 46px rgba(15,47,82,.13);
-  --p-radius:18px;
+  .ticker-track{
+
+    animation-duration:90s;
+
+  }
+
+  .mobile-menu button{
+
+   
+-webkit-tap-highlight-color:transparent;
+
+    touch-action:manipulation;
+
+  }
+
 }
 
-html,body{
-  background:var(--p-bg)!important;
-  color:var(--p-text)!important;
-}
-body{padding:0!important}
-.app{background:var(--p-bg);}
-
-/* Sidebar */
-.sidebar{
-  width:278px!important;
-  padding:20px 14px!important;
-  background:linear-gradient(180deg,#0b2f52 0%,#123f69 52%,#0b2f52 100%)!important;
-  box-shadow:10px 0 35px rgba(8,34,58,.10)!important;
-  position:sticky!important;
-  top:0!important;
-  height:100vh!important;
-  overflow-y:auto!important;
-  scrollbar-width:thin;
-  scrollbar-color:rgba(255,255,255,.22) transparent;
-}
-.brand{
-  margin:0 4px 18px!important;
-  padding:16px 10px 20px!important;
-  text-align:right!important;
-  border-bottom:1px solid rgba(255,255,255,.13)!important;
-}
-.brand h1{
-  font-size:30px!important;
-  letter-spacing:.3px!important;
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-.brand h1::before{
-  content:"P";
-  width:42px;height:42px;
-  display:inline-flex;align-items:center;justify-content:center;
-  border-radius:13px;
-  background:linear-gradient(135deg,#fff,#dcecff);
-  color:var(--p-blue);
-  font-size:22px;
-  box-shadow:0 8px 18px rgba(0,0,0,.16);
-}
-.brand p{font-size:12px!important;opacity:.72!important;margin-inline-start:53px!important}
-.menu-title{
-  font-size:11px!important;
-  letter-spacing:.4px;
-  opacity:.62!important;
-  margin:14px 10px 8px!important;
-}
-.side-btn,
-#reportsBtnSide,#activitiesBtnSide,#placementBtnSide,#examsBtnSide,
-#certificatesBtnSide,#crmBtnSide,#onlineBtnSide,#bookingBtnSide,
-#tasksBtnSide,#adminBtnSide,#transferBtnSide,#breakTimeBtnSide,
-#newStudentsBtnSide,#supervisoryBtnSide,#backupBtnSide,#credentialsBtnSide{
-  background:transparent!important;
-  color:#eef6ff!important;
-  min-height:48px!important;
-  padding:11px 12px!important;
-  margin:3px 0!important;
-  border-radius:12px!important;
-  box-shadow:none!important;
-  font-size:14px!important;
-  font-weight:800!important;
-  border:1px solid transparent!important;
-}
-.side-btn i{font-size:16px!important;color:#9dd8ff!important}
-.side-btn:hover{
-  transform:none!important;
-  background:rgba(255,255,255,.08)!important;
-  border-color:rgba(255,255,255,.08)!important;
-}
-.side-btn.active,
-#reportsBtnSide.active,#activitiesBtnSide.active,#placementBtnSide.active,
-#examsBtnSide.active,#certificatesBtnSide.active,#onlineBtnSide.active,
-#bookingBtnSide.active,#tasksBtnSide.active,#adminBtnSide.active,
-#transferBtnSide.active,#breakTimeBtnSide.active{
-  background:#fff!important;
-  color:var(--p-blue)!important;
-  box-shadow:0 9px 22px rgba(0,0,0,.14)!important;
-}
-.side-btn.active i{color:var(--p-blue)!important}
-.sidebar-bottom{
-  margin-top:14px!important;
-  padding-top:12px!important;
-  border-top:1px solid rgba(255,255,255,.12)!important;
-}
-
-/* Main and topbar */
-.main{background:var(--p-bg)!important}
-.topbar{
-  margin:0!important;
-  padding:15px 26px!important;
-  min-height:72px;
-  background:rgba(255,255,255,.94)!important;
-  backdrop-filter:blur(16px)!important;
-  border-bottom:1px solid var(--p-line)!important;
-  box-shadow:0 3px 16px rgba(15,47,82,.035)!important;
-}
-.topbar-left h2{
-  font-size:23px!important;
-  color:var(--p-navy)!important;
-  letter-spacing:-.2px;
-}
-.topbar-actions{gap:9px!important}
-.logout,.lang-toggle{
-  min-height:42px!important;
-  padding:10px 15px!important;
-  border-radius:11px!important;
-  box-shadow:none!important;
-  font-size:13px!important;
-}
-.logout{
-  background:#fff!important;
-  color:#b42318!important;
-  border:1px solid #ffd5d2!important;
-}
-.logout:hover{background:#fff5f4!important}
-.lang-toggle{
-  background:#eef5fc!important;
-  color:var(--p-blue)!important;
-  border:1px solid #d9e7f4!important;
-  margin:0!important;
-}
-
-/* Hero */
-.hero{
-  margin:22px 26px 18px!important;
-  padding:28px 30px!important;
-  min-height:180px;
-  border-radius:22px!important;
-  background:
-    radial-gradient(circle at 8% 20%,rgba(56,189,248,.24),transparent 25%),
-    linear-gradient(125deg,#0b2f52 0%,#164478 48%,#2369a8 100%)!important;
-  box-shadow:0 16px 38px rgba(22,68,120,.16)!important;
-}
-.hero::before{
-  width:240px!important;height:240px!important;
-  top:-125px!important;left:-60px!important;
-  border:1px solid rgba(255,255,255,.13);
-  background:transparent!important;
-}
-.hero::after{
-  width:150px!important;height:150px!important;
-  right:auto!important;left:110px!important;bottom:-105px!important;
-  border:1px solid rgba(255,255,255,.11);
-  background:transparent!important;
-}
-.hero h3{font-size:29px!important;margin-bottom:7px!important}
-.hero p{font-size:14px!important;opacity:.78!important}
-.ticker{
-  margin-top:20px!important;
-  border-radius:12px!important;
-  background:rgba(255,255,255,.09)!important;
-  border:1px solid rgba(255,255,255,.10);
-}
-.ticker-track{
-  padding:10px 0!important;
-  font-size:14px!important;
-  background:none!important;
-  -webkit-text-fill-color:#fff!important;
-  color:#fff!important;
-  text-shadow:none!important;
-  opacity:.92;
-}
-.task-ticker-note{
-  border-radius:12px!important;
-  font-size:12px!important;
-  padding:9px 12px!important;
-}
-
-/* Content */
-.content-wrap{padding:2px 26px 34px!important}
-.section-title{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-size:20px!important;
-  color:var(--p-navy)!important;
-  margin:17px 0 14px!important;
-}
-.section-title::before{
-  content:"";
-  width:5px;height:24px;
-  border-radius:99px;
-  background:linear-gradient(180deg,var(--p-blue2),var(--p-cyan));
-}
-.cards{
-  grid-template-columns:repeat(auto-fit,minmax(235px,1fr))!important;
-  gap:14px!important;
-}
-.card,
-.card.green,.card.red,.card.gold,.card.blue,.card.purple,.card.orange,.card.online,.card.weak-followup{
-  position:relative;
-  overflow:hidden;
-  min-height:205px!important;
-  padding:20px 18px 16px!important;
-  border-radius:16px!important;
-  border:1px solid var(--p-line)!important;
-  border-top:3px solid var(--accent,#2369a8)!important;
-  background:#fff!important;
-  box-shadow:var(--p-shadow)!important;
-  text-align:right!important;
-}
-.card.green{--accent:#16a34a}
-.card.red{--accent:#e34d59}
-.card.gold{--accent:#d89a18}
-.card.blue{--accent:#2f73c8}
-.card.purple{--accent:#7c4dcc}
-.card.orange{--accent:#e67e22}
-.card.online{--accent:#0891b2}
-.card.weak-followup{--accent:#d7265e}
-.card:hover{
-  transform:translateY(-4px)!important;
-  box-shadow:var(--p-shadow2)!important;
-  border-color:#d7e1ec!important;
-  border-top-color:var(--accent)!important;
-}
-.card .icon-box{
-  width:48px!important;height:48px!important;
-  margin:0 0 14px!important;
-  border-radius:13px!important;
-  background:color-mix(in srgb,var(--accent) 10%,white)!important;
-  color:var(--accent)!important;
-  font-size:20px!important;
-}
-.card h3{
-  margin:0 0 7px!important;
-  color:var(--p-navy)!important;
-  font-size:17px!important;
-  line-height:1.45!important;
-}
-.card .desc{
-  min-height:42px!important;
-  margin:0 0 16px!important;
-  color:var(--p-muted)!important;
-  font-size:12.5px!important;
-  line-height:1.65!important;
-}
-.card button{
-  width:100%;
-  padding:10px 12px!important;
-  border-radius:10px!important;
-  background:#f0f5fa!important;
-  color:var(--p-blue)!important;
-  border:1px solid #e0e9f2!important;
-  font-size:12.5px!important;
-  box-shadow:none!important;
-}
-.card button:hover{
-  transform:none!important;
-  background:var(--p-blue)!important;
-  color:#fff!important;
-}
-
-/* Task popup */
-.task-assignee-popover{
-  border-radius:14px!important;
-  border:1px solid var(--p-line)!important;
-  box-shadow:0 20px 50px rgba(10,40,70,.18)!important;
-}
-
-
-/* Assigned employees panel */
-
-
-.task-assignees-panel-head h3{
-  margin:0 0 4px;
-  color:var(--p-navy);
-  font-size:17px;
-}
-.task-assignees-panel-head h3 i{color:var(--p-blue2);margin-inline-end:7px}
-.task-assignees-panel-head p{
-  margin:0;
-  color:var(--p-muted);
-  font-size:12px;
-  font-weight:700;
-}
-
-
-.task-assignee-card{
-  display:flex;align-items:center;gap:10px;
-  padding:12px;border:1px solid #e5edf5;border-radius:12px;
-  background:#fbfdff;
-}
-.task-assignee-avatar{
-  width:38px;height:38px;flex:0 0 38px;
-  border-radius:11px;display:flex;align-items:center;justify-content:center;
-  background:#eaf3fb;color:var(--p-blue);font-weight:900;
-}
-.task-assignee-card strong{display:block;color:var(--p-navy);font-size:13px}
-.task-assignee-card small{display:block;color:var(--p-muted);font-size:11px;margin-top:2px}
-.task-assignee-card.priority-high{border-inline-start:4px solid #ef4444}
-.task-assignee-card.priority-medium{border-inline-start:4px solid #f59e0b}
-.task-assignee-card.priority-low{border-inline-start:4px solid #22c55e}
-
-/* Make hover popover easier to read in the redesigned sidebar */
-.task-assignee-popover{
-  right:calc(100% + 8px)!important;
-  top:-6px!important;
-  width:320px!important;
-}
-.task-nav-wrap:hover .task-assignee-popover{display:block!important}
-
-/* Mobile navigation: clean horizontal chips */
-.mobile-menu{
-  background:#fff;
-  border-bottom:1px solid var(--p-line);
-}
-@media(max-width:980px){
-  body{padding:0!important}
-  .sidebar{display:none!important}
-  .mobile-menu{
-    display:flex!important;
-    flex-wrap:nowrap!important;
-    overflow-x:auto!important;
-    gap:7px!important;
-    padding:10px!important;
-    scrollbar-width:none;
-  }
-  .mobile-menu::-webkit-scrollbar{display:none}
-  .mobile-menu button,
-  #reportsBtnMobile,#activitiesBtnMobile,#placementBtnMobile,#examsBtnMobile,
-  #certificatesBtnMobile,#onlineBtnMobile,#crmBtnMobile,#bookingBtnMobile,
-  #tasksBtnMobile,#adminBtnMobile,#transferBtnMobile,#breakTimeBtnMobile,
-  #newStudentsBtnMobile,#supervisoryBtnMobile,#backupBtnMobile,#credentialsBtnMobile{
-    flex:0 0 auto!important;
-    width:auto!important;
-    min-height:40px!important;
-    padding:9px 12px!important;
-    border-radius:10px!important;
-    border:1px solid #dfe8f1!important;
-    background:#f7f9fc!important;
-    color:var(--p-blue)!important;
-    box-shadow:none!important;
-    font-size:12px!important;
-    white-space:nowrap;
-  }
-  .mobile-menu button.active{
-    background:var(--p-blue)!important;
-    color:#fff!important;
-    outline:none!important;
-    box-shadow:none!important;
-  }
-  .topbar{padding:12px 14px!important;min-height:62px}
-  .hero{margin:12px!important;padding:22px 18px!important;min-height:155px}
-  .content-wrap{padding:0 12px 24px!important}
-  .cards{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
-  .card{min-height:205px!important;padding:15px 12px 12px!important}
-}
-@media(max-width:600px){
-  .topbar{flex-direction:row!important;align-items:center!important}
-  .topbar-left{text-align:start!important;min-width:0}
-  .topbar-left h2{font-size:17px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .topbar-actions{width:auto!important;justify-content:flex-end!important}
-  .logout,.lang-toggle{flex:0 0 auto!important;padding:9px 10px!important;font-size:11px!important}
-  .hero{border-radius:16px!important;margin:10px!important}
-  .hero h3{font-size:21px!important}
-  .hero p{font-size:12px!important}
-  .ticker-track{font-size:12px!important}
-  .content-wrap{padding:0 10px 22px!important}
-  .section-title{font-size:17px!important;margin:14px 0 10px!important}
-  .cards{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
-  .card{min-height:190px!important;border-radius:14px!important;padding:13px 10px 10px!important}
-  .card .icon-box{width:42px!important;height:42px!important;font-size:18px!important;margin-bottom:10px!important}
-  .card h3{font-size:13.5px!important}
-  .card .desc{font-size:10.5px!important;min-height:38px!important}
-  .card button{font-size:11px!important;padding:9px 6px!important}
-}
-@media(max-width:390px){
-  .cards{grid-template-columns:1fr!important}
-  .card{min-height:170px!important}
-}
-</style>
-
-<style>
-/* ===== TASK ASSIGNEES VISIBILITY FIX ===== */
-.sidebar{
-  overflow-y:auto!important;
-  overflow-x:visible!important;
-  z-index:10000!important;
-}
-.task-nav-wrap{
-  position:relative!important;
-  overflow:visible!important;
-  z-index:10020!important;
-}
-.task-assignee-popover{
-  position:fixed!important;
-  right:288px!important;
-  top:auto!important;
-  width:330px!important;
-  max-height:420px!important;
-  overflow-y:auto!important;
-  margin:0!important;
-  padding:14px!important;
-  background:#fff!important;
-  border:1px solid #d9e5f0!important;
-  border-radius:14px!important;
-  box-shadow:0 20px 55px rgba(8,38,66,.28)!important;
-  z-index:999999!important;
-  direction:rtl!important;
-}
-.task-nav-wrap:hover .task-assignee-popover{
-  display:block!important;
-}
-
-/* قائمة المسند إليهم أسفل التقارير */
-#reportsAssigneesPanel{
-  margin-top:20px;
-  background:#fff;
-  border:1px solid #dfe8f1;
-  border-radius:16px;
-  box-shadow:0 10px 30px rgba(15,47,82,.08);
-  overflow:hidden;
-}
-
-.reports-assignees-head h3{
-  margin:0;
-  color:#0b2f52;
-  font-size:17px;
-}
-.reports-assignees-head p{
-  margin:4px 0 0;
-  color:#75869a;
-  font-size:12px;
-  font-weight:700;
-}
-
-
-@media(max-width:980px){
-  .task-assignee-popover{
-    right:12px!important;
-    left:12px!important;
-    width:auto!important;
-    top:70px!important;
-  }
-}
-</style>
-
-<style>
-#reportsAssigneesPanel .task-assignee-card{
-  min-height:72px;
-  background:#fff;
-}
-#reportsAssigneesPanel .task-assignee-card strong{
-  font-size:16px!important;
-  font-weight:900!important;
-  color:#0b2f52!important;
-}
-#reportsAssigneesPanel .task-assignee-card small{
-  font-size:12px!important;
-  margin-top:5px!important;
-}
-#reportsAssigneesPanel .task-assignee-empty{
-  grid-column:1/-1;
-  padding:18px;
-  text-align:center;
-  color:#75869a;
-  font-weight:800;
-}
 </style>
 
 </head>
@@ -1619,1750 +2136,3090 @@ body{padding:0!important}
 
 <div class="app">
 
-  <!-- ===== SIDEBAR ===== -->
-  <aside class="sidebar">
-    <div class="brand">
-      <h1>Prudle</h1>
-      <p id="brandSub">Control Panel</p>
-    </div>
+  <!-- ===== SIDEBAR
+===== -->
 
-    <div class="menu-title" id="mainMenuTitle">القائمة الرئيسية</div>
+  <aside
+class="sidebar">
+
+    <div
+class="brand">
+
+      <h1>Prudle</h1>
+
+      <p id="brandSub">Control
+Panel</p>
+
+    </div>
+
+    <div
+class="menu-title" id="mainMenuTitle">القائمة الرئيسية</div>
 
 <button id="reportsBtnSide"
-        class="side-btn active"
-        onclick="load('reports')">
 
-  <i class="fa-solid fa-chart-column"></i>
-  <span id="reportsSideText">قسم التقارير</span>
+        class="side-btn
+active"
+
+       
+onclick="load('reports')">
+
+  <i
+class="fa-solid fa-chart-column"></i>
+
+  <span
+id="reportsSideText">قسم التقارير</span>
 
 </button>
+
 <!-- ===== زر قسم النشاطات ===== -->
-<button id="activitiesBtnSide"
-        class="side-btn"
-        onclick="load('activities')">
 
-  <i class="fa-solid fa-gamepad"></i>
-  <span id="activitiesSideText">قسم النشاطات</span>
+<button id="activitiesBtnSide"
+
+        class="side-btn"
+
+       
+onclick="load('activities')">
+
+  <i
+class="fa-solid fa-gamepad"></i>
+
+  <span
+id="activitiesSideText">قسم النشاطات</span>
 
 </button>
+
 <button
-  id="placementBtnSide"
-  class="side-btn"
-  onclick="load('placement')"
-  style="
-    background:linear-gradient(135deg,#7c3aed,#9333ea);
-    color:#fff;
-  "
->
-  <i class="fa-solid fa-graduation-cap"></i>
-  <span id="placementSideText">اختبار تحديد المستوى CEFR</span>
+
+  id="placementBtnSide"
+
+  class="side-btn"
+
+ 
+onclick="load('placement')"
+
+  style="
+
+   
+background:linear-gradient(135deg,#7c3aed,#9333ea);
+
+    color:#fff;
+
+  "
+
+> 
+
+  <i class="fa-solid
+fa-graduation-cap"></i>
+
+  <span
+id="placementSideText">اختبار تحديد
+المستوى CEFR</span>
+
 </button>
 
 <button id="examsBtnSide"
-        class="side-btn"
-        onclick="load('exams')">
-  <i class="fa-solid fa-file-signature"></i>
-  <span id="examsSideText">الاختبارات والتقييم النهائي</span>
+
+        class="side-btn"
+
+       
+onclick="load('exams')">
+
+  <i class="fa-solid
+fa-file-signature"></i>
+
+  <span
+id="examsSideText">الاختبارات
+والتقييم النهائي</span>
+
 </button>
 
 <button id="certificatesBtnSide"
-        class="side-btn"
-        onclick="load('certificates')">
-  <i class="fa-solid fa-certificate"></i>
-  <span id="certificatesSideText"> <span id="certificatesMobileText">الشهادات</span> </span>
+
+        class="side-btn"
+
+       
+onclick="load('certificates')">
+
+  <i class="fa-solid
+fa-certificate"></i>
+
+  <span
+id="certificatesSideText"> <span
+id="certificatesMobileText">الشهادات</span>
+</span>
+
 </button>
+
 <button id="crmBtnSide"
-        class="side-btn"
-        onclick="load('crm')"
-        style="
-          background:linear-gradient(135deg,#f7d27c,#eab308);
-          color:#164478;
-          font-weight:900;
-        ">
-  <i class="fa-solid fa-headset"></i>
-  <span id="crmSideText">CRM خدمة علاقات العملاء</span>
+
+        class="side-btn"
+
+       
+onclick="load('crm')"
+
+        style="
+
+         
+background:linear-gradient(135deg,#f7d27c,#eab308);
+
+          color:#164478;
+
+          font-weight:900;
+
+        ">
+
+  <i
+class="fa-solid fa-headset"></i>
+
+  <span
+id="crmSideText">CRM خدمة علاقات
+العملاء</span>
+
 </button>
+
 <button id="onlineBtnSide"
-        class="side-btn"
-        onclick="load('online')"
-        style="
-          background:linear-gradient(135deg,#06b6d4,#0891b2);
-          color:#fff;
-        ">
-  <i class="fa-solid fa-video"></i>
-  <span id="onlineSideText">قسم الأونلاين والاجتماعات</span>
+
+        class="side-btn"
+
+       
+onclick="load('online')"
+
+        style="
+
+         
+background:linear-gradient(135deg,#06b6d4,#0891b2);
+
+          color:#fff;
+
+        ">
+
+  <i
+class="fa-solid fa-video"></i>
+
+  <span
+id="onlineSideText">قسم الأونلاين
+والاجتماعات</span>
+
 </button>
-    <button id="bookingBtnSide" class="side-btn" onclick="load('booking')">
-      <i class="fa-solid fa-calendar-check"></i>
-      <span id="bookingSideText">قسم الحجوزات</span>
-    </button>
 
-    <div class="task-nav-wrap">
-      <button id="tasksBtnSide" class="side-btn task-alert-btn" onclick="load('tasks')">
-        <i class="fa-solid fa-list-check"></i>
-        <span id="tasksSideText">إسناد المهام</span>
-        <span id="tasksCountSide" class="task-count-badge">0</span>
-      </button>
-      <div class="task-assignee-popover" id="taskAssigneePopover">
-        <h4>المهام المسندة حالياً</h4>
-        <div id="taskAssigneeList" class="task-assignee-empty">لا توجد مهام مسندة حالياً</div>
-      </div>
-    </div>
+    <button
+id="bookingBtnSide" class="side-btn"
+onclick="load('booking')">
 
-    <button id="adminBtnSide" class="side-btn" onclick="load('admin')">
-      <i class="fa-solid fa-gear"></i>
-      <span id="adminSideText">قسم الإدارة</span>
-    </button>
-    <button id="transferBtnSide" class="side-btn" onclick="load('transfer')">
-      <i class="fa-solid fa-right-left"></i>
-      <span id="transferSideText">الترحيل</span>
-    </button>
+      <i class="fa-solid
+fa-calendar-check"></i>
 
-    <button id="breakTimeBtnSide" class="side-btn"
-            onclick="openPage('https://www.prudle-education.com/break-time')">
-      <i class="fa-solid fa-mug-hot"></i>
-      <span id="breakTimeSideText">أوقات الراحة للفصول</span>
-    </button>
+      <span
+id="bookingSideText">قسم الحجوزات</span>
+
+    </button>
+
+    <div
+class="task-nav-wrap">
+
+      <button
+id="tasksBtnSide" class="side-btn task-alert-btn"
+onclick="load('tasks')">
+
+        <i class="fa-solid
+fa-list-check"></i>
+
+        <span
+id="tasksSideText">إسناد المهام</span>
+
+        <span
+id="tasksCountSide"
+class="task-count-badge">0</span>
+
+      </button>
+
+      <div
+class="task-assignee-popover" id="taskAssigneePopover">
+
+        <h4>المهام المسندة حالياً</h4>
+
+        <div
+id="taskAssigneeList" class="task-assignee-empty">لا توجد مهام مسندة حالياً</div>
+
+      </div>
+
+    </div>
+
+    <button id="adminBtnSide"
+class="side-btn" onclick="load('admin')">
+
+      <i class="fa-solid
+fa-gear"></i>
+
+      <span
+id="adminSideText">قسم الإدارة</span>
+
+    </button>
+
+    <button
+id="transferBtnSide" class="side-btn"
+onclick="load('transfer')">
+
+      <i class="fa-solid
+fa-right-left"></i>
+
+      <span
+id="transferSideText">الترحيل</span>
+
+    </button>
+
+    <button
+id="breakTimeBtnSide" class="side-btn"
+
+            onclick="openPage('https://www.prudle-education.com/break-time')">
+
+      <i class="fa-solid
+fa-mug-hot"></i>
+
+      <span
+id="breakTimeSideText">أوقات الراحة
+للفصول</span>
+
+    </button>
 
 
-    <div class="sidebar-bottom">
-      <button id="newStudentsBtnSide" class="side-btn" onclick="load('newstudents')">
-        <i class="fa-solid fa-user-plus"></i>
-        <span id="newStudentsSideText">المستجدين</span>
-      </button>
+    <div
+class="sidebar-bottom">
 
-      <button id="supervisoryBtnSide" class="side-btn" onclick="openPage('https://www.prudle-education.com/gm-dashboard')">
-        <i class="fa-solid fa-user-tie"></i>
-        <span id="supervisorySideText">الجهة الإشرافية</span>
-      </button>
+      <button
+id="newStudentsBtnSide" class="side-btn"
+onclick="load('newstudents')">
 
-      <button id="backupBtnSide" class="side-btn" onclick="openPage('https://www.prudle-education.com/rb')">
-        <i class="fa-solid fa-database"></i>
-        <span id="backupSideText">النسخ الاحتياطي</span>
-      </button>
+        <i class="fa-solid
+fa-user-plus"></i>
 
-      <button id="credentialsBtnSide" class="side-btn" onclick="openPage('https://www.prudle-education.com/users')">
-        <i class="fa-solid fa-key"></i>
-        <span id="credentialsSideText">اسم المستخدم وكلمة المرور</span>
-      </button>
-    </div>
-  </aside>
+        <span
+id="newStudentsSideText">المستجدين</span>
 
-  <!-- ===== MAIN ===== -->
-  <main class="main">
+      </button>
 
-    <!-- ===== MOBILE MENU ===== -->
-    <div class="mobile-menu">
+      <button
+id="supervisoryBtnSide" class="side-btn"
+onclick="openPage('https://www.prudle-education.com/gm-dashboard')">
 
-  <button id="placementBtnMobile" onclick="load('placement')">
-    اختبار CEFR
-  </button>
+        <i class="fa-solid
+fa-user-tie"></i>
 
-  <button id="reportsBtnMobile" class="active" onclick="load('reports')">
-    التقارير
-  </button>
-<button id="activitiesBtnMobile" onclick="load('activities')">
-  النشاطات
+        <span
+id="supervisorySideText">الجهة
+الإشرافية</span>
+
+      </button>
+
+      <button
+id="backupBtnSide" class="side-btn"
+onclick="openPage('https://www.prudle-education.com/rb')">
+
+        <i class="fa-solid
+fa-database"></i>
+
+        <span
+id="backupSideText">النسخ الاحتياطي</span>
+
+      </button>
+
+      <button
+id="credentialsBtnSide" class="side-btn"
+onclick="openPage('https://www.prudle-education.com/users')">
+
+        <i class="fa-solid
+fa-key"></i>
+
+        <span
+id="credentialsSideText">اسم
+المستخدم وكلمة المرور</span>
+
+      </button>
+
+    </div>
+
+  </aside>
+
+  <!-- ===== MAIN =====
+-->
+
+  <main
+class="main">
+
+    <!-- ===== MOBILE
+MENU ===== -->
+
+    <div
+class="mobile-menu">
+
+  <button
+id="placementBtnMobile" onclick="load('placement')">
+
+    اختبار
+CEFR
+
+  </button>
+
+  <button
+id="reportsBtnMobile" class="active"
+onclick="load('reports')">
+
+    التقارير
+
+  </button>
+
+<button id="activitiesBtnMobile"
+onclick="load('activities')">
+
+  النشاطات
+
 </button>
-  <button id="examsBtnMobile" onclick="load('exams')">
-    الاختبارات
-  </button>
 
-  <button id="certificatesBtnMobile" onclick="load('certificates')">
-    الشهادات
-  </button>
+  <button
+id="examsBtnMobile" onclick="load('exams')">
 
-  <button id="onlineBtnMobile" onclick="load('online')">
-    الأونلاين
-  </button>
-<button id="crmBtnMobile" onclick="load('crm')">
-  <span id="crmMobileText">CRM</span>
+    الاختبارات
+
+  </button>
+
+  <button
+id="certificatesBtnMobile"
+onclick="load('certificates')">
+
+    الشهادات
+
+  </button>
+
+  <button
+id="onlineBtnMobile" onclick="load('online')">
+
+    الأونلاين
+
+  </button>
+
+<button id="crmBtnMobile"
+onclick="load('crm')">
+
+  <span
+id="crmMobileText">CRM</span>
+
 </button>
-  <button id="bookingBtnMobile" onclick="load('booking')">
-    الحجوزات
-  </button>
 
-  <button id="tasksBtnMobile" class="task-alert-btn" onclick="load('tasks')">
-    <span id="tasksMobileText">المهام</span>
-    <span id="tasksCountMobile" class="task-count-badge">0</span>
-  </button>
+  <button
+id="bookingBtnMobile" onclick="load('booking')">
 
-  <button id="adminBtnMobile" onclick="load('admin')">
-    الإدارة
-  </button>
-  <button id="transferBtnMobile" onclick="load('transfer')">
-    <span id="transferMobileText">الترحيل</span>
-  </button>
+    الحجوزات
 
-  <button id="breakTimeBtnMobile"
-          onclick="openPage('https://www.prudle-education.com/break-time')">
-    <span id="breakTimeMobileText">أوقات الراحة</span>
-  </button>
+  </button>
+
+  <button
+id="tasksBtnMobile" class="task-alert-btn"
+onclick="load('tasks')">
+
+    <span
+id="tasksMobileText">المهام</span>
+
+    <span
+id="tasksCountMobile"
+class="task-count-badge">0</span>
+
+  </button>
+
+  <button
+id="adminBtnMobile" onclick="load('admin')">
+
+    الإدارة
+
+  </button>
+
+  <button
+id="transferBtnMobile" onclick="load('transfer')">
+
+    <span
+id="transferMobileText">الترحيل</span>
+
+  </button>
+
+  <button
+id="breakTimeBtnMobile"
+
+         
+onclick="openPage('https://www.prudle-education.com/break-time')">
+
+    <span
+id="breakTimeMobileText">أوقات
+الراحة</span>
+
+  </button>
 
 
-  <button id="newStudentsBtnMobile" onclick="load('newstudents')">
-    <span id="newStudentsMobileText">المستجدين</span>
-  </button>
+  <button
+id="newStudentsBtnMobile" onclick="load('newstudents')">
 
-  <button id="supervisoryBtnMobile" onclick="openPage('https://www.prudle-education.com/gm-dashboard')">
-    <span id="supervisoryMobileText">الجهة الإشرافية</span>
-  </button>
+    <span
+id="newStudentsMobileText">المستجدين</span>
 
-  <button id="backupBtnMobile" onclick="openPage('https://www.prudle-education.com/rb')">
-    <span id="backupMobileText">النسخ الاحتياطي</span>
-  </button>
+  </button>
 
-  <button id="credentialsBtnMobile" onclick="openPage('https://www.prudle-education.com/users')">
-    <span id="credentialsMobileText">اسم المستخدم وكلمة المرور</span>
-  </button>
+  <button
+id="supervisoryBtnMobile"
+onclick="openPage('https://www.prudle-education.com/gm-dashboard')">
+
+    <span
+id="supervisoryMobileText">الجهة
+الإشرافية</span>
+
+  </button>
+
+  <button
+id="backupBtnMobile" onclick="openPage('https://www.prudle-education.com/rb')">
+
+    <span
+id="backupMobileText">النسخ الاحتياطي</span>
+
+  </button>
+
+  <button
+id="credentialsBtnMobile"
+onclick="openPage('https://www.prudle-education.com/users')">
+
+    <span
+id="credentialsMobileText">اسم
+المستخدم وكلمة المرور</span>
+
+  </button>
 
 </div>
 
-    <!-- ===== TOPBAR ===== -->
-    <div class="topbar">
-      <div class="topbar-left">
-        <h2 id="pageTitle">لوحة التحكم</h2>
-      </div>
+    <!-- ===== TOPBAR
+===== -->
 
-      <div class="topbar-actions">
-        <button class="lang-toggle" id="langToggleBtn" onclick="toggleDashboardLanguage()">
-          English
-        </button>
+    <div
+class="topbar">
 
-        <button class="logout" id="logoutBtn" onclick="logout()">
-          <i class="fa-solid fa-right-from-bracket"></i>
-          <span id="logoutText">تسجيل الخروج</span>
-        </button>
-      </div>
-    </div>
+      <div
+class="topbar-left">
 
-    <!-- ===== HERO ===== -->
-    <section class="hero">
-      <div class="hero-content">
-        <h3 id="heroWelcome">مرحبا بك في نظام برودل التعليمي</h3>
-        <p id="heroSub">.</p>
+        <h2
+id="pageTitle">لوحة التحكم</h2>
+
+      </div>
+
+      <div
+class="topbar-actions">
+
+        <button
+class="lang-toggle" id="langToggleBtn"
+onclick="toggleDashboardLanguage()">
+
+          English
+
+        </button>
+
+        <button
+class="logout" id="logoutBtn"
+onclick="logout()">
+
+          <i
+class="fa-solid fa-right-from-bracket"></i>
+
+          <span id="logoutText">تسجيل الخروج</span>
+
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- ===== HERO
+===== -->
+
+    <section
+class="hero">
+
+      <div
+class="hero-content">
+
+        <h3
+id="heroWelcome">مرحبا بك في نظام برودل التعليمي</h3>
+
+        <p
+id="heroSub">.</p>
 
 <div class="ticker">
-  <div class="ticker-track" id="movingText">
-    □ مرحبًا بك في Prudle —
-  </div>
+
+  <div
+class="ticker-track" id="movingText">
+
+    □ مرحبًا
+بك في Prudle —
+
+  </div>
+
 </div>
 
-<div class="task-ticker-note" id="taskTickerNote" style="display:none">
-  <span id="taskTickerNames"></span>
+<div class="task-ticker-note"
+id="taskTickerNote" style="display:none">
+
+  <span
+id="taskTickerNames"></span>
+
 </div>
-      </div>
-    </section>
 
-    <!-- ===== CONTENT ===== -->
-    <div class="content-wrap">
-      <div id="content"></div>
+      </div>
 
-      
+    </section>
 
-      
-    </div>
+    <!-- ===== CONTENT
+===== -->
 
-  </main>
+    <div
+class="content-wrap">
+
+      <div
+id="content"></div>
+
+    </div>
+
+  </main>
+
 </div>
 
 <script>
+
 /* =========================================================
-   ✨ الشريط المتحرك — عرض الدورات المفتوحة تلقائياً من Firestore
+
+   ✨ الشريط المتحرك — عرض الدورات المفتوحة
+تلقائياً من Firestore
+
 ========================================================= */
+
 function getCourseTickerLabel(c){
-  const courseName =
-    c.TrainingCourse ||
-    c.CourseName ||
-    c.courseName ||
-    c.Level ||
-    c.level ||
-    "";
 
-  const section =
-    c.Section ||
-    c.section ||
-    c.Gender ||
-    c.gender ||
-    "";
+  const courseName =
 
-  const branch =
-    c.Branch ||
-    c.branch ||
-    "";
+    c.TrainingCourse ||
 
-  const period =
-    c.Period ||
-    c.period ||
-    "";
+    c.CourseName ||
 
-  const parts = [];
+    c.courseName ||
 
-  if(courseName) parts.push(courseName);
-  if(section) parts.push(section);
-  if(branch) parts.push(branch);
-  if(period) parts.push(period);
+    c.Level ||
 
-  return parts.join(" - ");
+    c.level ||
+
+    "";
+
+  const section =
+
+    c.Section ||
+
+    c.section ||
+
+    c.Gender ||
+
+    c.gender ||
+
+    "";
+
+  const branch =
+
+    c.Branch ||
+
+    c.branch ||
+
+    "";
+
+  const period =
+
+    c.Period ||
+
+    c.period ||
+
+    "";
+
+  const parts = [];
+
+  if(courseName)
+parts.push(courseName);
+
+  if(section) parts.push(section);
+
+  if(branch) parts.push(branch);
+
+  if(period) parts.push(period);
+
+  return parts.join("
+- ");
+
 }
 
 function renderOpenCoursesTicker(courses){
-  const movingText = document.getElementById("movingText");
-  if(!movingText) return;
 
-  const t = UI_TEXT[DASH_LANG];
+  const movingText =
+document.getElementById("movingText");
 
-  if(!courses || !courses.length){
-    movingText.textContent = t.tickerEmpty;
-    return;
-  }
+  if(!movingText) return;
 
-  movingText.textContent =
-    t.tickerPrefix +
-    courses.join("   •   ") +
-    "   —   ";
+  const t =
+UI_TEXT[DASH_LANG];
+
+  if(!courses ||
+!courses.length){
+
+    movingText.textContent =
+t.tickerEmpty;
+
+    return;
+
+  }
+
+  movingText.textContent =
+
+    t.tickerPrefix +
+
+    courses.join("   •  
+") +
+
+    "   —  
+";
+
 }
 
 function loadOpenCoursesTicker(){
 
-  const movingText =
-    document.getElementById("movingText");
+  const movingText =
 
-  if(!movingText) return;
+   
+document.getElementById("movingText");
 
-  movingText.textContent = UI_TEXT[DASH_LANG].tickerLoading;
+  if(!movingText) return;
 
-  db.collection("Courses")
-    .where("status","==","open")
-    .onSnapshot(snapshot=>{
+  movingText.textContent =
+UI_TEXT[DASH_LANG].tickerLoading;
 
-      const courses = [];
+  db.collection("Courses")
 
-      snapshot.forEach(doc=>{
+   
+.where("status","==","open")
 
-        const c = doc.data() || {};
-        const label = getCourseTickerLabel(c);
+    .onSnapshot(snapshot=>{
 
-        if(label){
-          courses.push(label);
-        }
+      const courses = [];
 
-      });
+     
+snapshot.forEach(doc=>{
 
-      /* إزالة التكرار */
-      const uniqueCourses =
-        [...new Set(courses)];
+        const c =
+doc.data() || {};
 
-      window.OPEN_TICKER_COURSES = uniqueCourses;
-      renderOpenCoursesTicker(uniqueCourses);
+        const label =
+getCourseTickerLabel(c);
 
-    },error=>{
+        if(label){
 
-      console.error(
-        "Open courses ticker error:",
-        error
-      );
+          courses.push(label);
 
-      movingText.textContent = UI_TEXT[DASH_LANG].tickerError;
+        }
 
-    });
+      });
+
+      /* إزالة التكرار */
+
+      const uniqueCourses
+=
+
+        [...new Set(courses)];
+
+     
+window.OPEN_TICKER_COURSES = uniqueCourses;
+
+     
+renderOpenCoursesTicker(uniqueCourses);
+
+    },error=>{
+
+      console.error(
+
+        "Open courses ticker
+error:",
+
+        error
+
+      );
+
+     
+movingText.textContent = UI_TEXT[DASH_LANG].tickerError;
+
+    });
+
 }
 
 /* =========================================================
-   بيانات الأقسام
+
+   بيانات الأقسام
+
 ========================================================= */
+
 let LIVE_MEET_LINK = "";
 
 /* =========================================================
-   🌐 Arabic / English Dashboard Language
+
+   🌐
+Arabic / English Dashboard Language
+
 ========================================================= */
-let DASH_LANG = localStorage.getItem("prudleDashboardLang") || "ar";
+
+let DASH_LANG = localStorage.getItem("prudleDashboardLang") ||
+"ar";
 
 const UI_TEXT = {
-  ar:{
-    dir:"rtl",
-    langBtn:"English",
-    brandSub:"لوحة التحكم",
-    mainMenuTitle:"القائمة الرئيسية",
-    pageTitle:"لوحة التحكم",
-    heroWelcome:"مرحبا بك في نظام برودل التعليمي",
-    heroSub:".",
-    logout:"تسجيل الخروج",
 
-    reports:"قسم التقارير",
-    activities:"قسم النشاطات",
-    placement:"اختبار تحديد المستوى CEFR",
-    exams:"الاختبارات والتقييم النهائي",
-    certificates:"الشهادات",
-    crm:"CRM خدمة علاقات العملاء",
-    online:"قسم الأونلاين والاجتماعات",
-    booking:"قسم الحجوزات",
-    admin:"قسم الإدارة",
-    transfer:"الترحيل",
-    breakTime:"أوقات الراحة للفصول",
-    tasks:"إسناد المهام",
-    newstudents:"المستجدين",
-    supervisory:"الجهة الإشرافية",
-    backup:"النسخ الاحتياطي",
-    credentials:"اسم المستخدم وكلمة المرور",
+  ar:{
 
-    reportsMobile:"التقارير",
-    activitiesMobile:"النشاطات",
-    placementMobile:"اختبار CEFR",
-    examsMobile:"الاختبارات",
-    certificatesMobile:"الشهادات",
-    crmMobile:"CRM",
-    onlineMobile:"الأونلاين",
-    bookingMobile:"الحجوزات",
-    adminMobile:"الإدارة",
-    transferMobile:"الترحيل",
-    breakTimeMobile:"أوقات الراحة",
-    tasksMobile:"المهام",
-    newstudentsMobile:"المستجدين",
-    supervisoryMobile:"الجهة الإشرافية",
-    backupMobile:"النسخ الاحتياطي",
-    credentialsMobile:"اسم المستخدم وكلمة المرور",
+    dir:"rtl",
 
-    tickerPrefix:"🔥 الدورات المفتوحة الآن — ",
-    tickerLoading:"⏳ جاري تحميل الدورات المفتوحة...",
-    tickerEmpty:"لا توجد دورات مفتوحة حالياً",
-    tickerError:"تعذر تحميل الدورات المفتوحة حالياً",
-    openSection:"فتح القسم",
+    langBtn:"English",
 
-    sectionTitles:{
-      reports:"قسم التقارير",
-      activities:"قسم النشاطات",
-      placement:"اختبار تحديد المستوى CEFR",
-      exams:"الاختبارات والتقييم النهائي",
-      certificates:"الشهادات",
-      crm:"خدمة علاقات العملاء CRM",
-      online:"قسم الأونلاين",
-      booking:"قسم الحجوزات",
-      admin:"قسم الإدارة",
-      transfer:"الترحيل",
-      tasks:"إسناد المهام",
-      newstudents:"المستجدين"
-    }
-  },
+    brandSub:"لوحة التحكم",
 
-  en:{
-    dir:"ltr",
-    langBtn:"العربية",
-    brandSub:"Control Panel",
-    mainMenuTitle:"Main Menu",
-    pageTitle:"Dashboard",
-    heroWelcome:"Welcome to the Prudle Education System",
-    heroSub:".",
-    logout:"Logout",
+    mainMenuTitle:"القائمة الرئيسية",
 
-    reports:"Reports",
-    activities:"Activities",
-    placement:"CEFR Placement Test",
-    exams:"Exams & Final Evaluation",
-    certificates:"Certificates",
-    crm:"CRM Customer Relations",
-    online:"Online & Meetings",
-    booking:"Bookings",
-    admin:"Administration",
-    transfer:"Transfers",
-    breakTime:"Class Break Times",
-    tasks:"Task Assignment",
-    newstudents:"New Students",
-    supervisory:"Supervisory Authority",
-    backup:"Backup",
-    credentials:"Username & Password",
+    pageTitle:"لوحة التحكم",
 
-    reportsMobile:"Reports",
-    activitiesMobile:"Activities",
-    placementMobile:"CEFR",
-    examsMobile:"Exams",
-    certificatesMobile:"Certificates",
-    crmMobile:"CRM",
-    onlineMobile:"Online",
-    bookingMobile:"Bookings",
-    adminMobile:"Admin",
-    transferMobile:"Transfers",
-    breakTimeMobile:"Break Times",
-    tasksMobile:"Tasks",
-    newstudentsMobile:"New Students",
-    supervisoryMobile:"Supervision",
-    backupMobile:"Backup",
-    credentialsMobile:"Username & Password",
+    heroWelcome:"مرحبا بك في نظام برودل التعليمي",
 
-    tickerPrefix:"🔥 Open Courses Now — ",
-    tickerLoading:"⏳ Loading open courses...",
-    tickerEmpty:"No open courses are currently available",
-    tickerError:"Unable to load open courses right now",
-    openSection:"Open Section",
+    heroSub:".",
 
-    sectionTitles:{
-      reports:"Reports",
-      activities:"Activities",
-      placement:"CEFR Placement Test",
-      exams:"Exams & Final Evaluation",
-      certificates:"Certificates",
-      crm:"CRM Customer Relations",
-      online:"Online",
-      booking:"Bookings",
-      admin:"Administration",
-      transfer:"Transfers",
-      tasks:"Task Assignment",
-      newstudents:"New Students"
-    }
-  }
+    logout:"تسجيل الخروج",
+
+    reports:"قسم التقارير",
+
+    activities:"قسم النشاطات",
+
+    placement:"اختبار تحديد المستوى CEFR",
+
+    exams:"الاختبارات والتقييم النهائي",
+
+    certificates:"الشهادات",
+
+    crm:"CRM خدمة علاقات العملاء",
+
+    online:"قسم الأونلاين والاجتماعات",
+
+    booking:"قسم الحجوزات",
+
+    admin:"قسم الإدارة",
+
+    transfer:"الترحيل",
+
+    breakTime:"أوقات الراحة للفصول",
+
+    tasks:"إسناد المهام",
+
+    newstudents:"المستجدين",
+
+    supervisory:"الجهة الإشرافية",
+
+    backup:"النسخ الاحتياطي",
+
+    credentials:"اسم المستخدم وكلمة المرور",
+
+    reportsMobile:"التقارير",
+
+   
+activitiesMobile:"النشاطات",
+
+    placementMobile:"اختبار CEFR",
+
+    examsMobile:"الاختبارات",
+
+   
+certificatesMobile:"الشهادات",
+
+   
+crmMobile:"CRM",
+
+    onlineMobile:"الأونلاين",
+
+    bookingMobile:"الحجوزات",
+
+    adminMobile:"الإدارة",
+
+    transferMobile:"الترحيل",
+
+    breakTimeMobile:"أوقات الراحة",
+
+    tasksMobile:"المهام",
+
+   
+newstudentsMobile:"المستجدين",
+
+   
+supervisoryMobile:"الجهة الإشرافية",
+
+    backupMobile:"النسخ الاحتياطي",
+
+   
+credentialsMobile:"اسم المستخدم
+وكلمة المرور",
+
+    tickerPrefix:"🔥
+الدورات المفتوحة الآن — ",
+
+    tickerLoading:"⏳
+جاري تحميل الدورات المفتوحة...",
+
+    tickerEmpty:"لا توجد دورات مفتوحة حالياً",
+
+    tickerError:"تعذر تحميل الدورات المفتوحة حالياً",
+
+    openSection:"فتح القسم",
+
+    sectionTitles:{
+
+      reports:"قسم
+التقارير",
+
+      activities:"قسم النشاطات",
+
+      placement:"اختبار تحديد المستوى CEFR",
+
+      exams:"الاختبارات والتقييم النهائي",
+
+      certificates:"الشهادات",
+
+      crm:"خدمة علاقات العملاء CRM",
+
+      online:"قسم الأونلاين",
+
+      booking:"قسم الحجوزات",
+
+      admin:"قسم الإدارة",
+
+      transfer:"الترحيل",
+
+      tasks:"إسناد المهام",
+
+      newstudents:"المستجدين"
+
+    }
+
+  },
+
+  en:{
+
+    dir:"ltr",
+
+    langBtn:"العربية",
+
+    brandSub:"Control
+Panel",
+
+    mainMenuTitle:"Main Menu",
+
+   
+pageTitle:"Dashboard",
+
+    heroWelcome:"Welcome to
+the Prudle Education System",
+
+    heroSub:".",
+
+    logout:"Logout",
+
+   
+reports:"Reports",
+
+   
+activities:"Activities",
+
+    placement:"CEFR Placement
+Test",
+
+    exams:"Exams & Final
+Evaluation",
+
+   
+certificates:"Certificates",
+
+    crm:"CRM Customer
+Relations",
+
+    online:"Online &
+Meetings",
+
+    booking:"Bookings",
+
+   
+admin:"Administration",
+
+   
+transfer:"Transfers",
+
+    breakTime:"Class Break
+Times",
+
+    tasks:"Task
+Assignment",
+
+    newstudents:"New
+Students",
+
+    supervisory:"Supervisory
+Authority",
+
+    backup:"Backup",
+
+    credentials:"Username
+& Password",
+
+   
+reportsMobile:"Reports",
+
+   
+activitiesMobile:"Activities",
+
+   
+placementMobile:"CEFR",
+
+    examsMobile:"Exams",
+
+   
+certificatesMobile:"Certificates",
+
+    crmMobile:"CRM",
+
+   
+onlineMobile:"Online",
+
+   
+bookingMobile:"Bookings",
+
+    adminMobile:"Admin",
+
+   
+transferMobile:"Transfers",
+
+    breakTimeMobile:"Break
+Times",
+
+    tasksMobile:"Tasks",
+
+    newstudentsMobile:"New
+Students",
+
+   
+supervisoryMobile:"Supervision",
+
+   
+backupMobile:"Backup",
+
+   
+credentialsMobile:"Username & Password",
+
+    tickerPrefix:"🔥
+Open Courses Now — ",
+
+    tickerLoading:"⏳
+Loading open courses...",
+
+    tickerEmpty:"No open
+courses are currently available",
+
+    tickerError:"Unable to
+load open courses right now",
+
+    openSection:"Open
+Section",
+
+    sectionTitles:{
+
+      reports:"Reports",
+
+      activities:"Activities",
+
+      placement:"CEFR
+Placement Test",
+
+      exams:"Exams &
+Final Evaluation",
+
+     
+certificates:"Certificates",
+
+      crm:"CRM Customer
+Relations",
+
+      online:"Online",
+
+     
+booking:"Bookings",
+
+     
+admin:"Administration",
+
+      transfer:"Transfers",
+
+      tasks:"Task
+Assignment",
+
+      newstudents:"New
+Students"
+
+    }
+
+  }
+
 };
 
 const EN_ITEM_TEXT = {
-  "الحضور":"Attendance",
-  "الدرجات":"Grades",
-  "الواجبات":"Homework",
-  "واتس":"WhatsApp",
-  "الخطة":"Study Plan",
-  "الأعداد":"Student Numbers",
-  "الاستعلام الاكاديمي العام":"Academic Inquiry",
-  "تقارير المحادثة المدخلة":"Conversation Reports",
-  "تقارير تقييم الطلاب لمهارات اللغة":"Language Skills Reports",
-  "تقارير أداء المدربين":"Trainer Performance Reports",
-  "تقارير تعليقات المدرب ":"Trainer Comments",
-  "متابعة الطلاب الضعاف":"Weak Students Follow-up",
-  "الرواتب":"Salaries",
-  "المتأخرات":"Overdue Payments",
 
-  "إنشاء النشاطات":"Create Activities",
-  "نتائج النشاطات":"Activity Results",
-  "الطلاب المشاركون بالأنشطة":"Activity Participants",
+  "الحضور":"Attendance",
 
-  "الاختبارات":"Exams",
-  "نتائج الاختبارات":"Exam Results",
+  "الدرجات":"Grades",
 
-  "إصدار الشهادات":"Issue Certificates",
-  "الاستعلام عن الشهادات":"Certificate Inquiry",
+  "الواجبات":"Homework",
 
-  "CRM التواصل مع العملاء":"CRM Customer Communication",
+  "واتس":"WhatsApp",
 
-  "إنشاء رابط اجتماع":"Create Meeting Link",
-  "Google Meet Attendance":"Google Meet Attendance",
-  "تسجيلات الفيديو":"Video Recordings",
+  "الخطة":"Study Plan",
 
-  "اختبار CEFR":"CEFR Test",
-  "نتائج اختبارات CEFR":"CEFR Results",
+  "الأعداد":"Student Numbers",
 
-  "الحمدانية رجال":"Al-Hamdaniya Men",
-  "الحمدانية سيدات":"Al-Hamdaniya Women",
-  "عسفان":"Asfan",
-  "الجموم":"Al-Jumum",
-  "أونلاين":"Online",
+  "الاستعلام الاكاديمي العام":"Academic
+Inquiry",
 
-  "ترحيل الطلاب – حضوري رجال":"Move Students – Men",
-  "ترحيل الطلاب – حضوري سيدات":"Move Students – Women",
-  "ترحيل الطلاب – فرع عسفان":"Move Students – Asfan",
-  "ترحيل الطلاب – فرع الجموم":"Move Students – Al-Jumum",
-  "ترحيل الطلاب – أونلاين":"Move Students – Online",
-  "الدورات":"Courses",
-  "حذف الدورات":"Delete Courses",
-  "السجلات":"Records",
-  "متابعة حضور المدربين":"Trainer Attendance",
-  "الكويزات":"Quizzes",
-  "المستخدمين":"Users",
+  "تقارير المحادثة المدخلة":"Conversation Reports",
 
-  "الانضمام للاجتماع المباشر":"Join Live Meeting",
-  "إسناد مهمة جديدة":"Assign New Task",
-  "استعراض المهام":"View Tasks",
-  "إضافة مستجد":"Add New Student",
-  "تسكين الطلاب في الفصول":"Student Classroom Placement"
+  "تقارير تقييم الطلاب لمهارات اللغة":"Language
+Skills Reports",
+
+  "تقارير أداء المدربين":"Trainer Performance
+Reports",
+
+  "تقارير تعليقات المدرب ":"Trainer Comments",
+
+  "متابعة الطلاب الضعاف":"Weak Students Follow-up",
+
+  "الرواتب":"Salaries",
+
+  "المتأخرات":"Overdue Payments",
+
+  "إنشاء النشاطات":"Create Activities",
+
+  "نتائج النشاطات":"Activity Results",
+
+  "الطلاب المشاركون بالأنشطة":"Activity
+Participants",
+
+  "الاختبارات":"Exams",
+
+  "نتائج الاختبارات":"Exam Results",
+
+  "إصدار الشهادات":"Issue Certificates",
+
+  "الاستعلام عن الشهادات":"Certificate Inquiry",
+
+  "CRM التواصل مع العملاء":"CRM
+Customer Communication",
+
+  "إنشاء رابط اجتماع":"Create Meeting Link",
+
+  "Google Meet
+Attendance":"Google Meet Attendance",
+
+  "تسجيلات
+الفيديو":"Video Recordings",
+
+  "اختبار CEFR":"CEFR Test",
+
+  "نتائج اختبارات CEFR":"CEFR Results",
+
+  "الحمدانية رجال":"Al-Hamdaniya Men",
+
+  "الحمدانية سيدات":"Al-Hamdaniya Women",
+
+  "عسفان":"Asfan",
+
+  "الجموم":"Al-Jumum",
+
+  "أونلاين":"Online",
+
+  "ترحيل الطلاب – حضوري رجال":"Move
+Students – Men",
+
+  "ترحيل الطلاب – حضوري سيدات":"Move
+Students – Women",
+
+  "ترحيل الطلاب – فرع عسفان":"Move Students – Asfan",
+
+  "ترحيل الطلاب – فرع الجموم":"Move
+Students – Al-Jumum",
+
+  "ترحيل الطلاب – أونلاين":"Move Students – Online",
+
+  "الدورات":"Courses",
+
+  "حذف الدورات":"Delete Courses",
+
+  "السجلات":"Records",
+
+  "متابعة حضور المدربين":"Trainer Attendance",
+
+  "الكويزات":"Quizzes",
+
+  "المستخدمين":"Users",
+
+  "الانضمام للاجتماع المباشر":"Join Live
+Meeting",
+
+  "إسناد مهمة جديدة":"Assign New Task",
+
+  "استعراض المهام":"View Tasks",
+
+  "إضافة مستجد":"Add New Student",
+
+  "تسكين الطلاب في الفصول":"Student Classroom
+Placement"
+
 };
 
 const EN_HEADING_TEXT = {
-  "التقارير":"Reports",
-  "النشاطات التعليمية والترفيهية":"Educational & Recreational Activities",
-  "الاختبارات والتقييم":"Exams & Evaluation",
-  "إدارة الشهادات":"Certificate Management",
-  "CRM التواصل مع العملاء":"CRM Customer Communication",
-  "الفصول والتسجيلات":"Classes & Recordings",
-  "اختبارات تحديد المستوى":"Placement Tests",
-  "الحجوزات":"Bookings",
-  "تفاصيل الترحيل":"Student Transfer",
-  "الإدارة":"Administration",
-  "إسناد المهام":"Task Assignment",
-  "المستجدين":"New Students"
+
+  "التقارير":"Reports",
+
+  "النشاطات التعليمية والترفيهية":"Educational
+& Recreational Activities",
+
+  "الاختبارات والتقييم":"Exams & Evaluation",
+
+  "إدارة الشهادات":"Certificate Management",
+
+  "CRM التواصل مع العملاء":"CRM Customer
+Communication",
+
+  "الفصول والتسجيلات":"Classes &
+Recordings",
+
+  "اختبارات تحديد المستوى":"Placement Tests",
+
+  "الحجوزات":"Bookings",
+
+  "تفاصيل الترحيل":"Student Transfer",
+
+  "الإدارة":"Administration",
+
+  "إسناد المهام":"Task Assignment",
+
+  "المستجدين":"New Students"
+
 };
 
 function setText(id,value){
-  const el = document.getElementById(id);
-  if(el) el.textContent = value;
+
+  const el =
+document.getElementById(id);
+
+  if(el) el.textContent = value;
+
 }
 
 function applyDashboardLanguage(){
-  const t = UI_TEXT[DASH_LANG];
 
-  document.documentElement.lang = DASH_LANG === "ar" ? "ar" : "en";
-  document.documentElement.dir = t.dir;
+  const t = UI_TEXT[DASH_LANG];
 
-  setText("langToggleBtn",t.langBtn);
-  setText("brandSub",t.brandSub);
-  setText("mainMenuTitle",t.mainMenuTitle);
-  setText("pageTitle",t.pageTitle);
-  setText("heroWelcome",t.heroWelcome);
-  setText("heroSub",t.heroSub);
-  setText("logoutText",t.logout);
+ 
+document.documentElement.lang = DASH_LANG === "ar" ?
+"ar" : "en";
 
-  setText("reportsSideText",t.reports);
-  setText("activitiesSideText",t.activities);
-  setText("placementSideText",t.placement);
-  setText("examsSideText",t.exams);
-  setText("certificatesSideText",t.certificates);
-  setText("crmSideText",t.crm);
-  setText("onlineSideText",t.online);
-  setText("bookingSideText",t.booking);
-  setText("adminSideText",t.admin);
-  setText("transferSideText",t.transfer);
-  setText("breakTimeSideText",t.breakTime);
-  setText("tasksSideText",t.tasks);
-  setText("newStudentsSideText",t.newstudents);
-  setText("supervisorySideText",t.supervisory);
-  setText("backupSideText",t.backup);
-  setText("credentialsSideText",t.credentials);
+  document.documentElement.dir =
+t.dir;
 
-  setText("reportsMobileText",t.reportsMobile);
-  setText("activitiesMobileText",t.activitiesMobile);
-  setText("placementMobileText",t.placementMobile);
-  setText("examsMobileText",t.examsMobile);
-  setText("certificatesMobileText",t.certificatesMobile);
-  setText("crmMobileText",t.crmMobile);
-  setText("onlineMobileText",t.onlineMobile);
-  setText("bookingMobileText",t.bookingMobile);
-  setText("adminMobileText",t.adminMobile);
-  setText("transferMobileText",t.transferMobile);
-  setText("breakTimeMobileText",t.breakTimeMobile);
-  setText("tasksMobileText",t.tasksMobile);
-  setText("newStudentsMobileText",t.newstudentsMobile);
-  setText("supervisoryMobileText",t.supervisoryMobile);
-  setText("backupMobileText",t.backupMobile);
-  setText("credentialsMobileText",t.credentialsMobile);
+ 
+setText("langToggleBtn",t.langBtn);
 
-  // Re-render current section only after the dashboard is initialized
-  if(window.CURRENT_SECTION && typeof load === "function"){
-    load(window.CURRENT_SECTION);
-  }
+ 
+setText("brandSub",t.brandSub);
 
-  // Refresh ticker text with selected language
-  if(window.OPEN_TICKER_COURSES && typeof renderOpenCoursesTicker === "function"){
-    renderOpenCoursesTicker(window.OPEN_TICKER_COURSES);
-  }
+ 
+setText("mainMenuTitle",t.mainMenuTitle);
+
+ 
+setText("pageTitle",t.pageTitle);
+
+ 
+setText("heroWelcome",t.heroWelcome);
+
+ 
+setText("heroSub",t.heroSub);
+
+ 
+setText("logoutText",t.logout);
+
+ 
+setText("reportsSideText",t.reports);
+
+ 
+setText("activitiesSideText",t.activities);
+
+ 
+setText("placementSideText",t.placement);
+
+  setText("examsSideText",t.exams);
+
+ 
+setText("certificatesSideText",t.certificates);
+
+ 
+setText("crmSideText",t.crm);
+
+ 
+setText("onlineSideText",t.online);
+
+ 
+setText("bookingSideText",t.booking);
+
+ 
+setText("adminSideText",t.admin);
+
+ 
+setText("transferSideText",t.transfer);
+
+ 
+setText("breakTimeSideText",t.breakTime);
+
+ 
+setText("tasksSideText",t.tasks);
+
+ 
+setText("newStudentsSideText",t.newstudents);
+
+ 
+setText("supervisorySideText",t.supervisory);
+
+ 
+setText("backupSideText",t.backup);
+
+ 
+setText("credentialsSideText",t.credentials);
+
+ 
+setText("reportsMobileText",t.reportsMobile);
+
+ 
+setText("activitiesMobileText",t.activitiesMobile);
+
+ 
+setText("placementMobileText",t.placementMobile);
+
+ 
+setText("examsMobileText",t.examsMobile);
+
+  setText("certificatesMobileText",t.certificatesMobile);
+
+ 
+setText("crmMobileText",t.crmMobile);
+
+ 
+setText("onlineMobileText",t.onlineMobile);
+
+ 
+setText("bookingMobileText",t.bookingMobile);
+
+ 
+setText("adminMobileText",t.adminMobile);
+
+  setText("transferMobileText",t.transferMobile);
+
+ 
+setText("breakTimeMobileText",t.breakTimeMobile);
+
+ 
+setText("tasksMobileText",t.tasksMobile);
+
+ 
+setText("newStudentsMobileText",t.newstudentsMobile);
+
+ 
+setText("supervisoryMobileText",t.supervisoryMobile);
+
+  setText("backupMobileText",t.backupMobile);
+
+ 
+setText("credentialsMobileText",t.credentialsMobile);
+
+  // Re-render current
+section only after the dashboard is initialized
+
+  if(window.CURRENT_SECTION
+&& typeof load === "function"){
+
+    load(window.CURRENT_SECTION);
+
+  }
+
+  // Refresh ticker text
+with selected language
+
+  if(window.OPEN_TICKER_COURSES
+&& typeof renderOpenCoursesTicker === "function"){
+
+   
+renderOpenCoursesTicker(window.OPEN_TICKER_COURSES);
+
+  }
+
 }
 
 function logout(){
 
-  try{
+  try{
 
-    window.parent.postMessage(
-      "PRUDLE_LOGOUT",
-      "https://www.prudle-education.com"
-    );
+   
+window.parent.postMessage(
 
-  }catch(error){
+      "PRUDLE_LOGOUT",
 
-    console.error(
-      "Logout message error:",
-      error
-    );
+     
+"https://www.prudle-education.com"
 
-    window.location.replace(
-      "https://www.prudle-education.com/log-in-out"
-    );
+    );
 
-  }
+  }catch(error){
+
+    console.error(
+
+      "Logout message
+error:",
+
+      error
+
+    );
+
+   
+window.location.replace(
+
+     
+"https://www.prudle-education.com/log-in-out"
+
+    );
+
+  }
 
 }
 
 function toggleDashboardLanguage(){
-  DASH_LANG = DASH_LANG === "ar" ? "en" : "ar";
-  localStorage.setItem("prudleDashboardLang",DASH_LANG);
-  applyDashboardLanguage();
+
+  DASH_LANG = DASH_LANG ===
+"ar" ? "en" : "ar";
+
+ 
+localStorage.setItem("prudleDashboardLang",DASH_LANG);
+
+  applyDashboardLanguage();
+
 }
 
 /* =========================================================
-   🔔 إشعار لحظي عند إسناد مهمة — اللون حسب الأولوية
-   High = أحمر | Medium = برتقالي | Low = أخضر
+
+   🔔
+إشعار لحظي عند إسناد مهمة — اللون حسب
+الأولوية
+
+   High = أحمر | Medium = برتقالي | Low = أخضر
+
 ========================================================= */
+
 let TASKS_SNAPSHOT = [];
-let TASK_USERS_LOOKUP = new Map();
 
 let TASKS_LISTENER_READY = false;
+
 let TASK_FLASH_TIMER = null;
 
 function safeTaskText(v){
-  return String(v == null ? "" : v).trim();
+
+  return String(v == null ?
+"" : v).trim();
+
 }
 
 function taskPriorityValue(priority){
-  const p = safeTaskText(priority).toLowerCase();
-  if(p === "high") return 3;
-  if(p === "medium") return 2;
-  return 1;
+
+  const p =
+safeTaskText(priority).toLowerCase();
+
+  if(p === "high")
+return 3;
+
+  if(p === "medium")
+return 2;
+
+  return 1;
+
 }
 
 function normalizeTaskPriority(priority){
-  const p = safeTaskText(priority).toLowerCase();
-  if(p === "high" || p === "medium" || p === "low") return p;
-  return "medium";
+
+  const p =
+safeTaskText(priority).toLowerCase();
+
+  if(p === "high" || p
+=== "medium" || p === "low") return p;
+
+  return "medium";
+
 }
 
 function highestTaskPriority(tasks){
-  if(!tasks || !tasks.length) return "medium";
-  return tasks
-    .map(t=>normalizeTaskPriority(t.priority))
-    .sort((a,b)=>taskPriorityValue(b)-taskPriorityValue(a))[0] || "medium";
+
+  if(!tasks || !tasks.length)
+return "medium";
+
+  return tasks
+
+   
+.map(t=>normalizeTaskPriority(t.priority))
+
+   
+.sort((a,b)=>taskPriorityValue(b)-taskPriorityValue(a))[0] ||
+"medium";
+
 }
 
 function priorityArabic(priority){
-  return ({
-    high:"عالية",
-    medium:"متوسطة",
-    low:"منخفضة"
-  })[normalizeTaskPriority(priority)];
+
+  return ({
+
+    high:"عالية",
+
+    medium:"متوسطة",
+
+    low:"منخفضة"
+
+ 
+})[normalizeTaskPriority(priority)];
+
 }
 
 function flashTaskAssignment(priority){
-  const p = normalizeTaskPriority(priority);
-  const sideBtn = document.getElementById("tasksBtnSide");
-  const mobileBtn = document.getElementById("tasksBtnMobile");
 
-  [sideBtn,mobileBtn].forEach(btn=>{
-    if(!btn) return;
-    btn.classList.remove("task-flash-high","task-flash-medium","task-flash-low");
-    requestAnimationFrame(function(){
-      btn.classList.add("task-flash-"+p);
-    });
-  });
+  const p =
+normalizeTaskPriority(priority);
 
-  if(TASK_FLASH_TIMER) clearTimeout(TASK_FLASH_TIMER);
+  const sideBtn =
+document.getElementById("tasksBtnSide");
 
-  /* الوميض لحظي لمدة تقريباً 5.5 ثانية ثم يعود الزر لطبيعته */
-  TASK_FLASH_TIMER = setTimeout(()=>{
-    [sideBtn,mobileBtn].forEach(btn=>{
-      if(btn) btn.classList.remove("task-flash-high","task-flash-medium","task-flash-low");
-    });
-  },5600);
+  const mobileBtn =
+document.getElementById("tasksBtnMobile");
+
+ 
+[sideBtn,mobileBtn].forEach(btn=>{
+
+    if(!btn) return;
+
+    btn.classList.remove("task-flash-high","task-flash-medium","task-flash-low");
+
+   
+requestAnimationFrame(function(){
+
+     
+btn.classList.add("task-flash-"+p);
+
+    });
+
+  });
+
+  if(TASK_FLASH_TIMER)
+clearTimeout(TASK_FLASH_TIMER);
+
+  /* الوميض لحظي لمدة تقريباً 5.5 ثانية ثم يعود الزر لطبيعته
+*/
+
+  TASK_FLASH_TIMER =
+setTimeout(()=>{
+
+   
+[sideBtn,mobileBtn].forEach(btn=>{
+
+      if(btn)
+btn.classList.remove("task-flash-high","task-flash-medium","task-flash-low");
+
+    });
+
+  },5600);
+
 }
 
 function renderTaskAssignmentAlert(){
-  const sideBtn = document.getElementById("tasksBtnSide");
-  const mobileBtn = document.getElementById("tasksBtnMobile");
-  const sideBadge = document.getElementById("tasksCountSide");
-  const mobileBadge = document.getElementById("tasksCountMobile");
-  const listBox = document.getElementById("taskAssigneeList");
-  const tickerNote = document.getElementById("taskTickerNote");
-  const tickerNames = document.getElementById("taskTickerNames");
 
-  function taskStatus(t){
-    return String(t?.status || "assigned").trim().toLowerCase();
-  }
+  const sideBtn =
+document.getElementById("tasksBtnSide");
 
-  function isActiveTask(t){
-    const st = taskStatus(t);
-    return ![
-      "completed","cancelled","canceled","closed","done",
-      "مكتمل","مكتملة","تم الانتهاء","تم الإنهاء",
-      "ملغاة","ملغي","مغلق","مغلقة"
-    ].includes(st);
-  }
+  const mobileBtn =
+document.getElementById("tasksBtnMobile");
 
-  function isWaitingTask(t){
-    return ["assigned","تم الإسناد","مسند","مسندة"].includes(taskStatus(t));
-  }
+  const sideBadge =
+document.getElementById("tasksCountSide");
 
-  /*
-    كود إسناد المهام يحفظ:
-    employeeName     = اسم الموظف
-    employeeUsername = اسم المستخدم
-    لذلك لا نعتمد على تسجيل دخول المدير لمعرفة المسند إليه.
-  */
-  function getTaskAssignee(t){
-    const employeeName = safeTaskText(t?.employeeName);
-    const employeeUsername = safeTaskText(t?.employeeUsername);
+  const mobileBadge =
+document.getElementById("tasksCountMobile");
 
-    let username =
-      employeeUsername ||
-      safeTaskText(t?.assignedEmployeeUsername) ||
-      safeTaskText(t?.assigneeUsername) ||
-      safeTaskText(t?.assignedToUsername) ||
-      safeTaskText(t?.receiverUsername) ||
-      safeTaskText(t?.recipientUsername) ||
-      safeTaskText(t?.toUsername) ||
-      safeTaskText(t?.username) ||
-      safeTaskText(t?.userName);
+  const listBox =
+document.getElementById("taskAssigneeList");
 
-    let name =
-      employeeName ||
-      safeTaskText(t?.assignedEmployeeName) ||
-      safeTaskText(t?.assigneeName) ||
-      safeTaskText(t?.assignedToName) ||
-      safeTaskText(t?.receiverName) ||
-      safeTaskText(t?.recipientName);
+  const tickerNote =
+document.getElementById("taskTickerNote");
 
-    // إذا كان لدينا username نستخدم USERS للحصول على الاسم الكامل.
-    if(username){
-      const resolved = TASK_USERS_LOOKUP.get(username.toLowerCase());
-      if(resolved) name = name || resolved;
-    }
+  const tickerNames =
+document.getElementById("taskTickerNames");
 
-    // دعم السجلات القديمة التي تحفظ قيمة نصية فقط.
-    if(!name){
-      const oldValue =
-        safeTaskText(t?.employee) ||
-        safeTaskText(t?.assignedTo) ||
-        safeTaskText(t?.assignee) ||
-        safeTaskText(t?.receiver) ||
-        safeTaskText(t?.recipient) ||
-        safeTaskText(t?.toUser);
+  const activeTasks =
+TASKS_SNAPSHOT.filter(t =>
 
-      if(oldValue && oldValue !== "[object Object]"){
-        const resolved = TASK_USERS_LOOKUP.get(oldValue.toLowerCase());
-        name = resolved || oldValue;
-        if(!username && !resolved) username = oldValue;
-      }
-    }
+    t.status ===
+"assigned" || t.status === "in_progress"
 
-    const userId = safeTaskText(
-      t?.employeeUserId ||
-      t?.userId ||
-      t?.assignedUserId ||
-      t?.receiverUserId
-    );
+  );
 
-    if(!name && userId){
-      name = TASK_USERS_LOOKUP.get(userId.toLowerCase()) || "";
-    }
+  const waitingTasks =
+TASKS_SNAPSHOT.filter(t =>
 
-    // لا نخفي السجل أبداً حتى لو كان قديماً جداً.
-    if(!name) name = username || "غير محدد";
+    t.status ===
+"assigned"
 
-    return { name, username };
-  }
+  );
 
-  const activeTasks = TASKS_SNAPSHOT.filter(isActiveTask);
-  const waitingTasks = activeTasks.filter(isWaitingTask);
-  const alertCount = waitingTasks.length;
+  const alertCount =
+waitingTasks.length;
 
-  if(sideBadge) sideBadge.textContent = alertCount;
-  if(mobileBadge) mobileBadge.textContent = alertCount;
+  if(sideBadge)
+sideBadge.textContent = alertCount;
 
-  [sideBtn,mobileBtn].forEach(btn=>{
-    if(!btn) return;
-    btn.classList.toggle("has-task-count",alertCount > 0);
-  });
+  if(mobileBadge)
+mobileBadge.textContent = alertCount;
 
-  const byEmployee = new Map();
+ 
+[sideBtn,mobileBtn].forEach(btn=>{
 
-  activeTasks.forEach(t=>{
-    const assignee = getTaskAssignee(t);
-    const key = String(
-      assignee.username || assignee.name || t.id || Math.random()
-    ).trim().toLowerCase();
+    if(!btn) return;
 
-    const priority = normalizeTaskPriority(t.priority);
+   
+btn.classList.toggle("has-task-count",alertCount > 0);
 
-    const current = byEmployee.get(key) || {
-      name: assignee.name,
-      username: assignee.username,
-      count:0,
-      assigned:0,
-      progress:0,
-      priorities:[]
-    };
+  });
 
-    // لو ظهر الاسم لاحقاً من سجل أحدث، نحتفظ به.
-    if(
-      (!current.name || current.name === "غير محدد") &&
-      assignee.name
-    ){
-      current.name = assignee.name;
-    }
-    if(!current.username && assignee.username){
-      current.username = assignee.username;
-    }
+  /* التجميع الآن حسب اسم الموظف فقط — بدون رقم موظف
+*/
 
-    current.count++;
-    current.priorities.push(priority);
+  const byEmployee = new
+Map();
 
-    if(isWaitingTask(t)) current.assigned++;
-    else current.progress++;
+ 
+activeTasks.forEach(t=>{
 
-    byEmployee.set(key,current);
-  });
+    const name =
+safeTaskText(t.employeeName) || "غير
+محدد";
 
-  const employees = [...byEmployee.values()]
-    .map(e=>({
-      ...e,
-      priority:highestTaskPriority(
-        e.priorities.map(priority=>({priority}))
-      )
-    }))
-    .sort((a,b)=>
-      taskPriorityValue(b.priority)-taskPriorityValue(a.priority) ||
-      b.count-a.count ||
-      String(a.name).localeCompare(String(b.name),"ar")
-    );
+    const key =
+name.toLowerCase();
 
-  function employeeIdentityHtml(e){
-    const name = escapeTaskHtml(e.name || "غير محدد");
-    const username = safeTaskText(e.username);
-    return `
-      <strong>${name}</strong>
-      ${username ? `<div style="font-size:11px;color:#64748b;margin-top:3px;direction:ltr;text-align:right">@${escapeTaskHtml(username)}</div>` : ""}
-    `;
-  }
+    const priority = normalizeTaskPriority(t.priority);
 
-  function cardsHtml(){
-    if(!employees.length){
-      return '<div class="task-assignee-empty">لا توجد مهام مسندة حالياً</div>';
-    }
+    const current =
+byEmployee.get(key) || {
 
-    return employees.map(e=>{
-      const initial =
-        escapeTaskHtml((e.name || e.username || "?").trim().charAt(0) || "?");
+      name,
 
-      return `
-        <div class="task-assignee-card priority-${e.priority}">
-          <div class="task-assignee-avatar">${initial}</div>
-          <div>
-            ${employeeIdentityHtml(e)}
-            <small>
-              ${e.count} مهمة • ${priorityArabic(e.priority)}
-              ${e.assigned ? ` • ${e.assigned} بانتظار الاستلام` : ""}
-              ${e.progress ? ` • ${e.progress} قيد الإجراء` : ""}
-            </small>
-          </div>
-        </div>
-      `;
-    }).join("");
-  }
+      count:0,
 
+      assigned:0,
 
+      progress:0,
 
+      priorities:[]
 
-  if(listBox){
-    if(!employees.length){
-      listBox.className = "task-assignee-empty";
-      listBox.innerHTML = "لا توجد مهام مسندة حالياً";
-    }else{
-      listBox.className = "";
-      listBox.innerHTML = employees.map(e=>`
-        <div class="task-assignee-item priority-${e.priority}">
-          ${employeeIdentityHtml(e)}
-          <small>
-            أولوية ${priorityArabic(e.priority)}
-            • ${e.count} مهمة
-            ${e.assigned ? ` • ${e.assigned} بانتظار الاستلام` : ""}
-            ${e.progress ? ` • ${e.progress} قيد الإجراء` : ""}
-          </small>
-        </div>
-      `).join("");
-    }
-  }
+    };
 
-  if(tickerNote && tickerNames){
-    if(employees.length){
-      const topPriority = highestTaskPriority(activeTasks);
+    current.count++;
 
-      tickerNote.style.display = "block";
-      tickerNote.classList.remove(
-        "priority-high",
-        "priority-medium",
-        "priority-low"
-      );
-      tickerNote.classList.add("priority-"+topPriority);
+   
+current.priorities.push(priority);
 
-      tickerNames.textContent =
-        "🔔 مهام مسندة إلى: " +
-        employees.map(e=>{
-          const who = e.username
-            ? `${e.name} (@${e.username})`
-            : e.name;
-          return `${who} — ${priorityArabic(e.priority)} (${e.count})`;
-        }).join("  •  ") +
-        "   —   ";
-    }else{
-      tickerNote.style.display = "none";
-      tickerNote.classList.remove(
-        "priority-high",
-        "priority-medium",
-        "priority-low"
-      );
-      tickerNames.textContent = "";
-    }
-  }
+    if(t.status ===
+"assigned") current.assigned++;
+
+    if(t.status ===
+"in_progress") current.progress++;
+
+   
+byEmployee.set(key,current);
+
+  });
+
+  const employees =
+[...byEmployee.values()]
+
+    .map(e=>({
+
+      ...e,
+
+     
+priority:highestTaskPriority(e.priorities.map(priority=>({priority})))
+
+    }))
+
+    .sort((a,b)=>
+
+     
+taskPriorityValue(b.priority)-taskPriorityValue(a.priority) ||
+
+      b.count-a.count ||
+
+     
+a.name.localeCompare(b.name,"ar")
+
+    );
+
+  if(listBox){
+
+    if(!employees.length){
+
+      listBox.className =
+"task-assignee-empty";
+
+      listBox.innerHTML = "لا توجد مهام مسندة حالياً";
+
+    }else{
+
+      listBox.className =
+"";
+
+      listBox.innerHTML =
+employees.map(e=>`
+
+        <div
+class="task-assignee-item priority-${e.priority}">
+
+          ${e.name}
+
+          <small>
+
+            أولوية ${priorityArabic(e.priority)}
+
+            • ${e.count} مهمة
+
+            ${e.assigned ?
+` • ${e.assigned} بانتظار الاستلام` : ""}
+
+            ${e.progress ?
+` • ${e.progress} قيد الإجراء` : ""}
+
+          </small>
+
+        </div>
+
+      `).join("");
+
+    }
+
+  }
+
+  if(tickerNote &&
+tickerNames){
+
+    if(employees.length){
+
+      const topPriority =
+highestTaskPriority(activeTasks);
+
+     
+tickerNote.style.display = "block";
+
+     
+tickerNote.classList.remove("priority-high","priority-medium","priority-low");
+
+     
+tickerNote.classList.add("priority-"+topPriority);
+
+      tickerNames.textContent
+=
+
+        "🔔
+مهام مسندة إلى: " +
+
+       
+employees.map(e=>`${e.name} — ${priorityArabic(e.priority)}
+(${e.count})`).join("  •  ") +
+
+        "   —  
+";
+
+    }else{
+
+      tickerNote.style.display =
+"none";
+
+      tickerNote.classList.remove("priority-high","priority-medium","priority-low");
+
+      tickerNames.textContent =
+"";
+
+    }
+
+  }
+
 }
-// تحميل أسماء المستخدمين لدعم سجلات المهام القديمة والجديدة
-// حتى لو كان سجل المهمة يحتوي فقط على username أو userId.
-db.collection("USERS").onSnapshot(snapshot=>{
-  const map = new Map();
-  snapshot.forEach(doc=>{
-    const u = doc.data() || {};
-    const displayName = safeTaskText(
-      u.displayName || u.fullName || u.name || u.employeeName ||
-      u.username || u.userName || doc.id
-    );
-    const keys = [
-      doc.id, u.id, u.uid, u.username, u.userName,
-      u.usernameLower, u.email, u.employeeName, u.displayName, u.fullName, u.name
-    ];
-    keys.forEach(key=>{
-      const k = safeTaskText(key).toLowerCase();
-      if(k && displayName) map.set(k,displayName);
-    });
-  });
-  TASK_USERS_LOOKUP = map;
-  renderTaskAssignmentAlert();
-},error=>{
-  console.warn("USERS task-name lookup error:",error);
-});
-
-/* تثبيت نافذة أسماء المسند إليهم بجانب زر إسناد المهام */
-(function setupTaskPopoverPosition(){
-  const wrap = document.querySelector(".task-nav-wrap");
-  const pop = document.getElementById("taskAssigneePopover");
-  const btn = document.getElementById("tasksBtnSide");
-  if(!wrap || !pop || !btn) return;
-
-  function positionPopover(){
-    if(window.innerWidth <= 980) return;
-    const rect = btn.getBoundingClientRect();
-    const popHeight = Math.min(pop.scrollHeight || 340, 420);
-    let top = rect.top;
-    if(top + popHeight > window.innerHeight - 12){
-      top = Math.max(12, window.innerHeight - popHeight - 12);
-    }
-    pop.style.top = top + "px";
-    pop.style.right = (window.innerWidth - rect.left + 10) + "px";
-  }
-
-  wrap.addEventListener("mouseenter", positionPopover);
-  window.addEventListener("resize", positionPopover);
-  window.addEventListener("scroll", positionPopover, true);
-})();
 
 db.collection("EmployeeTasks")
-  .onSnapshot(snapshot=>{
 
-    /* أول تحميل لا يسبب وميض للمهام القديمة */
-    if(TASKS_LISTENER_READY){
-      const justAssigned = snapshot.docChanges()
-        .filter(change => {
-          if(change.type !== "added") return false;
-          const data = change.doc.data() || {};
-          const status = String(data.status || "assigned").trim().toLowerCase();
-          return ["assigned","تم الإسناد","مسند","مسندة"].includes(status);
-        })
-        .map(change=>({
-          id:change.doc.id,
-          ...(change.doc.data() || {})
-        }));
+  .onSnapshot(snapshot=>{
 
-      if(justAssigned.length){
-        flashTaskAssignment(highestTaskPriority(justAssigned));
-      }
-    }
+    /* أول تحميل لا يسبب وميض للمهام القديمة */
 
-    TASKS_SNAPSHOT = snapshot.docs.map(doc=>({
-      id:doc.id,
-      ...(doc.data() || {})
-    }));
+   
+if(TASKS_LISTENER_READY){
 
-    renderTaskAssignmentAlert();
-    TASKS_LISTENER_READY = true;
+      const justAssigned =
+snapshot.docChanges()
 
-  },error=>{
-    console.error("EmployeeTasks notification error:",error);
-  });
+        .filter(change =>
+
+          change.type ===
+"added" &&
+
+          ((change.doc.data()
+&& change.doc.data().status) || "assigned") ===
+"assigned"
+
+        )
+
+        .map(change=>({
+
+          id:change.doc.id,
+
+          ...(change.doc.data() ||
+{})
+
+        }));
+
+     
+if(justAssigned.length){
+
+       
+flashTaskAssignment(highestTaskPriority(justAssigned));
+
+      }
+
+    }
+
+    TASKS_SNAPSHOT =
+snapshot.docs.map(doc=>({
+
+      id:doc.id,
+
+      ...(doc.data() || {})
+
+    }));
+
+   
+renderTaskAssignmentAlert();
+
+    TASKS_LISTENER_READY = true;
+
+  },error=>{
+
+   
+console.error("EmployeeTasks notification error:",error);
+
+  });
 
 
 const DATA = {
 
 activities: {
-  title: "قسم النشاطات",
-  sections: [
-    {
-      heading: "النشاطات التعليمية والترفيهية",
-      items: [
 
-        [
-          "إنشاء النشاطات",
-          "fa-gamepad",
-          "https://www.prudle-education.com/quizzez",
-          "gold",
-          "إنشاء وإدارة النشاطات التعليمية والترفيهية"
-        ],
+  title: "قسم النشاطات",
 
-        [
-          "نتائج النشاطات",
-          "fa-chart-line",
-          "https://www.prudle-education.com/activities-results",
-          "blue",
-          "عرض نتائج الطلاب في النشاطات"
-        ],
+  sections: [
 
-        [
-          "الطلاب المشاركون بالأنشطة",
-          "fa-users",
-          "https://www.prudle-education.com/activity-performance",
-          "green",
-          "عرض الطلاب المشاركين في الأنشطة حسب الدورة والمدرب"
-        ]
+    {
 
-      ]
-    }
-  ]
+      heading: "النشاطات التعليمية والترفيهية",
+
+      items: [
+
+        [
+
+          "إنشاء النشاطات",
+
+         
+"fa-gamepad",
+
+         
+"https://www.prudle-education.com/quizzez",
+
+          "gold",
+
+          "إنشاء وإدارة النشاطات التعليمية والترفيهية"
+
+        ],
+
+        [
+
+          "نتائج النشاطات",
+
+         
+"fa-chart-line",
+
+         
+"https://www.prudle-education.com/activities-results",
+
+          "blue",
+
+          "عرض نتائج الطلاب في النشاطات"
+
+        ],
+
+        [
+
+          "الطلاب المشاركون بالأنشطة",
+
+         
+"fa-users",
+
+         
+"https://www.prudle-education.com/activity-performance",
+
+          "green",
+
+          "عرض الطلاب المشاركين في الأنشطة حسب الدورة والمدرب"
+
+        ]
+
+      ]
+
+    }
+
+  ]
+
 },
 
 exams: {
-  title: "الاختبارات والتقييم النهائي",
-  sections: [
-    {
-      heading: "الاختبارات والتقييم",
-      items: [
 
-        [
-          "الاختبارات",
-          "fa-file-pen",
-          "https://www.prudle-education.com/create-a-quiz",
-          "blue",
-          "إدارة وإنشاء الاختبارات"
-        ],
+  title: "الاختبارات والتقييم النهائي",
 
-        [
-          "نتائج الاختبارات",
-          "fa-chart-line",
-          "https://www.prudle-education.com/homework-reports",
-          "gold",
-          "عرض نتائج الطلاب"
-        ]
+  sections: [
 
-      ]
-    }
-  ]
+    {
+
+      heading: "الاختبارات والتقييم",
+
+      items: [
+
+        [
+
+          "الاختبارات",
+
+         
+"fa-file-pen",
+
+         
+"https://www.prudle-education.com/create-a-quiz",
+
+          "blue",
+
+          "إدارة وإنشاء الاختبارات"
+
+        ],
+
+        [
+
+          "نتائج الاختبارات",
+
+         
+"fa-chart-line",
+
+         
+"https://www.prudle-education.com/homework-reports",
+
+          "gold",
+
+          "عرض نتائج الطلاب"
+
+        ]
+
+      ]
+
+    }
+
+  ]
+
 },
 
 certificates: {
-  title: "الشهادات",
-  sections: [
-    {
-      heading: "إدارة الشهادات",
-      items: [
 
-        [
-          "إصدار الشهادات",
-          "fa-certificate",
-          "https://www.prudle-education.com/certificates",
-          "purple",
-          "إصدار واعتماد الشهادات"
-        ],
+  title: "الشهادات",
 
-        [
-          "الاستعلام عن الشهادات",
-          "fa-magnifying-glass",
-          "https://www.prudle-education.com/certificates-results",
-          "orange",
-          "التحقق من الشهادات"
-        ]
+  sections: [
 
-      ]
-    }
-  ]
+    {
+
+      heading: "إدارة الشهادات",
+
+      items: [
+
+        [
+
+          "إصدار الشهادات",
+
+         
+"fa-certificate",
+
+         
+"https://www.prudle-education.com/certificates",
+
+          "purple",
+
+          "إصدار واعتماد الشهادات"
+
+        ],
+
+        [
+
+          "الاستعلام عن الشهادات",
+
+         
+"fa-magnifying-glass",
+
+          "https://www.prudle-education.com/certificates-results",
+
+          "orange",
+
+          "التحقق من الشهادات"
+
+        ]
+
+      ]
+
+    }
+
+  ]
+
 },
+
 crm: {
-  title: "خدمة علاقات العملاء CRM",
-  sections: [
-    {
-      heading: "CRM التواصل مع العملاء",
-      items: [
 
-        [
-          "CRM التواصل مع العملاء",
-          "fa-headset",
-          "https://www.prudle-education.com/crm",
-          "blue",
-          "إدارة العملاء والمتابعة وخدمة العملاء"
-        ]
+  title: "خدمة علاقات العملاء CRM",
 
-      ]
-    }
-  ]
+  sections: [
+
+    {
+
+      heading: "CRM التواصل مع العملاء",
+
+      items: [
+
+        [
+
+          "CRM التواصل مع العملاء",
+
+         
+"fa-headset",
+
+         
+"https://www.prudle-education.com/crm",
+
+          "blue",
+
+          "إدارة العملاء والمتابعة وخدمة العملاء"
+
+        ]
+
+      ]
+
+    }
+
+  ]
+
 },
+
 online: {
-  title: "قسم الأونلاين",
-  sections: [
-    {
-      heading: "الفصول والتسجيلات",
-      items: [
+
+  title: "قسم الأونلاين",
+
+  sections: [
+
+    {
+
+      heading: "الفصول والتسجيلات",
+
+      items: [
+
 [
-  "إنشاء رابط اجتماع",
-  "fa-video",
-  "https://www.prudle-education.com/create-google-meet-link-gm",
-  "red",
-  "إنشاء وإدارة رابط اجتماع Google Meet"
+
+  "إنشاء رابط اجتماع",
+
+  "fa-video",
+
+ 
+"https://www.prudle-education.com/create-google-meet-link-gm",
+
+  "red",
+
+  "إنشاء
+وإدارة رابط اجتماع Google Meet"
+
 ],
-        [
-          "Google Meet Attendance",
-          "fa-video",
-          "https://www.prudle-education.com/google-meet-attendance-gm",
-          "online",
-          "متابعة حضور الطلاب في Google Meet"
-        ],
 
-        [
-          "تسجيلات الفيديو",
-          "fa-circle-play",
-          "https://www.prudle-education.com/recording-video.html",
-          "purple",
-          "إدارة ورفع ومشاهدة تسجيلات المحاضرات"
-        ]
+        [
 
-      ]
-    }
-  ]
+          "Google
+Meet Attendance",
+
+          "fa-video",
+
+         
+"https://www.prudle-education.com/google-meet-attendance-gm",
+
+          "online",
+
+          "متابعة حضور الطلاب في Google Meet"
+
+        ],
+
+        [
+
+          "تسجيلات الفيديو",
+
+         
+"fa-circle-play",
+
+         
+"https://www.prudle-education.com/recording-video.html",
+
+          "purple",
+
+          "إدارة ورفع ومشاهدة تسجيلات المحاضرات"
+
+        ]
+
+      ]
+
+    }
+
+  ]
+
 },
-  reports: {
-    title: "قسم التقارير",
-    sections: [
-      {
-        heading: "التقارير",
-        items: [
-          ["الحضور","fa-user-check","https://www.prudle-education.com/attendance-report","blue","تقارير حضور الطلاب والمدربين"],
-          ["الدرجات","fa-file-lines","https://www.prudle-education.com/grades-report","green","عرض ومتابعة نتائج الدرجات"],
-          ["الواجبات","fa-book","https://www.prudle-education.com/homework-reports","gold","متابعة الواجبات والتسليمات"],
-          ["الخطة","fa-calendar","https://www.prudle-education.com/courses-plan-t","purple","عرض الخطة الدراسية"],
-          ["الأعداد","fa-chart-bar","https://www.prudle-education.com/students-numbers","orange","إحصائيات وأعداد الطلاب"],
-          ["الاستعلام الاكاديمي العام","fa-chart-bar","https://www.prudle-education.com/dashboard-students","orange","الشهادات والدرجات"],
-          ["تقارير المحادثة المدخلة","fa-chart-bar"," https://www.prudle-education.com/coversation-resulrs-mg","orange","التقييم لدورة المحادثة"],
-          ["تقارير تقييم الطلاب لمهارات اللغة","fa-chart-bar"," https://www.prudle-education.com/skills-evaluation","orange","تقييم مهارات اللغة"],
-          ["تقارير أداء المدربين","fa-chart-bar","https://www.prudle-education.com/activities-results","orange","تقييم أداء المدربين"],
-         ["تقارير تعليقات المدرب ","fa-chart-bar","https://www.prudle-education.com/comments-reports","orange","التعليقات والملاحظات"],
-          ["متابعة الطلاب الضعاف","fa-user-shield","https://www.prudle-education.com/week-students-report","weak-followup","متابعة حالات الطلاب الضعاف وملاحظات المدربين وإجراءات المتابعة"],
+
+  reports: {
+
+    title: "قسم التقارير",
+
+    sections: [
+
+      {
+
+        heading: "التقارير",
+
+        items: [
+
+          ["الحضور","fa-user-check","https://www.prudle-education.com/attendance-report","blue","تقارير حضور الطلاب والمدربين"],
+
+          ["الدرجات","fa-file-lines","https://www.prudle-education.com/grades-report","green","عرض ومتابعة نتائج الدرجات"],
+
+          ["الواجبات","fa-book","https://www.prudle-education.com/homework-reports","gold","متابعة الواجبات والتسليمات"],
+
+          ["واتس","fa-whatsapp","https://www.prudle-education.com/weak-students","online","متابعة الطلاب عبر الواتساب"],
+
+          ["الخطة","fa-calendar","https://www.prudle-education.com/courses-plan-t","purple","عرض الخطة الدراسية"],
+
+          ["الأعداد","fa-chart-bar","https://www.prudle-education.com/students-numbers","orange","إحصائيات وأعداد الطلاب"],
+
+          ["الاستعلام الاكاديمي العام","fa-chart-bar","https://www.prudle-education.com/dashboard-students","orange","الشهادات والدرجات"],
+
+          ["تقارير المحادثة المدخلة","fa-chart-bar","
+https://www.prudle-education.com/coversation-resulrs-mg","orange","التقييم لدورة المحادثة"],
+
+          ["تقارير تقييم الطلاب لمهارات اللغة","fa-chart-bar","
+https://www.prudle-education.com/skills-evaluation","orange","تقييم مهارات اللغة"],
+
+          ["تقارير أداء المدربين","fa-chart-bar","https://www.prudle-education.com/activities-results","orange","تقييم أداء المدربين"],
+
+         ["تقارير تعليقات المدرب
+","fa-chart-bar","https://www.prudle-education.com/comments-reports","orange","التعليقات والملاحظات"],
+
+          ["متابعة الطلاب الضعاف","fa-user-shield","https://www.prudle-education.com/week-students-report","weak-followup","متابعة حالات الطلاب الضعاف وملاحظات المدربين
+وإجراءات المتابعة"],
 
 
-          ["الرواتب","fa-money-bill","https://www.prudle-education.com/edit-salary","green","متابعة الرواتب والساعات"],
-          ["المتأخرات","fa-triangle-exclamation","https://www.prudle-education.com/payments","red","عرض المتأخرات والتنبيهات"]
-        ]
-      }
-    ]
-  },
+          ["الرواتب","fa-money-bill","https://www.prudle-education.com/edit-salary","green","متابعة الرواتب والساعات"],
+
+          ["المتأخرات","fa-triangle-exclamation","https://www.prudle-education.com/payments","red","عرض المتأخرات والتنبيهات"]
+
+        ]
+
+      }
+
+    ]
+
+  },
+
 placement: {
 
-  title:"اختبار تحديد المستوى CEFR",
+  title:"اختبار تحديد المستوى CEFR",
 
-  sections:[
+  sections:[
 
-    {
+    {
 
-      heading:"اختبارات تحديد المستوى",
+      heading:"اختبارات تحديد المستوى",
 
-      items:[
+      items:[
 
-        [
-          "اختبار CEFR",
-          "fa-graduation-cap",
-          "https://www.prudle-education.com/placement-test",
-          "purple",
-          "اختبار تحديد مستوى اللغة الإنجليزية"
-        ],
+        [
 
-        [
-          "نتائج اختبارات CEFR",
-          "fa-chart-line",
-          "https://www.prudle-education.com/placement-test-gm",
-          "gold",
-          "عرض نتائج اختبارات تحديد المستوى"
-        ]
+          "اختبار CEFR",
 
-      ]
+         
+"fa-graduation-cap",
 
-    }
+         
+"https://www.prudle-education.com/placement-test",
 
-  ]
+          "purple",
+
+          "اختبار تحديد مستوى اللغة الإنجليزية"
+
+        ],
+
+        [
+
+          "نتائج اختبارات CEFR",
+
+         
+"fa-chart-line",
+
+         
+"https://www.prudle-education.com/placement-test-gm",
+
+          "gold",
+
+          "عرض نتائج اختبارات تحديد المستوى"
+
+        ]
+
+      ]
+
+    }
+
+  ]
 
 },
 
 
-  tasks: {
-    title: "إسناد المهام",
-    sections: [
-      {
-        heading: "إسناد المهام",
-        items: [
-          [
-            "إسناد مهمة جديدة",
-            "fa-user-plus",
-            "https://www.prudle-education.com/new-mission",
-            "gold",
-            "إنشاء مهمة جديدة وإسنادها لموظف مع ملاحظات الإدارة"
-          ],
-          [
-            "استعراض المهام",
-            "fa-list-check",
-            "https://www.prudle-education.com/recieved-mission",
-            "blue",
-            "استعراض جميع المهام ومتابعة الاستلام والتنفيذ والإنهاء"
-          ]
-        ]
-      }
-    ]
-  },
+  tasks: {
 
-  newstudents: {
-    title: "المستجدين",
-    sections: [
-      {
-        heading: "المستجدين",
-        items: [
-          [
-            "إضافة مستجد",
-            "fa-user-plus",
-            "https://www.prudle.edu.sa/registration4",
-            "green",
-            "إضافة وتسجيل طالب مستجد"
-          ],
-          [
-            "تسكين الطلاب في الفصول",
-            "fa-chart-column",
-            "https://www.prudle-education.com/student-housing",
-            "blue",
-            "عرض ومتابعة تقارير وسجلات المستجدين"
-          ]
-        ]
-      }
-    ]
-  },
+    title: "إسناد المهام",
 
-  booking: {
-    title: "قسم الحجوزات",
-    sections: [
-      {
-        heading: "الحجوزات",
-        items: [
-          ["الحمدانية رجال","fa-user","https://www.prudle-education.com/male-section","blue","حجز برامج فرع الحمدانية رجال"],
-          ["الحمدانية سيدات","fa-user-group","https://www.prudle-education.com/female-and-kids-section","purple","حجز برامج فرع الحمدانية سيدات"],
-          ["عسفان","fa-building","https://www.prudle-education.com/osfan-section","orange","حجز برامج فرع عسفان"],
-          ["الجموم","fa-location-dot","https://www.prudle-education.com/al-jumum-section","green","حجز برامج فرع الجموم"],
-          ["أونلاين","fa-laptop","https://www.prudle-education.com/online-section","online","الحجوزات الخاصة بالدورات الأونلاين"]
-        ]
-      }
-    ]
-  },
+    sections: [
 
-  transfer: {
-    title: "الترحيل",
-    sections: [
-      {
-        heading: "تفاصيل الترحيل",
-        items: [
-          ["ترحيل الطلاب – حضوري رجال","fa-user","https://www.prudle-education.com/move-to-male-section","blue","إدارة ترحيل الطلاب لفرع الرجال"],
-          ["ترحيل الطلاب – حضوري سيدات","fa-user-group","https://www.prudle-education.com/move-to-female-section","purple","إدارة ترحيل الطالبات"],
-          ["ترحيل الطلاب – فرع عسفان","fa-building","https://www.prudle-education.com/move-to-asfan","orange","إدارة ترحيل طلاب فرع عسفان"],
-          ["ترحيل الطلاب – فرع الجموم","fa-location-dot","https://www.prudle-education.com/move-to-al-jumum-section","green","إدارة ترحيل طلاب فرع الجموم"],
-          ["ترحيل الطلاب – أونلاين","fa-laptop","https://www.prudle-education.com/move-to-online-courses","online","إدارة ترحيل الطلاب الأونلاين"]
-        ]
-      }
-    ]
-  },
+      {
 
-  admin: {
-    title: "قسم الإدارة",
-    sections: [
-      {
-        heading: "الإدارة",
-        items: [
-          ["الدورات","fa-layer-group","https://www.prudle-education.com/create-new-course","blue","إدارة وإنشاء الدورات"],
-          ["حذف الدورات","fa-trash","https://www.prudle-education.com/edit-and-delete-courses","red","حذف وإغلاق الدورات واضافة الطلاب "],
+        heading: "إسناد المهام",
+
+        items: [
+
+          [
+
+            "إسناد مهمة جديدة",
+
+           
+"fa-user-plus",
+
+           
+"https://www.prudle-education.com/new-mission",
+
+            "gold",
+
+            "إنشاء مهمة جديدة وإسنادها لموظف مع ملاحظات
+الإدارة"
+
+          ],
+
+          [
+
+            "استعراض المهام",
+
+           
+"fa-list-check",
+
+            "https://www.prudle-education.com/recieved-mission",
+
+            "blue",
+
+            "استعراض جميع المهام ومتابعة الاستلام والتنفيذ
+والإنهاء"
+
+          ]
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  newstudents: {
+
+    title: "المستجدين",
+
+    sections: [
+
+      {
+
+        heading: "المستجدين",
+
+        items: [
+
+          [
+
+            "إضافة مستجد",
+
+           
+"fa-user-plus",
+
+           
+"https://www.prudle.edu.sa/registration4",
+
+            "green",
+
+            "إضافة وتسجيل طالب مستجد"
+
+          ],
+
+          [
+
+            "تسكين الطلاب في الفصول",
+
+           
+"fa-chart-column",
+
+           
+"https://www.prudle-education.com/student-housing",
+
+            "blue",
+
+            "عرض ومتابعة تقارير وسجلات المستجدين"
+
+          ]
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  booking: {
+
+    title: "قسم الحجوزات",
+
+    sections: [
+
+      {
+
+        heading: "الحجوزات",
+
+        items: [
+
+          ["الحمدانية رجال","fa-user","https://www.prudle-education.com/male-section","blue","حجز برامج فرع الحمدانية رجال"],
+
+          ["الحمدانية سيدات","fa-user-group","https://www.prudle-education.com/female-and-kids-section","purple","حجز برامج فرع الحمدانية سيدات"],
+
+          ["عسفان","fa-building","https://www.prudle-education.com/osfan-section","orange","حجز برامج فرع عسفان"],
+
+          ["الجموم","fa-location-dot","https://www.prudle-education.com/al-jumum-section","green","حجز برامج فرع الجموم"],
+
+          ["أونلاين","fa-laptop","https://www.prudle-education.com/online-section","online","الحجوزات الخاصة بالدورات الأونلاين"]
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  transfer: {
+
+    title: "الترحيل",
+
+    sections: [
+
+      {
+
+        heading: "تفاصيل الترحيل",
+
+        items: [
+
+          ["ترحيل الطلاب – حضوري رجال","fa-user","https://www.prudle-education.com/move-to-male-section","blue","إدارة ترحيل الطلاب لفرع الرجال"],
+
+          ["ترحيل الطلاب – حضوري سيدات","fa-user-group","https://www.prudle-education.com/move-to-female-section","purple","إدارة ترحيل الطالبات"],
+
+          ["ترحيل الطلاب – فرع عسفان","fa-building","https://www.prudle-education.com/move-to-asfan","orange","إدارة ترحيل طلاب فرع عسفان"],
+
+          ["ترحيل الطلاب – فرع الجموم","fa-location-dot","https://www.prudle-education.com/move-to-al-jumum-section","green","إدارة ترحيل طلاب فرع الجموم"],
+
+          ["ترحيل الطلاب – أونلاين","fa-laptop","https://www.prudle-education.com/move-to-online-courses","online","إدارة ترحيل الطلاب الأونلاين"]
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  admin: {
+
+    title: "قسم الإدارة",
+
+    sections: [
+
+      {
+
+        heading: "الإدارة",
+
+        items: [
+
+          ["الدورات","fa-layer-group","https://www.prudle-education.com/create-new-course","blue","إدارة وإنشاء الدورات"],
+
+          ["حذف الدورات","fa-trash","https://www.prudle-education.com/edit-and-delete-courses","red","حذف وإغلاق الدورات واضافة الطلاب
+"],
+
 ["السجلات","fa-file-invoice-dollar","https://www.prudle-education.com/studentss-edit","gold","عرض السجلات والعمليات"],
-          ["متابعة حضور المدربين","fa-calendar-check","https://www.prudle-education.com/edit-timesheet","green","ادارة ومتابعة حضور المدربين"],
-          ["الدرجات","fa-star","https://www.prudle-education.com/grades-reports","purple","إدارة درجات الطلاب"],
-          ["الكويزات","fa-paperclip","https://www.prudle-education.com/create-a-quiz","orange","إدارة الواجبات والاختبارات"],
-          ["الرواتب","fa-clock","https://www.prudle-education.com/edit-timesheet","green","الرواتب والحسابات"],
-        ]
-      }
-    ]
-  }
+
+          ["متابعة حضور المدربين","fa-calendar-check","https://www.prudle-education.com/edit-timesheet","green","ادارة ومتابعة حضور المدربين"],
+
+          ["الدرجات","fa-star","https://www.prudle-education.com/grades-reports","purple","إدارة درجات الطلاب"],
+
+          ["الكويزات","fa-paperclip","https://www.prudle-education.com/create-a-quiz","orange","إدارة الواجبات والاختبارات"],
+
+          ["الرواتب","fa-clock","https://www.prudle-education.com/edit-timesheet","green","الرواتب والحسابات"],
+
+          ["المستخدمين","fa-users","https://www.prudle-education.com/users","online","إدارة المستخدمين والصلاحيات"]
+
+        ]
+
+      }
+
+    ]
+
+  }
+
 };
 
 /* =========================================================
+
 َ
+
 ========================================================= */
+
 function activateButtons(type){
 
 const allSide = [
-  "onlineBtnSide",
-  "reportsBtnSide",
-  "activitiesBtnSide",
-  "bookingBtnSide",
-  "adminBtnSide",
-  "placementBtnSide",
-  "examsBtnSide",
-  "certificatesBtnSide",
-  "crmBtnSide",
-  "tasksBtnSide",
-  "newStudentsBtnSide",
-  "transferBtnSide",
-  "breakTimeBtnSide"
+
+  "onlineBtnSide",
+
+  "reportsBtnSide",
+
+  "activitiesBtnSide",
+
+  "bookingBtnSide",
+
+  "adminBtnSide",
+
+  "placementBtnSide",
+
+  "examsBtnSide",
+
+  "certificatesBtnSide",
+
+  "crmBtnSide",
+
+  "tasksBtnSide",
+
+  "newStudentsBtnSide",
+
+  "transferBtnSide",
+
+  "breakTimeBtnSide"
+
 ];
 
 const allMobile = [
-  "reportsBtnMobile",
-  "activitiesBtnMobile",
-  "bookingBtnMobile",
-  "adminBtnMobile",
-  "placementBtnMobile",
-  "onlineBtnMobile",
-  "examsBtnMobile",
-  "certificatesBtnMobile",
-  "crmBtnMobile",
-  "tasksBtnMobile",
-  "newStudentsBtnMobile",
-  "transferBtnMobile",
-  "breakTimeBtnMobile"
+
+  "reportsBtnMobile",
+
+  "activitiesBtnMobile",
+
+  "bookingBtnMobile",
+
+  "adminBtnMobile",
+
+  "placementBtnMobile",
+
+  "onlineBtnMobile",
+
+  "examsBtnMobile",
+
+ 
+"certificatesBtnMobile",
+
+  "crmBtnMobile",
+
+  "tasksBtnMobile",
+
+ 
+"newStudentsBtnMobile",
+
+  "transferBtnMobile",
+
+  "breakTimeBtnMobile"
+
 ];
 
-  allSide.forEach(id=>{
-    const el = document.getElementById(id);
-    if(el) el.classList.remove("active");
-  });
+  allSide.forEach(id=>{
 
-  allMobile.forEach(id=>{
-    const el = document.getElementById(id);
-    if(el) el.classList.remove("active");
-  });
+    const el =
+document.getElementById(id);
 
-  if(type==="reports"){
-    document.getElementById("reportsBtnSide")?.classList.add("active");
-    document.getElementById("reportsBtnMobile")?.classList.add("active");
-  }
-  if(type==="activities"){
-  document
-    .getElementById("activitiesBtnSide")
-    ?.classList.add("active");
+    if(el)
+el.classList.remove("active");
 
-  document
-    .getElementById("activitiesBtnMobile")
-    ?.classList.add("active");
+  });
+
+ 
+allMobile.forEach(id=>{
+
+    const el =
+document.getElementById(id);
+
+    if(el)
+el.classList.remove("active");
+
+  });
+
+ 
+if(type==="reports"){
+
+   
+document.getElementById("reportsBtnSide")?.classList.add("active");
+
+   
+document.getElementById("reportsBtnMobile")?.classList.add("active");
+
+  }
+
+ 
+if(type==="activities"){
+
+  document
+
+   
+.getElementById("activitiesBtnSide")
+
+   
+?.classList.add("active");
+
+  document
+
+   
+.getElementById("activitiesBtnMobile")
+
+    ?.classList.add("active");
+
 }
 
-  if(type==="booking"){
-    document.getElementById("bookingBtnSide")?.classList.add("active");
-    document.getElementById("bookingBtnMobile")?.classList.add("active");
-  }
+ 
+if(type==="booking"){
 
-  if(type==="admin"){
-    document.getElementById("adminBtnSide")?.classList.add("active");
-    document.getElementById("adminBtnMobile")?.classList.add("active");
-  }
+   
+document.getElementById("bookingBtnSide")?.classList.add("active");
 
-  if(type==="transfer"){
-    document.getElementById("transferBtnSide")?.classList.add("active");
-    document.getElementById("transferBtnMobile")?.classList.add("active");
-  }
+   
+document.getElementById("bookingBtnMobile")?.classList.add("active");
+
+  }
+
+ 
+if(type==="admin"){
+
+   
+document.getElementById("adminBtnSide")?.classList.add("active");
+
+   
+document.getElementById("adminBtnMobile")?.classList.add("active");
+
+  }
+
+ 
+if(type==="transfer"){
+
+   
+document.getElementById("transferBtnSide")?.classList.add("active");
+
+   
+document.getElementById("transferBtnMobile")?.classList.add("active");
+
+  }
 
 
-  if(type==="placement"){
-    document.getElementById("placementBtnSide")?.classList.add("active");
-    document.getElementById("placementBtnMobile")?.classList.add("active");
-  }
+ 
+if(type==="placement"){
 
- if(type==="exams"){
-  document.getElementById("examsBtnSide")?.classList.add("active");
-  document.getElementById("examsBtnMobile")?.classList.add("active");
+   
+document.getElementById("placementBtnSide")?.classList.add("active");
+
+   
+document.getElementById("placementBtnMobile")?.classList.add("active");
+
+  }
+
+ if(type==="exams"){
+
+ 
+document.getElementById("examsBtnSide")?.classList.add("active");
+
+  document.getElementById("examsBtnMobile")?.classList.add("active");
+
 }
 
-  if(type==="certificates"){
-    document.getElementById("certificatesBtnSide")?.classList.add("active");
-    document.getElementById("certificatesBtnMobile")?.classList.add("active");
-  }
+ 
+if(type==="certificates"){
+
+   
+document.getElementById("certificatesBtnSide")?.classList.add("active");
+
+   
+document.getElementById("certificatesBtnMobile")?.classList.add("active");
+
+  }
+
 if(type==="online"){
-  document.getElementById("onlineBtnSide")?.classList.add("active");
-  document.getElementById("onlineBtnMobile")?.classList.add("active");
+
+ 
+document.getElementById("onlineBtnSide")?.classList.add("active");
+
+ 
+document.getElementById("onlineBtnMobile")?.classList.add("active");
+
 }
+
 if(type==="crm"){
-  document.getElementById("crmBtnSide")?.classList.add("active");
-  document.getElementById("crmBtnMobile")?.classList.add("active");
+
+ 
+document.getElementById("crmBtnSide")?.classList.add("active");
+
+  document.getElementById("crmBtnMobile")?.classList.add("active");
+
 }
+
 if(type==="tasks"){
-  document.getElementById("tasksBtnSide")?.classList.add("active");
-  document.getElementById("tasksBtnMobile")?.classList.add("active");
+
+ 
+document.getElementById("tasksBtnSide")?.classList.add("active");
+
+ 
+document.getElementById("tasksBtnMobile")?.classList.add("active");
+
 }
+
 if(type==="newstudents"){
-  document.getElementById("newStudentsBtnSide")?.classList.add("active");
-  document.getElementById("newStudentsBtnMobile")?.classList.add("active");
+
+ 
+document.getElementById("newStudentsBtnSide")?.classList.add("active");
+
+ 
+document.getElementById("newStudentsBtnMobile")?.classList.add("active");
+
 }
+
 }
+
 /* =========================================================
-   إنشاء كرت
+
+   إنشاء كرت
+
 ========================================================= */
+
 function card(item){
-  const originalName = item[0];
-  const name = DASH_LANG === "en"
-    ? (EN_ITEM_TEXT[originalName] || originalName)
-    : originalName;
-  const icon = item[1];
-  const link = item[2];
-  const cls = item[3] || "";
-  const desc = item[4] || "";
 
-  return `
-    <div class="card ${cls}">
-      <div>
-        <div class="icon-box">
-          <i class="fa-solid ${icon}"></i>
-        </div>
-        <h3>${name}</h3>
-        <p class="desc">${desc}</p>
-      </div>
+  const originalName = item[0];
 
-      <button onclick="openPage('${link}')">
-        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        ${UI_TEXT[DASH_LANG].openSection}
-      </button>
-    </div>
-  `;
+  const name = DASH_LANG ===
+"en"
+
+    ? (EN_ITEM_TEXT[originalName]
+|| originalName)
+
+    : originalName;
+
+  const icon = item[1];
+
+  const link = item[2];
+
+  const cls = item[3] ||
+"";
+
+  const desc = item[4] ||
+"";
+
+  return `
+
+    <div class="card
+${cls}">
+
+      <div>
+
+        <div
+class="icon-box">
+
+          <i
+class="fa-solid ${icon}"></i>
+
+        </div>
+
+       
+<h3>${name}</h3>
+
+        <p
+class="desc">${desc}</p>
+
+      </div>
+
+      <button
+onclick="openPage('${link}')">
+
+        <i class="fa-solid
+fa-arrow-up-right-from-square"></i>
+
+       
+${UI_TEXT[DASH_LANG].openSection}
+
+      </button>
+
+    </div>
+
+  `;
+
 }
 
 /* =========================================================
-   النسخ الاحتياطي المباشر من لوحة التحكم
+
+   النسخ الاحتياطي المباشر من لوحة التحكم
+
 ========================================================= */
+
 async function backupFirestoreFromDashboard(){
-  const collections = [
-    "Courses",
-    "students",
-    "Trainers",
-    "TrainersRates",
-    "BreakSettings",
-    "users",
-    "questions",
-    "exams",
-    "cefr_results",
-    "EmployeeTasks",
-    "AdminMeetLinks",
-    "FakeRegistrations",
-    "FakePromotions"
-  ];
 
-  const backup = {
-    projectId:"prudle-system",
-    exportedAt:new Date().toISOString(),
-    collections:{}
-  };
+  const collections = [
 
-  const failed = [];
+    "Courses",
 
-  try{
-    for(const collectionName of collections){
-      try{
-        const snap = await db.collection(collectionName).get();
-        backup.collections[collectionName] = {};
+    "students",
 
-        snap.forEach(doc=>{
-          backup.collections[collectionName][doc.id] = doc.data();
-        });
-      }catch(error){
-        console.warn("Backup skipped:",collectionName,error);
-        failed.push(collectionName);
-      }
-    }
+    "Trainers",
 
-    const blob = new Blob(
-      [JSON.stringify(backup,null,2)],
-      {type:"application/json;charset=utf-8"}
-    );
+    "TrainersRates",
 
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    const now = new Date();
-    const stamp = [
-      now.getFullYear(),
-      String(now.getMonth()+1).padStart(2,"0"),
-      String(now.getDate()).padStart(2,"0"),
-      "_",
-      String(now.getHours()).padStart(2,"0"),
-      String(now.getMinutes()).padStart(2,"0")
-    ].join("");
+    "BreakSettings",
 
-    a.href = url;
-    a.download = `prudle-firestore-backup-${stamp}.json`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(()=>URL.revokeObjectURL(url),1500);
+    "users",
 
-    if(failed.length){
-      alert("تم تنزيل النسخة الاحتياطية، وتعذر الوصول إلى بعض المجموعات: " + failed.join(", "));
-    }else{
-      alert("تم تنزيل النسخة الاحتياطية بنجاح");
-    }
-  }catch(error){
-    console.error("Backup error:",error);
-    alert("تعذر إنشاء النسخة الاحتياطية. تحقق من صلاحيات Firestore ثم حاول مرة أخرى.");
-  }
+    "questions",
+
+    "exams",
+
+    "cefr_results",
+
+    "EmployeeTasks",
+
+    "AdminMeetLinks",
+
+    "FakeRegistrations",
+
+    "FakePromotions"
+
+  ];
+
+  const backup = {
+
+   
+projectId:"prudle-system",
+
+    exportedAt:new
+Date().toISOString(),
+
+    collections:{}
+
+  };
+
+  const failed = [];
+
+  try{
+
+    for(const collectionName of
+collections){
+
+      try{
+
+        const snap = await
+db.collection(collectionName).get();
+
+       
+backup.collections[collectionName] = {};
+
+       
+snap.forEach(doc=>{
+
+          backup.collections[collectionName][doc.id]
+= doc.data();
+
+        });
+
+      }catch(error){
+
+        console.warn("Backup
+skipped:",collectionName,error);
+
+       
+failed.push(collectionName);
+
+      }
+
+    }
+
+    const blob = new Blob(
+
+     
+[JSON.stringify(backup,null,2)],
+
+      {type:"application/json;charset=utf-8"}
+
+    );
+
+    const url =
+URL.createObjectURL(blob);
+
+    const a =
+document.createElement("a");
+
+    const now = new Date();
+
+    const stamp = [
+
+      now.getFullYear(),
+
+     
+String(now.getMonth()+1).padStart(2,"0"),
+
+     
+String(now.getDate()).padStart(2,"0"),
+
+      "_",
+
+     
+String(now.getHours()).padStart(2,"0"),
+
+     
+String(now.getMinutes()).padStart(2,"0")
+
+    ].join("");
+
+    a.href = url;
+
+    a.download = `prudle-firestore-backup-${stamp}.json`;
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    a.remove();
+
+   
+setTimeout(()=>URL.revokeObjectURL(url),1500);
+
+    if(failed.length){
+
+      alert("تم تنزيل النسخة الاحتياطية، وتعذر الوصول إلى
+بعض المجموعات: " + failed.join(", "));
+
+    }else{
+
+      alert("تم تنزيل النسخة الاحتياطية بنجاح");
+
+    }
+
+  }catch(error){
+
+    console.error("Backup
+error:",error);
+
+    alert("تعذر إنشاء النسخة الاحتياطية. تحقق من صلاحيات Firestore ثم حاول مرة أخرى.");
+
+  }
+
 }
 
 /* =========================================================
-   فتح رابط
+
+   فتح رابط
+
 ========================================================= */
+
 function openPage(url){
-  location.href = url;
+
+  location.href = url;
+
 }
+
 /* =========================================================
-   تحميل القسم
+
+   تحميل القسم
+
 ========================================================= */
+
 function load(type){
-  if(assigneesPanel){
-    assigneesPanel.style.display = type === "tasks" ? "block" : "none";
-  }
-  if(reportsAssigneesPanel){
-    reportsAssigneesPanel.style.display = type === "reports" ? "block" : "none";
-  }
 
-  window.CURRENT_SECTION = type;
-  activateButtons(type);
+  window.CURRENT_SECTION = type;
 
-  const section = DATA[type];
-  if(!section) return;
+  activateButtons(type);
 
-  document.getElementById("pageTitle").textContent =
-    UI_TEXT[DASH_LANG].sectionTitles[type] || section.title;
+  const section =
+DATA[type];
 
-  let html = "";
+  if(!section) return;
 
-  section.sections.forEach(sec=>{
-    const heading = DASH_LANG === "en"
-      ? (EN_HEADING_TEXT[sec.heading] || sec.heading)
-      : sec.heading;
-    html += `<div class="section-title">${heading}</div>`;
-    html += `<div class="cards">`;
+ 
+document.getElementById("pageTitle").textContent =
+
+    UI_TEXT[DASH_LANG].sectionTitles[type]
+|| section.title;
+
+  let html = "";
+
+ 
+section.sections.forEach(sec=>{
+
+    const heading = DASH_LANG ===
+"en"
+
+      ?
+(EN_HEADING_TEXT[sec.heading] || sec.heading)
+
+      : sec.heading;
+
+    html += `<div
+class="section-title">${heading}</div>`;
+
+    html += `<div
+class="cards">`;
+
 sec.items.forEach(item=>{
-  html += card(item);
+
+  html += card(item);
+
 });
 
 if(type === "online" && LIVE_MEET_LINK){
-  html += card([
-    "الانضمام للاجتماع المباشر",
-    "fa-circle-play",
-    LIVE_MEET_LINK,
-    "red",
-    "اضغط هنا للدخول إلى Google Meet المباشر"
-  ]);
-}    html += `</div>`;
-  });
 
-  document.getElementById("content").innerHTML = html;
+  html += card([
 
-  /* تحديث أسماء المسند إليهم فور فتح قسم التقارير/المهام */
-  if(type === "reports" || type === "tasks"){
-    renderTaskAssignmentAlert();
-    setTimeout(renderTaskAssignmentAlert, 50);
-  }
+    "الانضمام للاجتماع المباشر",
+
+    "fa-circle-play",
+
+    LIVE_MEET_LINK,
+
+    "red",
+
+    "اضغط هنا للدخول إلى Google Meet المباشر"
+
+  ]);
+
+}    html +=
+`</div>`;
+
+  });
+
+ 
+document.getElementById("content").innerHTML = html;
+
 }
 
 /* =========================================================
-   تسجيل الخروج
+
+   تسجيل الخروج
+
 ========================================================= */
+
 function logout(){
 
-  try{
+  try{
 
-    window.parent.postMessage(
-      "PRUDLE_LOGOUT",
-      "https://www.prudle-education.com"
-    );
+   
+window.parent.postMessage(
 
-  }catch(error){
+      "PRUDLE_LOGOUT",
 
-    console.error(
-      "Logout message error:",
-      error
-    );
+     
+"https://www.prudle-education.com"
 
-    window.location.replace(
-      "https://www.prudle-education.com/log-in-out"
-    );
+    );
 
-  }
+  }catch(error){
+
+    console.error(
+
+      "Logout message
+error:",
+
+      error
+
+    );
+
+   
+window.location.replace(
+
+     
+"https://www.prudle-education.com/log-in-out"
+
+    );
+
+  }
 
 }
 
 /* =========================================================
-   تحميل افتراضي
+
+   تحميل افتراضي
+
 ========================================================= */
+
 db.collection("AdminMeetLinks")
+
 .onSnapshot(snap=>{
 
-  let active = false;
+  let active = false;
 
-  snap.forEach(doc=>{
+  snap.forEach(doc=>{
 
-    const d = doc.data() || {};
+    const d = doc.data()
+|| {};
 
-    if(d.meetLink){
-      active = true;
-    }
+    if(d.meetLink){
 
-  });
+      active = true;
 
-  const sideBtn =
-    document.getElementById("onlineBtnSide");
+    }
 
-  const mobileBtn =
-    document.getElementById("onlineBtnMobile");
+  });
 
-  if(active){
+  const sideBtn =
 
-    sideBtn?.classList.add("live-online");
-    mobileBtn?.classList.add("live-online");
+   
+document.getElementById("onlineBtnSide");
 
-  }else{
+  const mobileBtn =
 
-    sideBtn?.classList.remove("live-online");
-    mobileBtn?.classList.remove("live-online");
+   
+document.getElementById("onlineBtnMobile");
 
-  }
+  if(active){
+
+   
+sideBtn?.classList.add("live-online");
+
+   
+mobileBtn?.classList.add("live-online");
+
+  }else{
+
+    sideBtn?.classList.remove("live-online");
+
+   
+mobileBtn?.classList.remove("live-online");
+
+  }
 
 });
+
 db.collection("AdminMeetLinks")
+
 .orderBy("createdAt","desc")
+
 .limit(1)
+
 .onSnapshot(snap=>{
 
-  LIVE_MEET_LINK = "";
+  LIVE_MEET_LINK =
+"";
 
-  snap.forEach(doc=>{
-    const d = doc.data() || {};
+  snap.forEach(doc=>{
 
-    if(d.meetLink){
-      LIVE_MEET_LINK = d.meetLink;
-    }
-  });
+    const d = doc.data() || {};
 
-  const sideBtn =
-    document.getElementById("onlineBtnSide");
+    if(d.meetLink){
 
-  const mobileBtn =
-    document.getElementById("onlineBtnMobile");
+      LIVE_MEET_LINK = d.meetLink;
 
-  if(LIVE_MEET_LINK){
+    }
 
-    sideBtn?.classList.add("live-online");
-    mobileBtn?.classList.add("live-online");
+  });
 
-  }else{
+  const sideBtn =
 
-    sideBtn?.classList.remove("live-online");
-    mobileBtn?.classList.remove("live-online");
+   
+document.getElementById("onlineBtnSide");
 
-  }
+  const mobileBtn =
+
+   
+document.getElementById("onlineBtnMobile");
+
+  if(LIVE_MEET_LINK){
+
+   
+sideBtn?.classList.add("live-online");
+
+   
+mobileBtn?.classList.add("live-online");
+
+  }else{
+
+   
+sideBtn?.classList.remove("live-online");
+
+   
+mobileBtn?.classList.remove("live-online");
+
+  }
 
 });
+
 applyDashboardLanguage();
+
 load("reports");
+
 loadOpenCoursesTicker();
+
 </script>
 
 </body>
+
 </html>
