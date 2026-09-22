@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+شش<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -493,58 +493,16 @@ function addTaskRow(task={}){
 }
 
 function openTaskModal(task=null){
-
-  /* إذا كانت عملية تعديل */
-  if(task && task.id){
-
-    const currentUser = String(
-      getCurrentAssigner() || ""
-    ).trim().toLowerCase();
-
-    const taskOwner = String(
-      task.assignedBy || ""
-    ).trim().toLowerCase();
-
-    if(
-      !currentUser ||
-      !taskOwner ||
-      currentUser === "غير معروف" ||
-      taskOwner === "غير معروف" ||
-      currentUser !== taskOwner
-    ){
-      alert(
-        "لا يمكنك تعديل هذه المهمة.\n\n" +
-        "يمكن تعديل المهمة فقط بواسطة الشخص الذي قام بإسنادها.\n\n" +
-        "المُسند بواسطة: " +
-        (task.assignedBy || "غير مسجل")
-      );
-
-      return;
-    }
-  }
-
   editingId = task?.id || "";
-
-  $("modalTitle").textContent =
-    editingId
-      ? "تعديل المهمة"
-      : "إسناد أكثر من مهمة";
-
-  $("employeeName").value =
-    task?.employeeName || "";
-
+  $("modalTitle").textContent = editingId ? "تعديل المهمة" : "إسناد أكثر من مهمة";
+  $("employeeName").value = task?.employeeName || "";
   $("multiTaskArea").innerHTML = "";
-
-  $("addAnotherTask").style.display =
-    editingId ? "none" : "";
-
-  $("saveTask").innerHTML =
-    editingId
-      ? '<i class="fa-solid fa-floppy-disk"></i> حفظ التعديل'
-      : '<i class="fa-solid fa-floppy-disk"></i> حفظ المهام';
+  $("addAnotherTask").style.display = editingId ? "none" : "";
+  $("saveTask").innerHTML = editingId
+    ? '<i class="fa-solid fa-floppy-disk"></i> حفظ التعديل'
+    : '<i class="fa-solid fa-floppy-disk"></i> حفظ المهام';
 
   addTaskRow(task || {});
-
   $("taskModal").classList.add("show");
 }
 
@@ -741,38 +699,8 @@ function render(){
       <td>${dateTime(t.completedAt)}</td>
       <td class="actions-cell">
         <button class="btn-soft viewBtn" data-id="${t.id}">عرض</button>
-        ${
-  String(t.assignedBy || "")
-    .trim()
-    .toLowerCase()
-  ===
-  String(getCurrentAssigner() || "")
-    .trim()
-    .toLowerCase()
-
-  ? `<button
-       class="editBtn"
-       data-id="${t.id}">
-       تعديل
-     </button>`
-  : ``
-}
-        ${
-  String(t.assignedBy || "")
-    .trim()
-    .toLowerCase()
-  ===
-  String(getCurrentAssigner() || "")
-    .trim()
-    .toLowerCase()
-
-  ? `<button
-       class="btn-red deleteBtn"
-       data-id="${t.id}">
-       حذف
-     </button>`
-  : ``
-}
+        <button class="editBtn" data-id="${t.id}">تعديل</button>
+        <button class="btn-red deleteBtn" data-id="${t.id}">حذف</button>
       </td>
     </tr>
   `).join("");
@@ -807,123 +735,16 @@ $("closeView").onclick=()=>$("viewModal").classList.remove("show");
 $("viewModal").onclick=e=>{if(e.target===$("viewModal"))$("viewModal").classList.remove("show");};
 
 async function deleteTask(id){
-
-  const t = tasks.find(x => x.id === id);
-
+  const t=tasks.find(x=>x.id===id);
   if(!t) return;
-
-
-  /* المستخدم الحالي */
-  const currentUser = String(
-    getCurrentAssigner() || ""
-  ).trim().toLowerCase();
-
-
-  /* صاحب المهمة */
-  const taskOwner = String(
-    t.assignedBy || ""
-  ).trim().toLowerCase();
-
-
-  /* التحقق من صاحب المهمة */
-  if(
-    !currentUser ||
-    !taskOwner ||
-    currentUser === "غير معروف" ||
-    taskOwner === "غير معروف" ||
-    currentUser !== taskOwner
-  ){
-
-    alert(
-      "لا يمكنك حذف هذه المهمة.\n\n" +
-      "يمكن حذف المهمة فقط بواسطة الشخص الذي قام بإسنادها.\n\n" +
-      "المُسند بواسطة: " +
-      (t.assignedBy || "غير مسجل")
-    );
-
-    return;
-  }
-
-
-  if(
-    !confirm(
-      `حذف المهمة: ${t.title}؟`
-    )
-  ){
-    return;
-  }
-
-
+  if(!confirm(`حذف المهمة: ${t.title}؟`)) return;
   try{
-
-    /* قراءة المهمة مباشرة من Firestore قبل الحذف */
-    const ref =
-      db.collection(TASKS).doc(id);
-
-    const snap =
-      await ref.get();
-
-
-    if(!snap.exists){
-
-      alert("المهمة غير موجودة.");
-
-      return;
-    }
-
-
-    const serverTask =
-      snap.data() || {};
-
-
-    const serverOwner =
-      String(
-        serverTask.assignedBy || ""
-      ).trim().toLowerCase();
-
-
-    /*
-      تحقق نهائي:
-      المستخدم الحالي يجب أن يطابق
-      assignedBy المسجل في Firestore
-    */
-    if(
-      !serverOwner ||
-      serverOwner === "غير معروف" ||
-      serverOwner !== currentUser
-    ){
-
-      alert(
-        "لا يمكنك حذف هذه المهمة.\n\n" +
-        "المهمة تم إنشاؤها بواسطة مستخدم آخر.\n\n" +
-        "المُسند بواسطة: " +
-        (
-          serverTask.assignedBy ||
-          "غير مسجل"
-        )
-      );
-
-      return;
-    }
-
-
-    /* تنفيذ الحذف */
-    await ref.delete();
-
-
+    await db.collection(TASKS).doc(id).delete();
     selectedIds.delete(id);
-
     updateSelectionUI();
-
-
   }catch(e){
-
-    console.error(e);
-
-    alert("تعذر حذف المهمة.");
-
+    console.error(e); alert("تعذر حذف المهمة.");
   }
-
 }
 
 ["search","employeeFilter","statusFilter","priorityFilter","dateFilter"].forEach(id=>{
