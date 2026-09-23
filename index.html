@@ -7274,44 +7274,184 @@ function setAIStatus(message, kind=""){
 
 function normalizeAIQuestion(q, fallbackType="mcq"){
   const allowed = new Set(["mcq","match","order","random","wheel","wheelmcq","balloon","mystery","bomb"]);
-  let type = String(q?.type || fallbackType || "mcq").toLowerCase();
+  let type = String(q?.type || q?.activityType || q?.questionType || fallbackType || "mcq")
+    .trim().toLowerCase();
+
+  type = normalizeAiActivityType(type);
   if(!allowed.has(type)) type = "mcq";
 
-  let answers = Array.isArray(q?.answers) ? q.answers : [];
-  answers = answers.map((a,index)=>({
-    text:String(a?.text ?? a?.answer ?? ""),
-    right:String(a?.right ?? a?.match ?? ""),
-    image:String(a?.image || ""),
-    correct:Boolean(a?.correct)
-  }));
+  const rawAnswers =
+    Array.isArray(q?.answers) ? q.answers :
+    Array.isArray(q?.options) ? q.options :
+    Array.isArray(q?.items) ? q.items :
+    Array.isArray(q?.pairs) ? q.pairs : [];
+
+  let answers = rawAnswers.map((a,index)=>{
+    if(typeof a === "string"){
+      return {
+        text:String(a).trim(),
+        right:"",
+        image:"",
+        correct:false
+      };
+    }
+
+    const left = String(
+      a?.text ??
+      a?.left ??
+      a?.item ??
+      a?.option ??
+      a?.word ??
+      a?.term ??
+      a?.question ??
+      ""
+    ).trim();
+
+    const right = String(
+      a?.right ??
+      a?.match ??
+      a?.pair ??
+      a?.matchingPair ??
+      a?.answer ??
+      a?.definition ??
+      a?.meaning ??
+      a?.translation ??
+      a?.value ??
+      a?.target ??
+      a?.challenge ??
+      ""
+    ).trim();
+
+    const image = String(
+      a?.image ??
+      a?.imageUrl ??
+      a?.answerImage ??
+      ""
+    ).trim();
+
+    return {
+      text:left,
+      right:right,
+      image:image,
+      correct:Boolean(a?.correct ?? a?.isCorrect ?? false)
+    };
+  });
+
+  const questionText = String(
+    q?.text ??
+    q?.question ??
+    q?.prompt ??
+    q?.instructions ??
+    ""
+  ).trim();
+
+  /*
+    AI AUTO-FILL:
+    Complete structurally missing fields before placing the question
+    in the editor so Save Activity does not fail on AI-generated data.
+  */
+  if(type === "match"){
+    answers = answers
+      .filter(a => a.text || a.right || a.image)
+      .map((a,index)=>{
+        const item = {...a, correct:false};
+
+        // If AI returned only the right side, use it as the left label too.
+        if(!item.text && item.right){
+          item.text = item.right;
+        }
+
+        // Match requires left + (right text OR image).
+        // Prefer real AI fields; as a final structural fallback, self-match
+        // the left item rather than leaving an invalid blank pair.
+        if(item.text && !item.right && !item.image){
+          item.right = item.text;
+        }
+
+        return item;
+      });
+
+    // Keep the editor valid even if AI returned too few pairs.
+    if(answers.length === 1){
+      answers.push({
+        text:answers[0].text,
+        right:answers[0].right || answers[0].text,
+        image:answers[0].image || "",
+        correct:false
+      });
+    }
+  }
 
   if(type === "order"){
-    answers = answers.map(a=>({...a,correct:false}));
-  }else if(type === "match" || type === "wheel" || type === "random"){
-    answers = answers.map(a=>({...a,correct:false}));
-  }else{
+    answers = answers
+      .filter(a => a.text || a.right)
+      .map(a=>({
+        ...a,
+        text:a.text || a.right,
+        right:"",
+        correct:false
+      }));
+  }
+
+  if(type === "wheel"){
+    answers = answers
+      .filter(a => a.text || a.right)
+      .map((a,index)=>({
+        ...a,
+        text:a.text || `Section ${index + 1}`,
+        right:a.right || questionText || a.text || `Challenge ${index + 1}`,
+        correct:false
+      }));
+  }
+
+  if(type === "random"){
+    answers = answers
+      .filter(a => a.text || a.image)
+      .map(a=>({...a,correct:false}));
+  }
+
+  if(["mcq","wheelmcq","balloon","mystery","bomb"].includes(type)){
+    answers = answers.filter(a => a.text || a.image);
+
+    // If the AI supplied no usable choices, create editable placeholders.
     if(!answers.length){
       answers = [
-        {text:"",right:"",image:"",correct:true},
-        {text:"",right:"",image:"",correct:false},
-        {text:"",right:"",image:"",correct:false},
-        {text:"",right:"",image:"",correct:false}
+        {text:"Option 1",right:"",image:"",correct:true},
+        {text:"Option 2",right:"",image:"",correct:false}
       ];
     }
-    if(!answers.some(a=>a.correct)) answers[0].correct = true;
+
+    if(answers.length === 1){
+      answers.push({
+        text:"Option 2",
+        right:"",
+        image:"",
+        correct:false
+      });
+    }
+
+    if(!answers.some(a=>a.correct)){
+      answers[0].correct = true;
+    }
+
     let found = false;
     answers.forEach(a=>{
-      if(a.correct && !found){ found = true; }
-      else if(a.correct){ a.correct = false; }
+      if(a.correct && !found){
+        found = true;
+      }else if(a.correct){
+        a.correct = false;
+      }
     });
   }
 
   return {
     type,
-    wheelAnswerMode:String(q?.wheelAnswerMode || "mcq").toLowerCase(),
-    text:String(q?.text ?? q?.question ?? ""),
+    wheelAnswerMode:String(q?.wheelAnswerMode || "mcq").toLowerCase() === "correctwrong"
+      ? "correctwrong"
+      : "mcq",
+    text:questionText || "AI generated activity",
     mediaType:String(q?.mediaType || (q?.image ? "image" : "none")),
-    mediaUrl:String(q?.mediaUrl || q?.image || ""),
+    mediaUrl:String(q?.mediaUrl || q?.audioUrl || q?.audio || q?.image || ""),
     image:String(q?.image || ""),
     answers
   };
@@ -7485,11 +7625,13 @@ Return ONLY valid JSON. Each question must contain:
 }
 
 Rules:
+- NEVER return blank required fields.
 - mcq/balloon/mystery/bomb: 2–4 answer choices and exactly one correct answer.
-- match: 2–6 pairs; use text for the left side and right for its matching value.
-- order: 2–6 items in their correct final order.
-- wheel/random: use concise prompts/items appropriate to the game.
-- wheelmcq: provide multiple-choice answers and one correct answer.
+- match: 2–6 pairs; EVERY pair MUST contain non-empty "text" for the Left Item and either non-empty "right" for the Matching Pair OR a valid "image" URL. Never return a match item with only the left side.
+- order: 2–6 non-empty items in their correct final order.
+- wheel: every section MUST contain non-empty "text" for the category and non-empty "right" for its challenge/question.
+- random: every item must contain the data required by the selected random activity.
+- wheelmcq: provide at least two non-empty choices and exactly one correct answer.
 `;
 }
 
