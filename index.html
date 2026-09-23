@@ -7450,8 +7450,9 @@ function normalizeAIQuestion(q, fallbackType="mcq"){
       ? "correctwrong"
       : "mcq",
     text:questionText || "AI generated activity",
-    mediaType:String(q?.mediaType || (q?.image ? "image" : "none")),
-    mediaUrl:String(q?.mediaUrl || q?.audioUrl || q?.audio || q?.image || ""),
+    mediaType:String(q?.mediaType || (q?.image ? "image" : "none")).toLowerCase(),
+    mediaPrompt:String(q?.mediaPrompt || q?.imagePrompt || q?.videoPrompt || ""),
+    mediaUrl:String(q?.mediaUrl || q?.audioUrl || q?.audio || q?.video || q?.image || ""),
     image:String(q?.image || ""),
     answers
   };
@@ -7617,12 +7618,21 @@ Return ONLY valid JSON. Each question must contain:
   "type":"mcq|match|order|random|wheel|wheelmcq|balloon|mystery|bomb",
   "wheelAnswerMode":"mcq",
   "text":"question or instruction",
-  "mediaType":"none",
+  "mediaType":"none|image|video",
+  "mediaPrompt":"clear visual prompt when image or video is educationally useful",
   "mediaUrl":"",
   "answers":[
     {"text":"...", "right":"", "image":"", "correct":true}
   ]
 }
+
+MEDIA RULES:
+- Decide for EACH question whether media improves learning.
+- Use "image" for vocabulary, objects, places, people, visual recognition, scenes, and concepts that benefit from a still illustration.
+- Use "video" only when motion, an action, process, short situation, or moving scene materially improves the question.
+- Use "none" when media is unnecessary, especially simple grammar/text-only questions.
+- When mediaType is image or video, mediaPrompt MUST be specific, classroom-safe, age-appropriate, and must NOT reveal the correct answer as visible text.
+- Do not invent an external media URL. Leave mediaUrl empty; Prudle will generate and store the media automatically.
 
 Rules:
 - NEVER return blank required fields.
@@ -7633,6 +7643,166 @@ Rules:
 - random: every item must contain the data required by the selected random activity.
 - wheelmcq: provide at least two non-empty choices and exactly one correct answer.
 `;
+}
+
+
+/* =========================================================
+   PRUDLE AI AUTO MEDIA
+   Generates image/video through the existing secure Worker.
+========================================================= */
+
+const PRUDLE_MEDIA_TASK = "generate_question_media";
+const PRUDLE_VIDEO_CHECK_TASK = "check_video_generation";
+
+function sleepPrudleMedia(ms){
+  return new Promise(resolve=>setTimeout(resolve,ms));
+}
+
+async function prudleWorkerRequest(body){
+  const response = await fetch(PRUDLE_AI_ENDPOINT,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(body)
+  });
+
+  const raw = await response.text();
+  let payload = {};
+  try{
+    payload = raw ? JSON.parse(raw) : {};
+  }catch(_){
+    throw new Error("Media endpoint returned invalid JSON.");
+  }
+
+  if(!response.ok){
+    throw new Error(payload?.error || `Media request failed (${response.status}).`);
+  }
+
+  return payload;
+}
+
+async function waitForPrudleVideo(operationName){
+  const maxAttempts = 40;
+
+  for(let attempt=1; attempt<=maxAttempts; attempt++){
+    setAIStatus(`Creating AI video... ${attempt}/${maxAttempts}`);
+
+    const result = await prudleWorkerRequest({
+      task:PRUDLE_VIDEO_CHECK_TASK,
+      operationName
+    });
+
+    if(String(result?.status || "").toLowerCase() === "completed" && result?.url){
+      return String(result.url).trim();
+    }
+
+    if(String(result?.status || "").toLowerCase() === "failed"){
+      throw new Error(result?.error || "AI video generation failed.");
+    }
+
+    await sleepPrudleMedia(5000);
+  }
+
+  throw new Error("AI video is still processing. Please try again shortly.");
+}
+
+async function generatePrudleMediaForQuestion(question,index,total){
+  const q = question && typeof question === "object" ? question : {};
+  const mediaType = String(q.mediaType || "none").trim().toLowerCase();
+
+  if(!["image","video"].includes(mediaType)){
+    q.mediaType = "none";
+    q.mediaUrl = "";
+    return q;
+  }
+
+  if(String(q.mediaUrl || "").trim()){
+    return q;
+  }
+
+  const mediaPrompt = String(
+    q.mediaPrompt ||
+    q.imagePrompt ||
+    q.videoPrompt ||
+    q.text ||
+    ""
+  ).trim();
+
+  if(!mediaPrompt){
+    q.mediaType = "none";
+    q.mediaUrl = "";
+    return q;
+  }
+
+  setAIStatus(
+    mediaType === "video"
+      ? `Creating video for question ${index + 1} of ${total}...`
+      : `Creating image for question ${index + 1} of ${total}...`
+  );
+
+  const result = await prudleWorkerRequest({
+    task:PRUDLE_MEDIA_TASK,
+    mediaType,
+    mediaPrompt,
+    questionText:String(q.text || ""),
+    prompt:mediaPrompt,
+    imageStyle:"clear educational illustration",
+    imageAspectRatio:"1:1",
+    videoAspectRatio:"16:9",
+    durationSeconds:8
+  });
+
+  if(mediaType === "image"){
+    const url = String(result?.url || result?.mediaUrl || "").trim();
+    if(!url) throw new Error(`Image generation did not return a URL for question ${index + 1}.`);
+    q.mediaUrl = url;
+    q.image = url;
+    return q;
+  }
+
+  if(mediaType === "video"){
+    let url = String(result?.url || result?.mediaUrl || "").trim();
+
+    if(!url){
+      const operationName = String(result?.operationName || result?.operation || "").trim();
+      if(!operationName){
+        throw new Error(`Video generation did not return an operation name for question ${index + 1}.`);
+      }
+      url = await waitForPrudleVideo(operationName);
+    }
+
+    q.mediaUrl = url;
+    q.video = url;
+    return q;
+  }
+
+  return q;
+}
+
+async function addAIQuestionsWithAutomaticMedia(list,count,fallbackType){
+  const selected = list.slice(0,count);
+  let mediaFailures = 0;
+
+  for(let i=0;i<selected.length;i++){
+    let item = normalizeAIQuestion(selected[i],fallbackType);
+
+    try{
+      item = await generatePrudleMediaForQuestion(item,i,selected.length);
+    }catch(error){
+      console.error("Automatic AI media error:",error);
+      mediaFailures++;
+      item.mediaType = "none";
+      item.mediaUrl = "";
+      item.image = "";
+      item.video = "";
+    }
+
+    addQuestion(item);
+  }
+
+  return {
+    added:selected.length,
+    mediaFailures
+  };
 }
 
 
@@ -7694,9 +7864,18 @@ async function generateQuestionsWithAI(){
       const list = Array.isArray(payload) ? payload : payload.questions;
       if(!Array.isArray(list) || !list.length) throw new Error("AI did not return any questions.");
 
-      list.slice(0,count).forEach(q=>addQuestion(normalizeAIQuestion(q, requestedType === "mixed" ? "mcq" : requestedType)));
-      setAIStatus(`Added ${Math.min(list.length,count)} AI questions. Review or edit them, then click Save Activity.`,"success");
-      toast(`Generated ${Math.min(list.length,count)} AI questions ✨`);
+      const autoMediaResult = await addAIQuestionsWithAutomaticMedia(
+        list,
+        count,
+        requestedType === "mixed" ? "mcq" : requestedType
+      );
+
+      const mediaNote = autoMediaResult.mediaFailures
+        ? ` (${autoMediaResult.mediaFailures} media item(s) could not be generated; the questions were still added.)`
+        : "";
+
+      setAIStatus(`Added ${autoMediaResult.added} AI questions with automatic media when useful.${mediaNote} Review or edit them, then click Save Activity.`,"success");
+      toast(`Generated ${autoMediaResult.added} AI questions ✨`);
       document.getElementById("questionsContainer")?.scrollIntoView({behavior:"smooth",block:"start"});
     }finally{
       button.disabled = false;
