@@ -7628,7 +7628,7 @@ Return ONLY valid JSON. Each question must contain:
   "type":"mcq|match|order|random|wheel|wheelmcq|balloon|mystery|bomb",
   "wheelAnswerMode":"mcq",
   "text":"question or instruction",
-  "mediaType":"none|image|video",
+  "mediaType":"none|image|video|audio",
   "mediaPrompt":"clear visual prompt when image or video is educationally useful",
   "mediaUrl":"",
   "answers":[
@@ -7813,6 +7813,145 @@ async function addAIQuestionsWithAutomaticMedia(list,count,fallbackType){
 }
 
 
+/* =========================================================
+   STRICT AI QUESTION-TYPE COORDINATION
+   Keeps the generated content structurally compatible with
+   the selected Prudle question/game type.
+========================================================= */
+
+function buildPrudleRequestedTypeInstructions(requestedType){
+  const type = String(requestedType || "smart").trim().toLowerCase();
+
+  const common = `
+CRITICAL PRUDLE TYPE RULES:
+The question wording, answers/items, and selected "type" MUST describe the SAME activity.
+Never write an Order instruction and label it MCQ.
+Never write a Wheel instruction and label it MCQ.
+Never write a Match instruction and label it MCQ.
+
+VALID STRUCTURES:
+- mcq: a direct question + 2–4 choices; exactly one correct=true.
+- match: instruction to match pairs + 2–6 answers shaped {text:left,right:right,image:"",correct:false}.
+- order: instruction to arrange/order + 2–6 answers; "text" values are already in the correct final order; correct=false.
+- random: instruction suitable for random selection + 2–6 independent items/prompts.
+- wheel: spinning-wheel activity + 2–8 sections; each answer MUST have text=category/label and right=challenge/question.
+- wheelmcq: wheel-style multiple-choice activity + 2–4 choices; exactly one correct=true.
+- balloon: short fast multiple-choice challenge + 2–4 choices; exactly one correct=true.
+- mystery: reveal/guess multiple-choice challenge + 2–4 choices; exactly one correct=true.
+- bomb: short review/challenge multiple-choice question + 2–4 choices; exactly one correct=true.
+
+Return the actual Prudle type in every question object.
+`;
+
+  if(type === "smart"){
+    return common + `
+MODE: SMART.
+For EACH question independently, choose the educationally most suitable type from:
+mcq, match, order, random, wheel, wheelmcq, balloon, mystery, bomb.
+Use variety only when the source content genuinely supports it.
+The wording MUST fit the chosen type and the answer structure MUST follow that type's schema.
+`;
+  }
+
+  if(type === "mixed"){
+    return common + `
+MODE: MIXED.
+Create a varied set using multiple Prudle types from:
+mcq, match, order, random, wheel, wheelmcq, balloon, mystery, bomb.
+Do not make everything MCQ.
+For every question, its wording and answer structure MUST exactly match its returned type.
+`;
+  }
+
+  return common + `
+MODE: FIXED TYPE.
+Every generated question MUST use type="${type}".
+Do not return any other type.
+Write every question/instruction specifically for ${type}, and use exactly the ${type} answer structure described above.
+`;
+}
+
+function inferPrudleTypeFromGeneratedQuestion(question, requestedType){
+  const requested = String(requestedType || "smart").trim().toLowerCase();
+
+  // A manually selected fixed type always wins.
+  if(PRUDLE_AI_ACTIVITY_TYPES.includes(requested)){
+    return requested;
+  }
+
+  const q = question && typeof question === "object" ? question : {};
+  const declaredRaw = String(
+    q.type || q.activityType || q.questionType || q.gameType || ""
+  ).trim().toLowerCase();
+
+  const declared = normalizeAiActivityType(declaredRaw);
+  const text = String(
+    q.text || q.question || q.prompt || q.instructions || ""
+  ).trim().toLowerCase();
+
+  const answers = Array.isArray(q.answers) ? q.answers :
+                  Array.isArray(q.options) ? q.options :
+                  Array.isArray(q.items) ? q.items :
+                  Array.isArray(q.pairs) ? q.pairs : [];
+
+  // Strong semantic signals override an incorrect MCQ label.
+  if(/\b(correct order|put .* in .* order|arrange|rearrange|sequence|correct sequence|order the)\b/i.test(text)){
+    return "order";
+  }
+
+  if(/\b(match|matching|pair|connect .* with|match .* with)\b/i.test(text) ||
+     answers.some(a => a && typeof a === "object" &&
+       String(a.right ?? a.match ?? a.pair ?? a.matchingPair ?? "").trim())){
+    return "match";
+  }
+
+  if(/\b(spin the wheel|wheel)\b/i.test(text)){
+    const hasChoices = answers.filter(a => {
+      if(typeof a === "string") return String(a).trim();
+      return String(a?.text ?? a?.option ?? a?.item ?? "").trim();
+    }).length >= 2;
+
+    const hasCorrect = answers.some(a => Boolean(a?.correct ?? a?.isCorrect));
+    return (hasChoices && hasCorrect) ? "wheelmcq" : "wheel";
+  }
+
+  if(/\b(balloon|pop the balloon)\b/i.test(text)) return "balloon";
+  if(/\b(mystery box|mystery|reveal)\b/i.test(text)) return "mystery";
+  if(/\b(bomb|defuse)\b/i.test(text)) return "bomb";
+  if(/\b(random|pick one|choose one at random)\b/i.test(text)) return "random";
+
+  // Otherwise respect a valid explicit AI type.
+  if(PRUDLE_AI_ACTIVITY_TYPES.includes(declaredRaw) ||
+     ["multiplechoice","matching","ordering","sequence","spinner","mysterybox","bombgame"].includes(
+       declaredRaw.replace(/[\s_-]+/g,"")
+     )){
+    return declared;
+  }
+
+  return "mcq";
+}
+
+function normalizeAIQuestionForRequestedMode(question, requestedType){
+  const q = question && typeof question === "object" ? {...question} : {};
+  q.type = inferPrudleTypeFromGeneratedQuestion(q, requestedType);
+
+  let normalized = normalizeAIQuestion(q, q.type);
+
+  // Fixed selection must never be silently changed by AI.
+  if(PRUDLE_AI_ACTIVITY_TYPES.includes(String(requestedType || "").toLowerCase())){
+    normalized.type = String(requestedType).toLowerCase();
+
+    // Re-normalize after forcing the selected type so its fields follow that schema.
+    normalized = normalizeAIQuestion(
+      {...normalized, type:normalized.type},
+      normalized.type
+    );
+  }
+
+  return normalized;
+}
+
+
 async function generateQuestionsWithAI(){
   try{
     if(!requireAdminForQuestions()) return;
@@ -7830,6 +7969,7 @@ async function generateQuestionsWithAI(){
     ).trim().toLowerCase();
 
   const smartTypeInstructions = buildPrudleSmartTypeInstructions(requestedType);
+    const strictTypeInstructions = buildPrudleRequestedTypeInstructions(requestedType);
     const language = document.getElementById("aiLanguage").value;
     let sourceText = "";
 
@@ -7857,13 +7997,26 @@ async function generateQuestionsWithAI(){
         method:"POST",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({
-          task:AI_TASK, text:sourceText, prompt:sourceText, sourceText,
-          level, count, questionType:requestedType,
-        mediaType: requestedMedia,
+          task:AI_TASK,
+          text:sourceText,
+          sourceText,
+          prompt:[
+            sourceText,
+            strictTypeInstructions,
+            smartTypeInstructions
+          ].filter(Boolean).join("\n\n"),
+          level,
+          count,
+          questionType:requestedType,
+          requestedQuestionType:requestedType,
+          mediaType:requestedMedia,
 
           smartActivityTypes:requestedType === "smart",
+          mixedActivityTypes:requestedType === "mixed",
           availableActivityTypes:PRUDLE_AI_ACTIVITY_TYPES,
-          smartTypeInstructions, language,
+          smartTypeInstructions,
+          strictTypeInstructions,
+          language,
           activityTitle:readText("activityTitle"),
           activityDescription:readText("activityDescription"), responseFormat:"json"
         })
@@ -7880,9 +8033,9 @@ async function generateQuestionsWithAI(){
       const selectedQuestions = list.slice(0,count);
 
       for(let mediaIndex=0; mediaIndex<selectedQuestions.length; mediaIndex++){
-        let item = normalizeAIQuestion(
+        let item = normalizeAIQuestionForRequestedMode(
           selectedQuestions[mediaIndex],
-          requestedType === "mixed" ? "mcq" : requestedType
+          requestedType
         );
 
         if(requestedMedia === "none"){
