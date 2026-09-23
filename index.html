@@ -7607,9 +7607,14 @@ async function generateListeningWithAI(){
         method:"POST",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({
-          task:AI_TASK,
-          mode:"listening",
-          text:sourceText,
+
+  task:AI_TASK,
+
+  mode:"listening",
+
+  mediaType:"audio",
+
+  text:sourceText,
           prompt:sourceText,
           sourceText,
           level,
