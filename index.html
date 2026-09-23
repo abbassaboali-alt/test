@@ -7627,12 +7627,9 @@ Return ONLY valid JSON. Each question must contain:
 }
 
 MEDIA RULES:
-- Decide for EACH question whether media improves learning.
-- Use "image" for vocabulary, objects, places, people, visual recognition, scenes, and concepts that benefit from a still illustration.
-- Use "video" only when motion, an action, process, short situation, or moving scene materially improves the question.
-- Use "none" when media is unnecessary, especially simple grammar/text-only questions.
-- When mediaType is image or video, mediaPrompt MUST be specific, classroom-safe, age-appropriate, and must NOT reveal the correct answer as visible text.
-- Do not invent an external media URL. Leave mediaUrl empty; Prudle will generate and store the media automatically.
+- Do NOT generate or request images, videos, or audio automatically.
+- Always return mediaType as "none" and mediaUrl as an empty string for AI-generated questions.
+- Image, video, and audio are created only when the user explicitly chooses them from the existing media controls.
 
 Rules:
 - NEVER return blank required fields.
@@ -7864,18 +7861,24 @@ async function generateQuestionsWithAI(){
       const list = Array.isArray(payload) ? payload : payload.questions;
       if(!Array.isArray(list) || !list.length) throw new Error("AI did not return any questions.");
 
-      const autoMediaResult = await addAIQuestionsWithAutomaticMedia(
-        list,
-        count,
-        requestedType === "mixed" ? "mcq" : requestedType
-      );
+      list.slice(0,count).forEach(q=>{
+        const item = normalizeAIQuestion(
+          q,
+          requestedType === "mixed" ? "mcq" : requestedType
+        );
 
-      const mediaNote = autoMediaResult.mediaFailures
-        ? ` (${autoMediaResult.mediaFailures} media item(s) could not be generated; the questions were still added.)`
-        : "";
+        // Never create media automatically. The user chooses media manually.
+        item.mediaType = "none";
+        item.mediaUrl = "";
+        item.image = "";
+        item.video = "";
+        item.audio = "";
 
-      setAIStatus(`Added ${autoMediaResult.added} AI questions with automatic media when useful.${mediaNote} Review or edit them, then click Save Activity.`,"success");
-      toast(`Generated ${autoMediaResult.added} AI questions ✨`);
+        addQuestion(item);
+      });
+
+      setAIStatus(`Added ${Math.min(list.length,count)} AI questions. Image, video, and audio are created only when you choose them manually.`,"success");
+      toast(`Generated ${Math.min(list.length,count)} AI questions ✨`);
       document.getElementById("questionsContainer")?.scrollIntoView({behavior:"smooth",block:"start"});
     }finally{
       button.disabled = false;
