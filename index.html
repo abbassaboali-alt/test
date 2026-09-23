@@ -2407,6 +2407,16 @@ button{cursor:pointer}
           <option value="smart" selected>✨ Smart — Choose Best Type Automatically</option>
 <option value="mixed">Mixed Types</option>
         </select>
+          <div class="field">
+            <label>AI Media</label>
+            <select id="aiMediaChoice">
+              <option value="none">No Media</option>
+              <option value="image">🖼️ Images</option>
+              <option value="video">🎬 Videos</option>
+              <option value="audio">🔊 Audio</option>
+            </select>
+            <div class="help">Choose before generating. Media will be created only when selected here.</div>
+          </div>
         <div class="help">
           Smart mode analyzes each generated question and automatically assigns the most suitable activity:
           MCQ, Match, Order, Wheel, Wheel + MCQ, Balloon, Mystery, Bomb, or Random.
@@ -7815,6 +7825,10 @@ async function generateQuestionsWithAI(){
     const level = document.getElementById("aiLevel").value;
     const count = Math.max(1, Math.min(20, Number(document.getElementById("aiQuestionCount").value || 10)));
     const requestedType = document.getElementById("aiQuestionType").value;
+    const requestedMedia = String(
+      document.getElementById("aiMediaChoice")?.value || "none"
+    ).trim().toLowerCase();
+
   const smartTypeInstructions = buildPrudleSmartTypeInstructions(requestedType);
     const language = document.getElementById("aiLanguage").value;
     let sourceText = "";
@@ -7845,6 +7859,8 @@ async function generateQuestionsWithAI(){
         body:JSON.stringify({
           task:AI_TASK, text:sourceText, prompt:sourceText, sourceText,
           level, count, questionType:requestedType,
+        mediaType: requestedMedia,
+
           smartActivityTypes:requestedType === "smart",
           availableActivityTypes:PRUDLE_AI_ACTIVITY_TYPES,
           smartTypeInstructions, language,
@@ -7861,24 +7877,140 @@ async function generateQuestionsWithAI(){
       const list = Array.isArray(payload) ? payload : payload.questions;
       if(!Array.isArray(list) || !list.length) throw new Error("AI did not return any questions.");
 
-      list.slice(0,count).forEach(q=>{
-        const item = normalizeAIQuestion(
-          q,
+      const selectedQuestions = list.slice(0,count);
+
+      for(let mediaIndex=0; mediaIndex<selectedQuestions.length; mediaIndex++){
+        let item = normalizeAIQuestion(
+          selectedQuestions[mediaIndex],
           requestedType === "mixed" ? "mcq" : requestedType
         );
 
-        // Never create media automatically. The user chooses media manually.
-        item.mediaType = "none";
-        item.mediaUrl = "";
-        item.image = "";
-        item.video = "";
-        item.audio = "";
+        if(requestedMedia === "none"){
+          item.mediaType = "none";
+          item.mediaUrl = "";
+          item.image = "";
+          item.video = "";
+          item.audio = "";
+        }else{
+          item.mediaType = requestedMedia;
+
+          const mediaPrompt = String(
+            item.mediaPrompt ||
+            item.text ||
+            sourceText ||
+            "Educational English language activity"
+          ).trim();
+
+          setAIStatus(
+            `Creating ${requestedMedia} for question ${mediaIndex + 1} of ${selectedQuestions.length}...`
+          );
+
+          try{
+            const mediaResponse = await fetch(PRUDLE_AI_ENDPOINT,{
+              method:"POST",
+              headers:{"Content-Type":"application/json"},
+              body:JSON.stringify({
+                task:"generate_question_media",
+                mediaType:requestedMedia,
+                questionText:String(item.text || ""),
+                text:String(item.text || ""),
+                audioText:String(item.text || ""),
+                mediaPrompt:mediaPrompt,
+                prompt:mediaPrompt,
+                imageStyle:"clear educational illustration",
+                imageAspectRatio:"1:1",
+                videoAspectRatio:"16:9",
+                durationSeconds:8
+              })
+            });
+
+            const mediaRaw = await mediaResponse.text();
+            let mediaPayload = {};
+            try{ mediaPayload = mediaRaw ? JSON.parse(mediaRaw) : {}; }catch(_){}
+
+            if(!mediaResponse.ok){
+              throw new Error(mediaPayload?.error || `Media generation failed (${mediaResponse.status}).`);
+            }
+
+            let mediaUrl = String(
+              mediaPayload?.url ||
+              mediaPayload?.mediaUrl ||
+              mediaPayload?.audioUrl ||
+              ""
+            ).trim();
+
+            if(requestedMedia === "video" && !mediaUrl){
+              const operationName = String(
+                mediaPayload?.operationName ||
+                mediaPayload?.operation ||
+                ""
+              ).trim();
+
+              if(operationName){
+                for(let attempt=1; attempt<=40 && !mediaUrl; attempt++){
+                  setAIStatus(
+                    `Processing video ${mediaIndex + 1} of ${selectedQuestions.length}...`
+                  );
+                  await new Promise(resolve=>setTimeout(resolve,5000));
+
+                  const checkResponse = await fetch(PRUDLE_AI_ENDPOINT,{
+                    method:"POST",
+                    headers:{"Content-Type":"application/json"},
+                    body:JSON.stringify({
+                      task:"check_video_generation",
+                      operationName
+                    })
+                  });
+
+                  const checkPayload = await checkResponse.json().catch(()=>({}));
+
+                  if(String(checkPayload?.status || "").toLowerCase() === "failed"){
+                    throw new Error(checkPayload?.error || "Video generation failed.");
+                  }
+
+                  if(String(checkPayload?.status || "").toLowerCase() === "completed"){
+                    mediaUrl = String(checkPayload?.url || checkPayload?.mediaUrl || "").trim();
+                  }
+                }
+              }
+            }
+
+            if(!mediaUrl){
+              throw new Error(`No ${requestedMedia} URL was returned.`);
+            }
+
+            item.mediaUrl = mediaUrl;
+
+            if(requestedMedia === "image"){
+              item.image = mediaUrl;
+            }else if(requestedMedia === "video"){
+              item.video = mediaUrl;
+            }else if(requestedMedia === "audio"){
+              item.audio = mediaUrl;
+              item.audioUrl = mediaUrl;
+            }
+
+          }catch(mediaError){
+            console.error("AI media generation error:",mediaError);
+            item.mediaType = "none";
+            item.mediaUrl = "";
+            item.image = "";
+            item.video = "";
+            item.audio = "";
+            toast(`Question ${mediaIndex + 1}: ${requestedMedia} could not be generated.`);
+          }
+        }
 
         addQuestion(item);
-      });
+      }
 
-      setAIStatus(`Added ${Math.min(list.length,count)} AI questions. Image, video, and audio are created only when you choose them manually.`,"success");
-      toast(`Generated ${Math.min(list.length,count)} AI questions ✨`);
+      setAIStatus(
+        `Added ${selectedQuestions.length} AI questions` +
+        (requestedMedia === "none" ? " without media." : ` with ${requestedMedia}.`) +
+        " Review or edit them, then click Save Activity.",
+        "success"
+      );
+      toast(`Generated ${selectedQuestions.length} AI questions ✨`);
       document.getElementById("questionsContainer")?.scrollIntoView({behavior:"smooth",block:"start"});
     }finally{
       button.disabled = false;
