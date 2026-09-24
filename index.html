@@ -2119,6 +2119,156 @@ button{cursor:pointer}
 .question-group-control select{width:100%}
 .activity-owner-lock{font-weight:900}
 
+
+/* =========================================================
+   PRUDLE KIDS INTERACTIVE ACTIVITIES — DESIGN PHASE 1
+   Visual design only. Existing activity logic is untouched.
+========================================================= */
+.kids-activity-design-panel{
+  position:relative;
+  overflow:hidden;
+  border:1px solid #d7e6f3;
+  background:
+    radial-gradient(circle at 8% 8%,rgba(244,185,66,.18),transparent 20%),
+    radial-gradient(circle at 92% 12%,rgba(36,103,165,.13),transparent 22%),
+    linear-gradient(145deg,#f8fcff,#fffdf6);
+}
+.kids-activity-design-panel:before{
+  content:"";
+  position:absolute;
+  width:180px;height:180px;border-radius:50%;
+  right:-70px;bottom:-85px;
+  background:rgba(23,166,115,.08);
+  pointer-events:none;
+}
+.kids-design-heading{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.kids-design-heading .kids-title-icon{
+  width:46px;height:46px;border-radius:15px;
+  display:grid;place-items:center;
+  background:linear-gradient(135deg,#164478,#2467a5);
+  color:#fff;font-size:22px;
+  box-shadow:0 8px 20px rgba(22,68,120,.2);
+}
+.kids-design-subtitle{
+  margin:-7px 0 18px;
+  color:var(--muted);font-size:13px;font-weight:700;line-height:1.7;
+}
+.kids-activity-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+  position:relative;z-index:1;
+}
+.kids-activity-card{
+  --kid-accent:#2467a5;
+  --kid-soft:#eef6fd;
+  min-height:235px;
+  padding:17px;
+  border:1px solid #dce6ef;
+  border-radius:22px;
+  background:#fff;
+  box-shadow:0 9px 24px rgba(22,68,120,.08);
+  transition:transform .2s,box-shadow .2s,border-color .2s;
+  position:relative;overflow:hidden;
+}
+.kids-activity-card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 16px 30px rgba(22,68,120,.14);
+  border-color:var(--kid-accent);
+}
+.kids-activity-card:after{
+  content:"";
+  position:absolute;right:-28px;top:-28px;
+  width:88px;height:88px;border-radius:50%;
+  background:var(--kid-soft);
+}
+.kids-card-top{
+  display:flex;align-items:center;gap:11px;position:relative;z-index:1;
+}
+.kids-card-icon{
+  width:52px;height:52px;flex:0 0 52px;border-radius:17px;
+  display:grid;place-items:center;
+  background:var(--kid-soft);
+  font-size:27px;
+}
+.kids-card-title{font-size:16px;font-weight:900;color:var(--text);line-height:1.35}
+.kids-card-tag{
+  display:inline-flex;margin-top:5px;padding:4px 8px;border-radius:999px;
+  background:var(--kid-soft);color:var(--kid-accent);
+  font-size:10px;font-weight:900;
+}
+.kids-card-desc{
+  margin:13px 0 12px;color:var(--muted);
+  font-size:12px;font-weight:700;line-height:1.65;
+}
+.kids-mini-stage{
+  min-height:82px;border-radius:16px;padding:10px;
+  background:linear-gradient(145deg,var(--kid-soft),#fff);
+  border:1px dashed color-mix(in srgb,var(--kid-accent) 38%, #dce6ef);
+  display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;
+  position:relative;
+}
+.kids-mini-pill{
+  padding:7px 10px;border-radius:11px;background:#fff;
+  border:1px solid #dce6ef;font-size:11px;font-weight:900;
+  box-shadow:0 3px 8px rgba(22,68,120,.06);
+}
+.kids-mini-play{
+  width:39px;height:39px;border-radius:50%;border:0;
+  display:grid;place-items:center;background:var(--kid-accent);color:#fff;
+  font-size:15px;box-shadow:0 6px 14px rgba(22,68,120,.18);
+}
+.kids-mini-mic{
+  width:39px;height:39px;border-radius:50%;
+  display:grid;place-items:center;background:#fff;color:var(--kid-accent);
+  border:2px solid var(--kid-accent);
+}
+.kids-letter{
+  width:32px;height:35px;border-radius:9px;background:#fff;
+  border:2px solid var(--kid-accent);display:grid;place-items:center;
+  color:var(--kid-accent);font-weight:900;font-size:13px;
+}
+.kids-word-chip{
+  padding:7px 9px;border-radius:10px;background:#fff;
+  border:1px solid #dce6ef;font-weight:900;font-size:11px;
+}
+.kids-catch-dot{
+  position:absolute;width:58px;min-height:30px;border-radius:999px;
+  display:grid;place-items:center;background:#fff;
+  border:2px solid var(--kid-accent);color:var(--kid-accent);
+  font-size:10px;font-weight:900;
+}
+.kids-catch-dot.one{left:8px;top:8px;transform:rotate(-4deg)}
+.kids-catch-dot.two{right:8px;top:10px;transform:rotate(5deg)}
+.kids-catch-dot.three{left:50%;bottom:7px;transform:translateX(-50%)}
+.kids-move-go{
+  font-size:23px;font-weight:900;color:var(--kid-accent);letter-spacing:.5px;
+}
+.kids-move-count{
+  width:38px;height:38px;border-radius:50%;display:grid;place-items:center;
+  background:var(--kid-accent);color:#fff;font-weight:900;font-size:18px;
+}
+.kids-activity-card.listenchoose{--kid-accent:#2467a5;--kid-soft:#eaf4ff}
+.kids-activity-card.listenrepeat{--kid-accent:#d6336c;--kid-soft:#fff0f5}
+.kids-activity-card.buildword{--kid-accent:#17a673;--kid-soft:#eafaf4}
+.kids-activity-card.buildsentence{--kid-accent:#8e44ad;--kid-soft:#f7edfb}
+.kids-activity-card.catchanswer{--kid-accent:#e67e22;--kid-soft:#fff5e9}
+.kids-activity-card.movechoose{--kid-accent:#e74c3c;--kid-soft:#fff0ee}
+.kids-design-note{
+  margin-top:15px;padding:11px 13px;border-radius:13px;
+  background:#eef6fd;color:var(--blue);font-size:12px;font-weight:800;
+  position:relative;z-index:1;
+}
+@media(max-width:950px){
+  .kids-activity-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:620px){
+  .kids-activity-grid{grid-template-columns:1fr}
+  .kids-activity-card{min-height:auto}
+}
+
 </style>
 </head>
 
@@ -2542,6 +2692,138 @@ button{cursor:pointer}
         </button>
       </div>
     </div>
+
+
+  <!-- =====================================================
+       KIDS INTERACTIVE ACTIVITIES — DESIGN PHASE 1
+       Visual concepts only; no existing logic is replaced.
+  ====================================================== -->
+  <div class="panel kids-activity-design-panel" id="kidsActivityDesignPanel">
+    <div class="panel-title">
+      <div class="kids-design-heading">
+        <div class="kids-title-icon"><i class="fa-solid fa-shapes"></i></div>
+        <div>
+          <h2 style="margin:0">Kids Interactive Activities</h2>
+          <div class="help" style="margin-top:3px">New activity designs for young learners</div>
+        </div>
+      </div>
+      <span class="badge">Design Preview</span>
+    </div>
+
+    <div class="kids-design-subtitle">
+      Listening, speaking, spelling, sentence building, speed and physical movement — designed as child-friendly games.
+    </div>
+
+    <div class="kids-activity-grid">
+
+      <div class="kids-activity-card listenchoose">
+        <div class="kids-card-top">
+          <div class="kids-card-icon">👂</div>
+          <div>
+            <div class="kids-card-title">Listen &amp; Choose</div>
+            <span class="kids-card-tag">LISTENING</span>
+          </div>
+        </div>
+        <div class="kids-card-desc">Listen to a word or sentence, then choose the correct picture or answer.</div>
+        <div class="kids-mini-stage">
+          <div class="kids-mini-play"><i class="fa-solid fa-play"></i></div>
+          <div class="kids-mini-pill">🍎 Apple</div>
+          <div class="kids-mini-pill">🍌 Banana</div>
+        </div>
+      </div>
+
+      <div class="kids-activity-card listenrepeat">
+        <div class="kids-card-top">
+          <div class="kids-card-icon">🔊</div>
+          <div>
+            <div class="kids-card-title">Listen &amp; Repeat</div>
+            <span class="kids-card-tag">PRONUNCIATION</span>
+          </div>
+        </div>
+        <div class="kids-card-desc">Play the model audio, then let the child record and repeat the word or sentence.</div>
+        <div class="kids-mini-stage">
+          <div class="kids-mini-play"><i class="fa-solid fa-volume-high"></i></div>
+          <div class="kids-mini-pill">Hello, teacher!</div>
+          <div class="kids-mini-mic"><i class="fa-solid fa-microphone"></i></div>
+        </div>
+      </div>
+
+      <div class="kids-activity-card buildword">
+        <div class="kids-card-top">
+          <div class="kids-card-icon">🔤</div>
+          <div>
+            <div class="kids-card-title">Build the Word</div>
+            <span class="kids-card-tag">SPELLING</span>
+          </div>
+        </div>
+        <div class="kids-card-desc">Show a picture and let the child arrange shuffled letters to build the correct word.</div>
+        <div class="kids-mini-stage">
+          <span style="font-size:27px">🍎</span>
+          <div class="kids-letter">P</div><div class="kids-letter">A</div>
+          <div class="kids-letter">L</div><div class="kids-letter">E</div>
+        </div>
+      </div>
+
+      <div class="kids-activity-card buildsentence">
+        <div class="kids-card-top">
+          <div class="kids-card-icon">🧩</div>
+          <div>
+            <div class="kids-card-title">Build the Sentence</div>
+            <span class="kids-card-tag">SENTENCE</span>
+          </div>
+        </div>
+        <div class="kids-card-desc">Arrange shuffled words in the correct order to make a complete sentence.</div>
+        <div class="kids-mini-stage">
+          <div class="kids-word-chip">This</div>
+          <div class="kids-word-chip">is</div>
+          <div class="kids-word-chip">my</div>
+          <div class="kids-word-chip">mother.</div>
+        </div>
+      </div>
+
+      <div class="kids-activity-card catchanswer">
+        <div class="kids-card-top">
+          <div class="kids-card-icon">🎯</div>
+          <div>
+            <div class="kids-card-title">Catch the Correct Answer</div>
+            <span class="kids-card-tag">SPEED GAME</span>
+          </div>
+        </div>
+        <div class="kids-card-desc">Answers move around the play area. Catch the correct answer before time runs out.</div>
+        <div class="kids-mini-stage">
+          <div class="kids-catch-dot one">CAT</div>
+          <div class="kids-catch-dot two">DOG</div>
+          <div class="kids-catch-dot three">BIRD</div>
+          <span style="font-size:26px">🎯</span>
+        </div>
+      </div>
+
+      <div class="kids-activity-card movechoose">
+        <div class="kids-card-top">
+          <div class="kids-card-icon">🏃</div>
+          <div>
+            <div class="kids-card-title">Move &amp; Choose</div>
+            <span class="kids-card-tag">PHYSICAL ACTIVITY</span>
+          </div>
+        </div>
+        <div class="kids-card-desc">A classroom movement challenge: find, touch, point, jump or act before the countdown ends.</div>
+        <div class="kids-mini-stage">
+          <div class="kids-move-count">3</div>
+          <div class="kids-move-count">2</div>
+          <div class="kids-move-count">1</div>
+          <div class="kids-move-go">GO! 🏃</div>
+          <div class="kids-mini-pill" style="width:100%;text-align:center">Touch something BLUE!</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="kids-design-note">
+      <i class="fa-solid fa-wand-magic-sparkles"></i>
+      Phase 1: visual design added without changing the current activity engine or saved data.
+    </div>
+  </div>
+
 
     <div id="questionsContainer"></div>
 
