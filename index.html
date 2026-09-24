@@ -585,6 +585,13 @@ button{cursor:pointer}
 .ai-status.success{background:#eafaf4;color:var(--green)}
 .ai-source-file{margin-top:10px}
 
+.ai-type-checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px;margin-top:10px}
+.ai-type-check{display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:#fff;font-weight:800;font-size:13px}
+.ai-type-check input{width:auto;accent-color:var(--blue)}
+.ai-type-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+.bulk-group-tools{display:grid;grid-template-columns:minmax(220px,1fr) auto;gap:10px;align-items:end;margin-top:14px;padding:14px;border:1px solid #cfe0ef;border-radius:15px;background:#f7fbff}
+@media(max-width:650px){.bulk-group-tools{grid-template-columns:1fr}.ai-type-checks{grid-template-columns:1fr}}
+
 /* Question types: MCQ, Match, Order */
 .question-type-note{
   margin-top:8px;
@@ -2557,6 +2564,22 @@ button{cursor:pointer}
           <option value="smart" selected>✨ Smart — Choose Best Type Automatically</option>
 <option value="mixed">Mixed Types</option>
         </select>
+        <div class="help">Use Smart for automatic selection, or choose the exact question types below that AI is allowed to mix.</div>
+        <div class="ai-type-checks" id="aiAllowedTypes">
+          <label class="ai-type-check"><input type="checkbox" value="mcq" checked> Multiple Choice</label>
+          <label class="ai-type-check"><input type="checkbox" value="match" checked> Match</label>
+          <label class="ai-type-check"><input type="checkbox" value="order" checked> Order / Sequence</label>
+          <label class="ai-type-check"><input type="checkbox" value="random"> Random Image Question</label>
+          <label class="ai-type-check"><input type="checkbox" value="wheel"> 🎡 Wheel of Fortune</label>
+          <label class="ai-type-check"><input type="checkbox" value="wheelmcq"> 🎡✅ Wheel + Multiple Choice</label>
+          <label class="ai-type-check"><input type="checkbox" value="balloon"> 🎈 Balloon Pop</label>
+          <label class="ai-type-check"><input type="checkbox" value="mystery"> 🎁 Mystery Box</label>
+          <label class="ai-type-check"><input type="checkbox" value="bomb"> 💣 Bomb Defuse</label>
+        </div>
+        <div class="ai-type-tools">
+          <button class="btn btn-light" type="button" onclick="setAIAllowedTypes(true)">Select All</button>
+          <button class="btn btn-light" type="button" onclick="setAIAllowedTypes(false)">Clear</button>
+        </div>
           <div class="field">
             <label>AI Media</label>
             <select id="aiMediaChoice" onchange="updateAIImagePlacementUI()">
@@ -2653,7 +2676,14 @@ button{cursor:pointer}
       <div class="field"><label>Current Groups</label><div id="quizGroupsList" class="quiz-groups-list"></div></div>
     </div>
     <div class="actions"><button class="btn btn-success" type="button" onclick="createQuizGroup()"><i class="fa-solid fa-folder-plus"></i> Create Group</button></div>
-    <div class="help">Each question can be assigned to one named group. Groups are saved inside the same activity.</div>
+    <div class="bulk-group-tools">
+      <div class="field">
+        <label><i class="fa-solid fa-layer-group"></i> Assign ALL Questions to Group</label>
+        <select id="bulkQuestionGroupSelect"></select>
+      </div>
+      <button class="btn btn-primary" type="button" onclick="applyGroupToAllQuestions()"><i class="fa-solid fa-check-double"></i> Apply to All Questions</button>
+    </div>
+    <div class="help">You can still change a single question individually, or assign every current question to one group at once.</div>
   </div>
 
   <div class="panel">
@@ -3153,6 +3183,12 @@ function renderQuizGroups(){
   QUIZ_GROUPS=[...new Set(["General",...QUIZ_GROUPS.map(x=>String(x||"").trim()).filter(Boolean)])];
   const list=document.getElementById("quizGroupsList");
   if(list){ list.innerHTML=QUIZ_GROUPS.map(name=>`<span class="quiz-group-chip"><i class="fa-solid fa-folder"></i> ${esc(name)} ${name!=="General"?`<button type="button" title="Delete group" onclick='deleteQuizGroup(${JSON.stringify(name)})'><i class="fa-solid fa-xmark"></i></button>`:""}</span>`).join(""); }
+  const bulk=document.getElementById("bulkQuestionGroupSelect");
+  if(bulk){
+    const current=String(bulk.value||"General");
+    bulk.innerHTML=QUIZ_GROUPS.map(g=>`<option value="${esc(g)}">${esc(g)}</option>`).join("");
+    bulk.value=QUIZ_GROUPS.includes(current)?current:"General";
+  }
   refreshQuestionGroupSelects();
 }
 function createQuizGroup(){
@@ -3161,6 +3197,14 @@ function createQuizGroup(){
   if(!QUIZ_GROUPS.some(g=>g.toLowerCase()===name.toLowerCase())) QUIZ_GROUPS.push(name);
   if(input) input.value=""; renderQuizGroups();
 }
+function applyGroupToAllQuestions(){
+  const group=String(document.getElementById("bulkQuestionGroupSelect")?.value||"General").trim()||"General";
+  const selects=Array.from(document.querySelectorAll(".q-group-select"));
+  if(!selects.length){ toast("No questions to update."); return; }
+  selects.forEach(select=>{ select.value=group; select.dataset.savedGroup=""; });
+  toast(`Assigned ${selects.length} questions to ${group}.`);
+}
+
 function deleteQuizGroup(name){
   if(name==="General")return;
   if(Array.from(document.querySelectorAll(".q-group-select")).some(el=>el.value===name)){alert("This group contains questions. Move them first.");return;}
@@ -7589,6 +7633,17 @@ function toggleActivityTimerFields(){
 const PRUDLE_AI_ENDPOINT = "https://muddy-frost-dfd0.abbassaboali.workers.dev";
 const AI_TASK = "generate_activity_questions";
 
+function getAIAllowedTypes(){
+  const selected=Array.from(document.querySelectorAll("#aiAllowedTypes input[type=checkbox]:checked"))
+    .map(el=>String(el.value||"").trim().toLowerCase())
+    .filter(type=>PRUDLE_AI_ACTIVITY_TYPES.includes(type));
+  return [...new Set(selected)];
+}
+
+function setAIAllowedTypes(checked){
+  document.querySelectorAll("#aiAllowedTypes input[type=checkbox]").forEach(el=>el.checked=Boolean(checked));
+}
+
 function updateAISourceUI(){
   const type = document.getElementById("aiSourceType")?.value || "topic";
   document.getElementById("aiTopicField")?.classList.toggle("hidden", type !== "topic");
@@ -8151,8 +8206,10 @@ async function addAIQuestionsWithAutomaticMedia(list,count,fallbackType){
    the selected Prudle question/game type.
 ========================================================= */
 
-function buildPrudleRequestedTypeInstructions(requestedType){
+function buildPrudleRequestedTypeInstructions(requestedType, allowedTypes=[]){
   const type = String(requestedType || "smart").trim().toLowerCase();
+  const allowed = Array.isArray(allowedTypes) && allowedTypes.length ? allowedTypes.filter(t=>PRUDLE_AI_ACTIVITY_TYPES.includes(t)) : [...PRUDLE_AI_ACTIVITY_TYPES];
+  const allowedText = allowed.join(", ");
 
   const common = `
 CRITICAL PRUDLE TYPE RULES:
@@ -8178,8 +8235,9 @@ Return the actual Prudle type in every question object.
   if(type === "smart"){
     return common + `
 MODE: SMART.
-For EACH question independently, choose the educationally most suitable type from:
-mcq, match, order, random, wheel, wheelmcq, balloon, mystery, bomb.
+For EACH question independently, choose the educationally most suitable type ONLY from:
+${allowedText}.
+Never return a type outside this allowed list.
 Use variety only when the source content genuinely supports it.
 The wording MUST fit the chosen type and the answer structure MUST follow that type's schema.
 `;
@@ -8188,8 +8246,9 @@ The wording MUST fit the chosen type and the answer structure MUST follow that t
   if(type === "mixed"){
     return common + `
 MODE: MIXED.
-Create a varied set using multiple Prudle types from:
-mcq, match, order, random, wheel, wheelmcq, balloon, mystery, bomb.
+Create a varied set using multiple Prudle types ONLY from:
+${allowedText}.
+Never return a type outside this allowed list.
 Do not make everything MCQ.
 For every question, its wording and answer structure MUST exactly match its returned type.
 `;
@@ -8374,7 +8433,16 @@ async function generateQuestionsWithAI(){
     const sourceType = document.getElementById("aiSourceType").value;
     const level = document.getElementById("aiLevel").value;
     const count = Math.max(1, Math.min(20, Number(document.getElementById("aiQuestionCount").value || 10)));
-    const requestedType = document.getElementById("aiQuestionType").value;
+    let requestedType = document.getElementById("aiQuestionType").value;
+    const selectedAllowedTypes = getAIAllowedTypes();
+    if(!selectedAllowedTypes.length){
+      throw new Error("Select at least one Question / Game Type checkbox for AI generation.");
+    }
+    // When Smart/Mixed is used, checkboxes define the exact pool AI may mix.
+    // A fixed dropdown type remains fixed, but it is also added to the allowed pool automatically.
+    if(PRUDLE_AI_ACTIVITY_TYPES.includes(requestedType) && !selectedAllowedTypes.includes(requestedType)){
+      selectedAllowedTypes.push(requestedType);
+    }
     const requestedMedia = String(
       document.getElementById("aiMediaChoice")?.value || "none"
     ).trim().toLowerCase();
@@ -8384,7 +8452,7 @@ async function generateQuestionsWithAI(){
     ).trim().toLowerCase();
 
   const smartTypeInstructions = buildPrudleSmartTypeInstructions(requestedType);
-    const strictTypeInstructions = buildPrudleRequestedTypeInstructions(requestedType);
+    const strictTypeInstructions = buildPrudleRequestedTypeInstructions(requestedType, selectedAllowedTypes);
     const language = document.getElementById("aiLanguage").value;
     let sourceText = "";
 
@@ -8429,7 +8497,8 @@ async function generateQuestionsWithAI(){
 
           smartActivityTypes:requestedType === "smart",
           mixedActivityTypes:requestedType === "mixed",
-          availableActivityTypes:PRUDLE_AI_ACTIVITY_TYPES,
+          availableActivityTypes:selectedAllowedTypes,
+           allowedQuestionTypes:selectedAllowedTypes,
           smartTypeInstructions,
           strictTypeInstructions,
           language,
@@ -8453,6 +8522,10 @@ async function generateQuestionsWithAI(){
           selectedQuestions[mediaIndex],
           requestedType
         );
+
+        if((requestedType === "smart" || requestedType === "mixed") && !selectedAllowedTypes.includes(item.type)){
+          item = normalizeAIQuestion({...item,type:selectedAllowedTypes[0]}, selectedAllowedTypes[0]);
+        }
 
         if(requestedMedia === "none"){
           item.mediaType = "none";
