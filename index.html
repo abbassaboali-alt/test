@@ -296,6 +296,185 @@ button{cursor:pointer}
 @media(max-width:850px){.saved-type-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.saved-type-cards{grid-template-columns:1fr}.saved-type-card{min-height:125px}}
 
+
+/* =========================================================
+   SAVED ACTIVITIES — INTERACTIVE DESIGN CARDS
+   Uses the same visual language as the former design preview.
+========================================================= */
+.saved-type-cards{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+}
+.saved-type-card{
+  --kid-accent:var(--type-color,#2467a5);
+  --kid-soft:var(--type-soft,#eef6fd);
+  width:100%;
+  min-height:235px;
+  padding:17px;
+  border:1px solid #dce6ef;
+  border-radius:22px;
+  background:#fff;
+  color:var(--text);
+  text-align:left;
+  font:inherit;
+  box-shadow:0 9px 24px rgba(22,68,120,.08);
+  transition:transform .2s,box-shadow .2s,border-color .2s;
+  position:relative;
+  overflow:hidden;
+}
+.saved-type-card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 16px 30px rgba(22,68,120,.14);
+  border-color:var(--kid-accent);
+}
+.saved-type-card.active{
+  border:2px solid var(--kid-accent);
+  background:#fff;
+}
+.saved-type-card:after{
+  content:"";
+  position:absolute;
+  right:-28px;
+  top:-28px;
+  width:88px;
+  height:88px;
+  border-radius:50%;
+  background:var(--kid-soft);
+}
+.saved-type-card-top{
+  position:relative;
+  z-index:1;
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding-right:0;
+}
+.saved-type-card-icon{
+  width:52px;
+  height:52px;
+  flex:0 0 52px;
+  display:grid;
+  place-items:center;
+  border-radius:17px;
+  background:var(--kid-soft);
+  color:var(--kid-accent);
+  font-size:24px;
+}
+.saved-type-card-title-wrap{min-width:0;flex:1}
+.saved-type-card-name{
+  display:block;
+  font-size:16px;
+  line-height:1.35;
+  font-weight:900;
+  color:var(--text);
+}
+.saved-type-card-tag{
+  display:inline-flex;
+  margin-top:5px;
+  padding:4px 8px;
+  border-radius:999px;
+  background:var(--kid-soft);
+  color:var(--kid-accent);
+  font-size:10px;
+  font-weight:900;
+}
+.saved-type-card-desc{
+  position:relative;
+  z-index:1;
+  margin:13px 0 12px;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:700;
+  line-height:1.65;
+}
+.saved-type-mini-stage{
+  min-height:82px;
+  border-radius:16px;
+  padding:10px;
+  background:linear-gradient(145deg,var(--kid-soft),#fff);
+  border:1px dashed color-mix(in srgb,var(--kid-accent) 38%, #dce6ef);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  flex-wrap:wrap;
+  position:relative;
+  z-index:1;
+}
+.saved-type-mini-pill{
+  padding:7px 10px;
+  border-radius:11px;
+  background:#fff;
+  border:1px solid #dce6ef;
+  font-size:11px;
+  font-weight:900;
+  box-shadow:0 3px 8px rgba(22,68,120,.06);
+}
+.saved-type-mini-play{
+  width:39px;height:39px;border-radius:50%;
+  display:grid;place-items:center;
+  background:var(--kid-accent);color:#fff;
+  font-size:15px;box-shadow:0 6px 14px rgba(22,68,120,.18);
+}
+.saved-type-mini-outline{
+  width:39px;height:39px;border-radius:50%;
+  display:grid;place-items:center;background:#fff;color:var(--kid-accent);
+  border:2px solid var(--kid-accent);
+}
+.saved-type-letter{
+  width:32px;height:35px;border-radius:9px;background:#fff;
+  border:2px solid var(--kid-accent);display:grid;place-items:center;
+  color:var(--kid-accent);font-weight:900;font-size:13px;
+}
+.saved-type-word-chip{
+  padding:7px 9px;border-radius:10px;background:#fff;
+  border:1px solid #dce6ef;font-weight:900;font-size:11px;
+}
+.saved-type-catch-dot{
+  position:absolute;width:58px;min-height:30px;border-radius:999px;
+  display:grid;place-items:center;background:#fff;
+  border:2px solid var(--kid-accent);color:var(--kid-accent);
+  font-size:10px;font-weight:900;
+}
+.saved-type-catch-dot.one{left:8px;top:8px;transform:rotate(-4deg)}
+.saved-type-catch-dot.two{right:8px;top:10px;transform:rotate(5deg)}
+.saved-type-catch-dot.three{left:50%;bottom:7px;transform:translateX(-50%)}
+.saved-type-move-count{
+  width:38px;height:38px;border-radius:50%;display:grid;place-items:center;
+  background:var(--kid-accent);color:#fff;font-weight:900;font-size:18px;
+}
+.saved-type-move-go{font-size:23px;font-weight:900;color:var(--kid-accent)}
+.saved-type-count{
+  position:absolute;
+  right:11px;
+  bottom:9px;
+  z-index:3;
+  min-width:31px;
+  height:31px;
+  padding:0 8px;
+  border-radius:999px;
+  display:grid;
+  place-items:center;
+  background:var(--kid-accent);
+  color:#fff;
+  font-size:11px;
+  font-weight:900;
+  box-shadow:0 5px 12px rgba(22,68,120,.14);
+}
+.saved-type-card.all-type{
+  --type-color:#164478;
+  --type-soft:#edf4fa;
+  --kid-accent:#164478;
+  --kid-soft:#edf4fa;
+}
+@media(max-width:950px){
+  .saved-type-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:620px){
+  .saved-type-cards{grid-template-columns:1fr}
+  .saved-type-card{min-height:auto}
+}
+
 /* Saved Activities — type popup */
 .saved-activities-type-modal{
   position:fixed;inset:0;z-index:5000;display:none;align-items:center;justify-content:center;
@@ -2826,137 +3005,6 @@ button{cursor:pointer}
     </div>
 
 
-  <!-- =====================================================
-       KIDS INTERACTIVE ACTIVITIES — DESIGN PHASE 1
-       Visual concepts only; no existing logic is replaced.
-  ====================================================== -->
-  <div class="panel kids-activity-design-panel" id="kidsActivityDesignPanel">
-    <div class="panel-title">
-      <div class="kids-design-heading">
-        <div class="kids-title-icon"><i class="fa-solid fa-shapes"></i></div>
-        <div>
-          <h2 style="margin:0">Kids Interactive Activities</h2>
-          <div class="help" style="margin-top:3px">New activity designs for young learners</div>
-        </div>
-      </div>
-      <span class="badge">Design Preview</span>
-    </div>
-
-    <div class="kids-design-subtitle">
-      Listening, speaking, spelling, sentence building, speed and physical movement — designed as child-friendly games.
-    </div>
-
-    <div class="kids-activity-grid">
-
-      <div class="kids-activity-card listenchoose">
-        <div class="kids-card-top">
-          <div class="kids-card-icon">👂</div>
-          <div>
-            <div class="kids-card-title">Listen &amp; Choose</div>
-            <span class="kids-card-tag">LISTENING</span>
-          </div>
-        </div>
-        <div class="kids-card-desc">Listen to a word or sentence, then choose the correct picture or answer.</div>
-        <div class="kids-mini-stage">
-          <div class="kids-mini-play"><i class="fa-solid fa-play"></i></div>
-          <div class="kids-mini-pill">🍎 Apple</div>
-          <div class="kids-mini-pill">🍌 Banana</div>
-        </div>
-      </div>
-
-      <div class="kids-activity-card listenrepeat">
-        <div class="kids-card-top">
-          <div class="kids-card-icon">🔊</div>
-          <div>
-            <div class="kids-card-title">Listen &amp; Repeat</div>
-            <span class="kids-card-tag">PRONUNCIATION</span>
-          </div>
-        </div>
-        <div class="kids-card-desc">Play the model audio, then let the child record and repeat the word or sentence.</div>
-        <div class="kids-mini-stage">
-          <div class="kids-mini-play"><i class="fa-solid fa-volume-high"></i></div>
-          <div class="kids-mini-pill">Hello, teacher!</div>
-          <div class="kids-mini-mic"><i class="fa-solid fa-microphone"></i></div>
-        </div>
-      </div>
-
-      <div class="kids-activity-card buildword">
-        <div class="kids-card-top">
-          <div class="kids-card-icon">🔤</div>
-          <div>
-            <div class="kids-card-title">Build the Word</div>
-            <span class="kids-card-tag">SPELLING</span>
-          </div>
-        </div>
-        <div class="kids-card-desc">Show a picture and let the child arrange shuffled letters to build the correct word.</div>
-        <div class="kids-mini-stage">
-          <span style="font-size:27px">🍎</span>
-          <div class="kids-letter">P</div><div class="kids-letter">A</div>
-          <div class="kids-letter">L</div><div class="kids-letter">E</div>
-        </div>
-      </div>
-
-      <div class="kids-activity-card buildsentence">
-        <div class="kids-card-top">
-          <div class="kids-card-icon">🧩</div>
-          <div>
-            <div class="kids-card-title">Build the Sentence</div>
-            <span class="kids-card-tag">SENTENCE</span>
-          </div>
-        </div>
-        <div class="kids-card-desc">Arrange shuffled words in the correct order to make a complete sentence.</div>
-        <div class="kids-mini-stage">
-          <div class="kids-word-chip">This</div>
-          <div class="kids-word-chip">is</div>
-          <div class="kids-word-chip">my</div>
-          <div class="kids-word-chip">mother.</div>
-        </div>
-      </div>
-
-      <div class="kids-activity-card catchanswer">
-        <div class="kids-card-top">
-          <div class="kids-card-icon">🎯</div>
-          <div>
-            <div class="kids-card-title">Catch the Correct Answer</div>
-            <span class="kids-card-tag">SPEED GAME</span>
-          </div>
-        </div>
-        <div class="kids-card-desc">Answers move around the play area. Catch the correct answer before time runs out.</div>
-        <div class="kids-mini-stage">
-          <div class="kids-catch-dot one">CAT</div>
-          <div class="kids-catch-dot two">DOG</div>
-          <div class="kids-catch-dot three">BIRD</div>
-          <span style="font-size:26px">🎯</span>
-        </div>
-      </div>
-
-      <div class="kids-activity-card movechoose">
-        <div class="kids-card-top">
-          <div class="kids-card-icon">🏃</div>
-          <div>
-            <div class="kids-card-title">Move &amp; Choose</div>
-            <span class="kids-card-tag">PHYSICAL ACTIVITY</span>
-          </div>
-        </div>
-        <div class="kids-card-desc">A classroom movement challenge: find, touch, point, jump or act before the countdown ends.</div>
-        <div class="kids-mini-stage">
-          <div class="kids-move-count">3</div>
-          <div class="kids-move-count">2</div>
-          <div class="kids-move-count">1</div>
-          <div class="kids-move-go">GO! 🏃</div>
-          <div class="kids-mini-pill" style="width:100%;text-align:center">Touch something BLUE!</div>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="kids-design-note">
-      <i class="fa-solid fa-wand-magic-sparkles"></i>
-      Phase 1: visual design added without changing the current activity engine or saved data.
-    </div>
-  </div>
-
-
     <div id="questionTypeGroups" class="question-type-groups"></div>
     <div id="questionsContainer"></div>
 
@@ -3024,8 +3072,8 @@ button{cursor:pointer}
       class="activity-search-count">
     </div>
     <div id="savedActivityTypeBrowser" class="saved-type-browser">
-      <div class="saved-type-browser-title"><i class="fa-solid fa-shapes"></i> Activities by Question Type</div>
-      <div class="saved-type-browser-subtitle">Choose a type. Each card shows how many saved activity groups contain that question type.</div>
+      <div class="saved-type-browser-title"><i class="fa-solid fa-shapes"></i> Interactive Activities</div>
+      <div class="saved-type-browser-subtitle">Choose an activity type to open its saved groups.</div>
       <div id="savedActivityTypeCards" class="saved-type-cards"></div>
     </div>
 
@@ -9552,29 +9600,96 @@ let ADMIN_SAVED_TYPE_FILTER="";
 
 function getSavedTypeInfo(type){
   const map={
-    listenchoose:{label:"Listen & Choose",icon:"fa-solid fa-ear-listen"},
-    listenrepeat:{label:"Listen & Repeat",icon:"fa-solid fa-volume-high"},
-    buildword:{label:"Build the Word",icon:"fa-solid fa-font"},
-    buildsentence:{label:"Build the Sentence",icon:"fa-solid fa-puzzle-piece"},
-    catchanswer:{label:"Catch the Correct Answer",icon:"fa-solid fa-bullseye"},
-    movechoose:{label:"Move & Choose",icon:"fa-solid fa-person-running"},
-    mcq:{label:"Multiple Choice",icon:"fa-solid fa-list-check"},
-    match:{label:"Matching",icon:"fa-solid fa-link"},
-    order:{label:"Ordering",icon:"fa-solid fa-arrow-down-1-9"},
-    random:{label:"Random Image",icon:"fa-solid fa-images"},
-    wheelmcq:{label:"Wheel + Multiple Choice",icon:"fa-solid fa-dharmachakra"},
-    balloon:{label:"Balloon Pop",icon:"fa-solid fa-circle"},
-    mystery:{label:"Mystery Box",icon:"fa-solid fa-gift"},
-    bomb:{label:"Bomb Defuse",icon:"fa-solid fa-bomb"},
-    text:{label:"Written Answer",icon:"fa-solid fa-pen"},
-    voice:{label:"Speaking",icon:"fa-solid fa-microphone"},
-    audio:{label:"Audio",icon:"fa-solid fa-volume-high"},
-    video:{label:"Video",icon:"fa-solid fa-video"}
+    listenchoose:{label:"Listen & Choose",icon:"fa-solid fa-ear-listen",emoji:"👂",tag:"LISTENING",desc:"Listen to a word or sentence, then choose the correct picture or answer."},
+    listenrepeat:{label:"Listen & Repeat",icon:"fa-solid fa-volume-high",emoji:"🔊",tag:"PRONUNCIATION",desc:"Play the model audio, then let the learner record and repeat the word or sentence."},
+    buildword:{label:"Build the Word",icon:"fa-solid fa-font",emoji:"🔤",tag:"SPELLING",desc:"Show a picture and arrange shuffled letters to build the correct word."},
+    buildsentence:{label:"Build the Sentence",icon:"fa-solid fa-puzzle-piece",emoji:"🧩",tag:"SENTENCE",desc:"Arrange shuffled words in the correct order to make a complete sentence."},
+    catchanswer:{label:"Catch the Correct Answer",icon:"fa-solid fa-bullseye",emoji:"🎯",tag:"SPEED GAME",desc:"Answers move around the play area. Catch the correct answer before time runs out."},
+    movechoose:{label:"Move & Choose",icon:"fa-solid fa-person-running",emoji:"🏃",tag:"PHYSICAL ACTIVITY",desc:"A classroom movement challenge: find, touch, point, jump or act before the countdown ends."},
+    mcq:{label:"Multiple Choice",icon:"fa-solid fa-list-check",tag:"QUIZ",desc:"Choose the correct answer from multiple options."},
+    match:{label:"Matching",icon:"fa-solid fa-link",tag:"MATCHING",desc:"Connect each word, picture or prompt with its correct match."},
+    order:{label:"Ordering",icon:"fa-solid fa-arrow-down-1-9",tag:"ORDERING",desc:"Put the items in the correct sequence or order."},
+    random:{label:"Random Image",icon:"fa-solid fa-images",tag:"RANDOM",desc:"Reveal a random image and use it as an interactive classroom prompt."},
+    wheelmcq:{label:"Wheel + Multiple Choice",icon:"fa-solid fa-dharmachakra",tag:"WHEEL GAME",desc:"Spin the wheel, reveal a question and choose the correct answer."},
+    balloon:{label:"Balloon Pop",icon:"fa-solid fa-circle",tag:"POP GAME",desc:"Pop the balloon to reveal the question and answer the challenge."},
+    mystery:{label:"Mystery Box",icon:"fa-solid fa-gift",tag:"SURPRISE",desc:"Open the mystery box to reveal a hidden question or challenge."},
+    bomb:{label:"Bomb Defuse",icon:"fa-solid fa-bomb",tag:"CHALLENGE",desc:"Answer correctly before the countdown ends and defuse the bomb."},
+    text:{label:"Written Answer",icon:"fa-solid fa-pen",tag:"WRITING",desc:"Read the prompt and type a written answer."},
+    voice:{label:"Speaking",icon:"fa-solid fa-microphone",tag:"SPEAKING",desc:"Respond to the prompt using a spoken answer."},
+    audio:{label:"Audio",icon:"fa-solid fa-volume-high",tag:"LISTENING",desc:"Listen to the audio and respond to the activity prompt."},
+    video:{label:"Video",icon:"fa-solid fa-video",tag:"VIDEO",desc:"Watch the video and complete the related activity."}
   };
   return map[String(type||"").trim().toLowerCase()] || {
     label:"Activity",
-    icon:"fa-solid fa-gamepad"
+    icon:"fa-solid fa-gamepad",
+    tag:"ACTIVITY",
+    desc:"Open this interactive activity and view its saved groups."
   };
+}
+
+function savedTypeMiniPreview(type){
+  const t=String(type||"").trim().toLowerCase();
+
+  if(t==="listenchoose")return `
+    <div class="saved-type-mini-play"><i class="fa-solid fa-play"></i></div>
+    <div class="saved-type-mini-pill">🍎 Apple</div>
+    <div class="saved-type-mini-pill">🍌 Banana</div>`;
+
+  if(t==="listenrepeat")return `
+    <div class="saved-type-mini-play"><i class="fa-solid fa-volume-high"></i></div>
+    <div class="saved-type-mini-pill">Hello, teacher!</div>
+    <div class="saved-type-mini-outline"><i class="fa-solid fa-microphone"></i></div>`;
+
+  if(t==="buildword")return `
+    <span style="font-size:27px">🍎</span>
+    <div class="saved-type-letter">P</div><div class="saved-type-letter">A</div>
+    <div class="saved-type-letter">L</div><div class="saved-type-letter">E</div>`;
+
+  if(t==="buildsentence")return `
+    <div class="saved-type-word-chip">This</div><div class="saved-type-word-chip">is</div>
+    <div class="saved-type-word-chip">my</div><div class="saved-type-word-chip">mother.</div>`;
+
+  if(t==="catchanswer")return `
+    <div class="saved-type-catch-dot one">CAT</div>
+    <div class="saved-type-catch-dot two">DOG</div>
+    <div class="saved-type-catch-dot three">BIRD</div>
+    <span style="font-size:26px">🎯</span>`;
+
+  if(t==="movechoose")return `
+    <div class="saved-type-move-count">3</div><div class="saved-type-move-count">2</div>
+    <div class="saved-type-move-count">1</div><div class="saved-type-move-go">GO! 🏃</div>
+    <div class="saved-type-mini-pill" style="width:100%;text-align:center">Touch something BLUE!</div>`;
+
+  if(t==="mcq")return `
+    <div class="saved-type-mini-pill">A</div><div class="saved-type-mini-pill">B</div>
+    <div class="saved-type-mini-pill">C</div><div class="saved-type-mini-pill">✓</div>`;
+
+  if(t==="match")return `
+    <div class="saved-type-mini-pill">🍎 Apple</div><i class="fa-solid fa-link" style="color:var(--kid-accent)"></i>
+    <div class="saved-type-mini-pill">🐶 Dog</div>`;
+
+  if(t==="order")return `
+    <div class="saved-type-word-chip">1</div><i class="fa-solid fa-arrow-right" style="color:var(--kid-accent)"></i>
+    <div class="saved-type-word-chip">2</div><i class="fa-solid fa-arrow-right" style="color:var(--kid-accent)"></i>
+    <div class="saved-type-word-chip">3</div>`;
+
+  if(t==="random")return `
+    <div class="saved-type-mini-play"><i class="fa-solid fa-shuffle"></i></div>
+    <div class="saved-type-mini-pill">🖼️ Random Image</div>`;
+
+  if(t==="wheelmcq")return `
+    <div class="saved-type-mini-play"><i class="fa-solid fa-dharmachakra"></i></div>
+    <div class="saved-type-mini-pill">Spin</div><div class="saved-type-mini-pill">Choose</div>`;
+
+  if(t==="balloon")return `<span style="font-size:42px">🎈</span><div class="saved-type-mini-pill">POP!</div>`;
+  if(t==="mystery")return `<span style="font-size:42px">🎁</span><div class="saved-type-mini-pill">Open the box</div>`;
+  if(t==="bomb")return `<span style="font-size:40px">💣</span><div class="saved-type-mini-pill">3 · 2 · 1</div>`;
+  if(t==="text")return `<div class="saved-type-mini-pill" style="width:80%;text-align:left">Type your answer...</div>`;
+  if(t==="voice")return `<div class="saved-type-mini-outline"><i class="fa-solid fa-microphone"></i></div><div class="saved-type-mini-pill">Speak now</div>`;
+  if(t==="audio")return `<div class="saved-type-mini-play"><i class="fa-solid fa-play"></i></div><div class="saved-type-mini-pill">Listen</div>`;
+  if(t==="video")return `<div class="saved-type-mini-play"><i class="fa-solid fa-play"></i></div><div class="saved-type-mini-pill">Watch Video</div>`;
+
+  return `<div class="saved-type-mini-play"><i class="fa-solid fa-gamepad"></i></div><div class="saved-type-mini-pill">Open Activity</div>`;
 }
 
 function savedTypeTheme(type){
@@ -9624,12 +9739,19 @@ function renderSavedTypeCards(activities){
       onclick="setAdminSavedTypeFilter('')">
       <div class="saved-type-card-top">
         <span class="saved-type-card-icon"><i class="fa-solid fa-layer-group"></i></span>
-        <span class="saved-type-card-name">All Question Types</span>
+        <span class="saved-type-card-title-wrap">
+          <span class="saved-type-card-name">All Question Types</span>
+          <span class="saved-type-card-tag">ALL ACTIVITIES</span>
+        </span>
       </div>
-      <div class="saved-type-card-bottom">
-        <span class="saved-type-card-count">${total} ${total===1?"Group":"Groups"}</span>
-        <span class="saved-type-card-number">${total}</span>
+      <div class="saved-type-card-desc">Open all saved activity groups and browse every available question type.</div>
+      <div class="saved-type-mini-stage">
+        <div class="saved-type-mini-play"><i class="fa-solid fa-shapes"></i></div>
+        <div class="saved-type-mini-pill">Listen</div>
+        <div class="saved-type-mini-pill">Play</div>
+        <div class="saved-type-mini-pill">Speak</div>
       </div>
+      <span class="saved-type-count" title="${total} saved groups">${total}</span>
     </button>`;
 
   html+=types.map(type=>{
@@ -9643,13 +9765,17 @@ function renderSavedTypeCards(activities){
         style="--type-color:${color};--type-soft:${soft}"
         onclick="setAdminSavedTypeFilter('${esc(type)}')">
         <div class="saved-type-card-top">
-          <span class="saved-type-card-icon"><i class="${info.icon}"></i></span>
-          <span class="saved-type-card-name">${esc(info.label)}</span>
+          <span class="saved-type-card-icon">${
+            info.emoji ? esc(info.emoji) : `<i class="${info.icon}"></i>`
+          }</span>
+          <span class="saved-type-card-title-wrap">
+            <span class="saved-type-card-name">${esc(info.label)}</span>
+            <span class="saved-type-card-tag">${esc(info.tag||"ACTIVITY")}</span>
+          </span>
         </div>
-        <div class="saved-type-card-bottom">
-          <span class="saved-type-card-count">${count} ${count===1?"Group":"Groups"}</span>
-          <span class="saved-type-card-number">${count}</span>
-        </div>
+        <div class="saved-type-card-desc">${esc(info.desc||"Open this interactive activity.")}</div>
+        <div class="saved-type-mini-stage">${savedTypeMiniPreview(type)}</div>
+        <span class="saved-type-count" title="${count} saved ${count===1?"group":"groups"}">${count}</span>
       </button>`;
   }).join("");
 
