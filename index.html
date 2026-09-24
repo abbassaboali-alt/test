@@ -495,6 +495,36 @@ button{cursor:pointer}
   width:44px;height:44px;border:0;border-radius:14px;background:#edf4fa;color:var(--blue);
   display:grid;place-items:center;font-size:20px
 }
+.saved-activities-popup-search{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:14px 18px 0;
+  padding:0 12px;
+  min-height:48px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:#fff;
+  box-shadow:0 5px 14px rgba(22,68,120,.05);
+}
+.saved-activities-popup-search > i{color:var(--blue);font-size:15px}
+.saved-activities-popup-search input{
+  flex:1;
+  min-width:0;
+  height:46px;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:var(--text);
+  font:inherit;
+  font-size:16px;
+}
+.saved-activities-popup-search-clear{
+  width:36px;height:36px;flex:0 0 36px;
+  border:0;border-radius:10px;
+  background:#edf4fa;color:var(--blue);
+  display:grid;place-items:center;cursor:pointer;
+}
 .saved-activities-type-body{padding:18px;overflow:auto;overscroll-behavior:contain}
 #adminActivities.saved-admin-list-inline-hidden{display:none}
 #savedActivitiesTypeModalBody #adminActivities{display:grid}
@@ -502,7 +532,7 @@ button{cursor:pointer}
   .saved-activities-type-modal{padding:9px}
   .saved-activities-type-dialog{width:100%;max-height:95vh;border-radius:18px}
   .saved-activities-type-head{padding:13px 14px}
-  .saved-activities-type-body{padding:11px}
+  .saved-activities-popup-search{margin:10px 11px 0}\n  .saved-activities-type-body{padding:11px}
 }
 
 
@@ -3089,6 +3119,24 @@ button{cursor:pointer}
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
+
+        <div class="saved-activities-popup-search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input
+            id="savedActivitiesModalSearch"
+            type="search"
+            placeholder="Search saved activities..."
+            autocomplete="off"
+            oninput="syncSavedActivitiesModalSearch(this.value)">
+          <button
+            type="button"
+            class="saved-activities-popup-search-clear"
+            title="Clear search"
+            onclick="clearSavedActivitiesModalSearch()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
         <div id="savedActivitiesTypeModalBody" class="saved-activities-type-body"></div>
       </div>
     </div>
@@ -5179,8 +5227,8 @@ function renderQuestionLockControls(){
     button.style.display = getCurrentPrudleUsername() ? "" : "none";
     button.disabled = !getCurrentPrudleUsername();
     button.innerHTML = locked
-      ? '<i class="fa-solid fa-lock-open"></i> Unlock Quiz'
-      : '<i class="fa-solid fa-lock"></i> Lock Quiz';
+      ? '<i class="fa-solid fa-lock-open"></i> Unlock Questions'
+      : '<i class="fa-solid fa-lock"></i> Lock Questions';
   }
 }
 
@@ -9782,6 +9830,21 @@ function renderSavedTypeCards(activities){
   host.innerHTML=html;
 }
 
+function syncSavedActivitiesModalSearch(value){
+  const mainSearch=document.getElementById("adminActivitySearch");
+  if(mainSearch){
+    mainSearch.value=String(value||"");
+  }
+  renderAdminActivities();
+}
+
+function clearSavedActivitiesModalSearch(){
+  const popupSearch=document.getElementById("savedActivitiesModalSearch");
+  if(popupSearch)popupSearch.value="";
+  syncSavedActivitiesModalSearch("");
+  popupSearch?.focus();
+}
+
 function setAdminSavedTypeFilter(type){
   ADMIN_SAVED_TYPE_FILTER=String(type||"").trim().toLowerCase();
 
@@ -9791,8 +9854,14 @@ function setAdminSavedTypeFilter(type){
   const body=document.getElementById("savedActivitiesTypeModalBody");
   const title=document.getElementById("savedActivitiesTypeModalTitle");
   const list=document.getElementById("adminActivities");
+  const popupSearch=document.getElementById("savedActivitiesModalSearch");
+  const mainSearch=document.getElementById("adminActivitySearch");
 
   if(!modal || !body || !list)return;
+
+  if(popupSearch){
+    popupSearch.value=String(mainSearch?.value||"");
+  }
 
   const info=ADMIN_SAVED_TYPE_FILTER
     ? getSavedTypeInfo(ADMIN_SAVED_TYPE_FILTER)
@@ -10064,45 +10133,61 @@ function renderAdminActivities(){
 
           <div class="actions">
 
-            ${isActivityLockedForCurrentUser(activity) ? `<button class="btn btn-light" type="button" disabled title="Locked by ${esc(activity.lockedBy || activity.lockedByUsername || "another user")}"><i class="fa-solid fa-lock"></i> Locked</button>` : `<button class="btn btn-primary" onclick="editActivity('${activity.id}')"><i class="fa-solid fa-pen"></i> Edit</button>`}
+            ${isActivityLockedForCurrentUser(activity) ? `<button class="btn btn-light" type="button" disabled title="Locked by ${esc(activity.lockedBy || activity.lockedByUsername || "another user")}"><i class="fa-solid fa-lock"></i> Locked</button>` : `<button class="btn btn-primary" onclick="closeSavedActivitiesTypeModal();editActivity('${activity.id}')"><i class="fa-solid fa-pen"></i> Edit</button>`}
 
             <button
               class="btn btn-success"
-              onclick="previewActivity('${activity.id}')">
+              onclick="closeSavedActivitiesTypeModal();previewActivity('${activity.id}')">
 
               <i class="fa-solid fa-eye"></i>
               Preview
             </button>
 
 
-            <button
-              class="btn btn-light"
-              onclick="copyActivity('${activity.id}')">
-
-              <i class="fa-solid fa-copy"></i>
-              Copy
-            </button>
+            ${
+              isActivityLockedForCurrentUser(activity)
+                ? `<button class="btn btn-light" type="button" disabled title="Questions locked by ${esc(activity.lockedBy || activity.lockedByUsername || "another user")}"><i class="fa-solid fa-lock"></i> Copy Locked</button>`
+                : `
+                  <button
+                    class="btn btn-light"
+                    onclick="closeSavedActivitiesTypeModal();copyActivity('${activity.id}')">
+                    <i class="fa-solid fa-copy"></i>
+                    Copy
+                  </button>
+                `
+            }
 
             ${
               getCurrentPrudleUsername()
-                ? `
-                  <button
-                    class="btn btn-gold"
-                    onclick="toggleActivityQuestionsLock('${activity.id}')">
-
-                    <i class="fa-solid ${
-                      activity.questionsLocked
-                        ? "fa-lock-open"
-                        : "fa-lock"
-                    }"></i>
-
-                    ${
-                      activity.questionsLocked
-                        ? "Unlock Quiz"
-                        : "Lock Quiz"
-                    }
-                  </button>
-                `
+                ? (
+                    activity.questionsLocked && isActivityLockedForCurrentUser(activity)
+                      ? `
+                        <button
+                          class="btn btn-light"
+                          type="button"
+                          disabled
+                          title="Only ${esc(activity.lockedBy || activity.lockedByUsername || "the user who locked it")} can unlock these questions">
+                          <i class="fa-solid fa-lock"></i>
+                          Questions Locked
+                        </button>
+                      `
+                      : `
+                        <button
+                          class="btn btn-gold"
+                          onclick="closeSavedActivitiesTypeModal();toggleActivityQuestionsLock('${activity.id}')">
+                          <i class="fa-solid ${
+                            activity.questionsLocked
+                              ? "fa-lock-open"
+                              : "fa-lock"
+                          }"></i>
+                          ${
+                            activity.questionsLocked
+                              ? "Unlock Questions"
+                              : "Lock Questions"
+                          }
+                        </button>
+                      `
+                  )
                 : ""
             }
 
@@ -10114,7 +10199,7 @@ function renderAdminActivities(){
                 ? `
                   <button
                     class="btn btn-danger"
-                    onclick="deleteActivity('${activity.id}')">
+                    onclick="closeSavedActivitiesTypeModal();deleteActivity('${activity.id}')">
 
                     <i class="fa-solid fa-trash"></i>
                     Delete
