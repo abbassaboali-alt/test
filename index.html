@@ -2409,13 +2409,25 @@ button{cursor:pointer}
         </select>
           <div class="field">
             <label>AI Media</label>
-            <select id="aiMediaChoice">
+            <select id="aiMediaChoice" onchange="updateAIImagePlacementUI()">
               <option value="none">No Media</option>
               <option value="image">🖼️ Images</option>
               <option value="video">🎬 Videos</option>
               <option value="audio">🔊 Audio</option>
             </select>
             <div class="help">Choose before generating. Media will be created only when selected here.</div>
+          </div>
+          <div class="field hidden" id="aiImagePlacementField">
+            <label>Where should images appear?</label>
+            <select id="aiImagePlacement">
+              <option value="question">Question only</option>
+              <option value="answers">Answers / Options only</option>
+              <option value="both">Question + Answers / Options</option>
+            </select>
+            <div class="help">
+              For Match, answer images are attached to the matching items. For Multiple Choice,
+              images can appear above the question, inside the choices, or in both places.
+            </div>
           </div>
         <div class="help">
           Smart mode analyzes each generated question and automatically assigns the most suitable activity:
@@ -7273,6 +7285,16 @@ function updateAISourceUI(){
   document.getElementById("aiFileField")?.classList.toggle("hidden", type !== "file");
 }
 
+
+function updateAIImagePlacementUI(){
+  const media = String(
+    document.getElementById("aiMediaChoice")?.value || "none"
+  ).trim().toLowerCase();
+
+  document.getElementById("aiImagePlacementField")
+    ?.classList.toggle("hidden", media !== "image");
+}
+
 function setAIStatus(message, kind=""){
   const box = document.getElementById("aiGeneratorStatus");
   if(!box) return;
@@ -7952,6 +7974,85 @@ function normalizeAIQuestionForRequestedMode(question, requestedType){
 }
 
 
+
+function prudleAnswerImagePrompt(question, answer){
+  const type = String(question?.type || "mcq").toLowerCase();
+  const questionText = String(question?.text || "").trim();
+  const left = String(answer?.text || "").trim();
+  const right = String(answer?.right || "").trim();
+  const target = type === "match" ? (right || left) : (left || right);
+
+  return [
+    "Create one clear educational image for one answer option only.",
+    `Question type: ${type}.`,
+    questionText ? `Question: ${questionText}` : "",
+    type === "match" && left ? `Left item: ${left}.` : "",
+    target ? `The image must specifically represent this answer: ${target}.` : "",
+    "Do not combine multiple answers in one image.",
+    "Do not create a worksheet, collage, answer key, or full question card.",
+    "Use a simple centered subject and a clean educational background.",
+    "Avoid extra written text unless the answer itself must be shown as text."
+  ].filter(Boolean).join(" ");
+}
+
+async function generatePrudleAnswerImages(question, questionIndex, questionTotal){
+  const q = question && typeof question === "object" ? question : {};
+  const answers = Array.isArray(q.answers) ? q.answers : [];
+
+  for(let answerIndex=0; answerIndex<answers.length; answerIndex++){
+    const answer = answers[answerIndex];
+    if(!answer) continue;
+
+    const target = String(
+      q.type === "match"
+        ? (answer.right || answer.text || "")
+        : (answer.text || answer.right || "")
+    ).trim();
+
+    if(!target) continue;
+
+    setAIStatus(
+      `Creating answer image ${answerIndex + 1} of ${answers.length} ` +
+      `for question ${questionIndex + 1} of ${questionTotal}...`
+    );
+
+    const prompt = prudleAnswerImagePrompt(q, answer);
+
+    const response = await fetch(PRUDLE_AI_ENDPOINT,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        task:"generate_question_media",
+        mediaType:"image",
+        questionText:String(q.text || ""),
+        text:target,
+        mediaPrompt:prompt,
+        prompt,
+        imageStyle:"clear educational illustration",
+        imageAspectRatio:"1:1"
+      })
+    });
+
+    const raw = await response.text();
+    let payload = {};
+    try{ payload = raw ? JSON.parse(raw) : {}; }catch(_){}
+
+    if(!response.ok){
+      throw new Error(payload?.error || `Answer image generation failed (${response.status}).`);
+    }
+
+    const imageUrl = String(payload?.url || payload?.mediaUrl || "").trim();
+    if(!imageUrl){
+      throw new Error(`No image URL returned for answer ${answerIndex + 1}.`);
+    }
+
+    answer.image = imageUrl;
+  }
+
+  q.answers = answers;
+  return q;
+}
+
 async function generateQuestionsWithAI(){
   try{
     if(!requireAdminForQuestions()) return;
@@ -7966,6 +8067,10 @@ async function generateQuestionsWithAI(){
     const requestedType = document.getElementById("aiQuestionType").value;
     const requestedMedia = String(
       document.getElementById("aiMediaChoice")?.value || "none"
+    ).trim().toLowerCase();
+
+    const imagePlacement = String(
+      document.getElementById("aiImagePlacement")?.value || "question"
     ).trim().toLowerCase();
 
   const smartTypeInstructions = buildPrudleSmartTypeInstructions(requestedType);
@@ -8010,6 +8115,7 @@ async function generateQuestionsWithAI(){
           questionType:requestedType,
           requestedQuestionType:requestedType,
           mediaType:requestedMedia,
+          imagePlacement:requestedMedia === "image" ? imagePlacement : "question",
 
           smartActivityTypes:requestedType === "smart",
           mixedActivityTypes:requestedType === "mixed",
@@ -8044,7 +8150,93 @@ async function generateQuestionsWithAI(){
           item.image = "";
           item.video = "";
           item.audio = "";
+
+          if(Array.isArray(item.answers)){
+            item.answers.forEach(answer => answer.image = "");
+          }
+
+        }else if(requestedMedia === "image"){
+          const wantsQuestionImage =
+            imagePlacement === "question" || imagePlacement === "both";
+
+          const wantsAnswerImages =
+            imagePlacement === "answers" || imagePlacement === "both";
+
+          if(wantsQuestionImage){
+            item.mediaType = "image";
+
+            const prompt = String(
+              item.mediaPrompt ||
+              item.text ||
+              sourceText ||
+              "Educational English language activity"
+            ).trim();
+
+            setAIStatus(
+              `Creating question image ${mediaIndex + 1} of ${selectedQuestions.length}...`
+            );
+
+            try{
+              const response = await fetch(PRUDLE_AI_ENDPOINT,{
+                method:"POST",
+                headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({
+                  task:"generate_question_media",
+                  mediaType:"image",
+                  questionText:String(item.text || ""),
+                  text:String(item.text || ""),
+                  mediaPrompt:prompt,
+                  prompt,
+                  imageStyle:"clear educational illustration",
+                  imageAspectRatio:"1:1"
+                })
+              });
+
+              const raw = await response.text();
+              let payload = {};
+              try{ payload = raw ? JSON.parse(raw) : {}; }catch(_){}
+
+              if(!response.ok){
+                throw new Error(payload?.error || `Question image generation failed (${response.status}).`);
+              }
+
+              const url = String(payload?.url || payload?.mediaUrl || "").trim();
+              if(!url) throw new Error("No question image URL was returned.");
+
+              item.mediaUrl = url;
+              item.image = url;
+
+            }catch(error){
+              console.error("AI question image generation error:",error);
+              item.mediaType = "none";
+              item.mediaUrl = "";
+              item.image = "";
+              toast(`Question ${mediaIndex + 1}: question image could not be generated.`);
+            }
+          }else{
+            // Answers only: do not create/show the large question image.
+            item.mediaType = "none";
+            item.mediaUrl = "";
+            item.image = "";
+          }
+
+          if(wantsAnswerImages){
+            try{
+              item = await generatePrudleAnswerImages(
+                item,
+                mediaIndex,
+                selectedQuestions.length
+              );
+            }catch(error){
+              console.error("AI answer image generation error:",error);
+              toast(`Question ${mediaIndex + 1}: one or more answer images could not be generated.`);
+            }
+          }else if(Array.isArray(item.answers)){
+            item.answers.forEach(answer => answer.image = "");
+          }
+
         }else{
+          // Video and audio stay attached to the question itself.
           item.mediaType = requestedMedia;
 
           const mediaPrompt = String(
@@ -8068,7 +8260,7 @@ async function generateQuestionsWithAI(){
                 questionText:String(item.text || ""),
                 text:String(item.text || ""),
                 audioText:String(item.text || ""),
-                mediaPrompt:mediaPrompt,
+                mediaPrompt,
                 prompt:mediaPrompt,
                 imageStyle:"clear educational illustration",
                 imageAspectRatio:"1:1",
@@ -8101,9 +8293,7 @@ async function generateQuestionsWithAI(){
 
               if(operationName){
                 for(let attempt=1; attempt<=40 && !mediaUrl; attempt++){
-                  setAIStatus(
-                    `Processing video ${mediaIndex + 1} of ${selectedQuestions.length}...`
-                  );
+                  setAIStatus(`Processing video ${mediaIndex + 1} of ${selectedQuestions.length}...`);
                   await new Promise(resolve=>setTimeout(resolve,5000));
 
                   const checkResponse = await fetch(PRUDLE_AI_ENDPOINT,{
@@ -8134,9 +8324,7 @@ async function generateQuestionsWithAI(){
 
             item.mediaUrl = mediaUrl;
 
-            if(requestedMedia === "image"){
-              item.image = mediaUrl;
-            }else if(requestedMedia === "video"){
+            if(requestedMedia === "video"){
               item.video = mediaUrl;
             }else if(requestedMedia === "audio"){
               item.audio = mediaUrl;
@@ -8147,7 +8335,6 @@ async function generateQuestionsWithAI(){
             console.error("AI media generation error:",mediaError);
             item.mediaType = "none";
             item.mediaUrl = "";
-            item.image = "";
             item.video = "";
             item.audio = "";
             toast(`Question ${mediaIndex + 1}: ${requestedMedia} could not be generated.`);
@@ -8159,7 +8346,11 @@ async function generateQuestionsWithAI(){
 
       setAIStatus(
         `Added ${selectedQuestions.length} AI questions` +
-        (requestedMedia === "none" ? " without media." : ` with ${requestedMedia}.`) +
+        (requestedMedia === "none"
+          ? " without media."
+          : requestedMedia === "image"
+            ? ` with images (${imagePlacement}).`
+            : ` with ${requestedMedia}.`) +
         " Review or edit them, then click Save Activity.",
         "success"
       );
