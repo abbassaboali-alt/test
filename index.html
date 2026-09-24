@@ -296,6 +296,37 @@ button{cursor:pointer}
 @media(max-width:850px){.saved-type-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.saved-type-cards{grid-template-columns:1fr}.saved-type-card{min-height:125px}}
 
+/* Saved Activities — type popup */
+.saved-activities-type-modal{
+  position:fixed;inset:0;z-index:5000;display:none;align-items:center;justify-content:center;
+  padding:22px;background:rgba(12,34,54,.6);backdrop-filter:blur(5px)
+}
+.saved-activities-type-modal.show{display:flex}
+.saved-activities-type-dialog{
+  width:min(1180px,96vw);max-height:92vh;overflow:hidden;background:#fff;
+  border:1px solid var(--border);border-radius:24px;box-shadow:0 30px 80px rgba(0,0,0,.28);
+  display:flex;flex-direction:column
+}
+.saved-activities-type-head{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:17px 20px;border-bottom:1px solid var(--border);background:#f8fbfd
+}
+.saved-activities-type-title{font-size:19px;font-weight:900;color:var(--blue)}
+.saved-activities-type-close{
+  width:44px;height:44px;border:0;border-radius:14px;background:#edf4fa;color:var(--blue);
+  display:grid;place-items:center;font-size:20px
+}
+.saved-activities-type-body{padding:18px;overflow:auto;overscroll-behavior:contain}
+#adminActivities.saved-admin-list-inline-hidden{display:none}
+#savedActivitiesTypeModalBody #adminActivities{display:grid}
+@media(max-width:600px){
+  .saved-activities-type-modal{padding:9px}
+  .saved-activities-type-dialog{width:100%;max-height:95vh;border-radius:18px}
+  .saved-activities-type-head{padding:13px 14px}
+  .saved-activities-type-body{padding:11px}
+}
+
+
 
 @media(max-width:520px){
   .activity-type-logo{
@@ -2994,8 +3025,24 @@ button{cursor:pointer}
     </div>
     <div id="savedActivityTypeBrowser" class="saved-type-browser">
       <div class="saved-type-browser-title"><i class="fa-solid fa-shapes"></i> Activities by Question Type</div>
-      <div class="saved-type-browser-subtitle">Choose a type. Each card shows the number of saved questions inside that type.</div>
+      <div class="saved-type-browser-subtitle">Choose a type. Each card shows how many saved activity groups contain that question type.</div>
       <div id="savedActivityTypeCards" class="saved-type-cards"></div>
+    </div>
+
+    <div id="savedActivitiesTypeModal" class="saved-activities-type-modal"
+      onclick="closeSavedActivitiesTypeModal(event)">
+      <div class="saved-activities-type-dialog" onclick="event.stopPropagation()">
+        <div class="saved-activities-type-head">
+          <div id="savedActivitiesTypeModalTitle" class="saved-activities-type-title">
+            Saved Activity Groups
+          </div>
+          <button type="button" class="saved-activities-type-close"
+            onclick="closeSavedActivitiesTypeModal()" aria-label="Close">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div id="savedActivitiesTypeModalBody" class="saved-activities-type-body"></div>
+      </div>
     </div>
 
     <div id="adminActivities" class="activity-list"></div>
@@ -9503,6 +9550,33 @@ async function loadActivities(){
 
 let ADMIN_SAVED_TYPE_FILTER="";
 
+function getSavedTypeInfo(type){
+  const map={
+    listenchoose:{label:"Listen & Choose",icon:"fa-solid fa-ear-listen"},
+    listenrepeat:{label:"Listen & Repeat",icon:"fa-solid fa-volume-high"},
+    buildword:{label:"Build the Word",icon:"fa-solid fa-font"},
+    buildsentence:{label:"Build the Sentence",icon:"fa-solid fa-puzzle-piece"},
+    catchanswer:{label:"Catch the Correct Answer",icon:"fa-solid fa-bullseye"},
+    movechoose:{label:"Move & Choose",icon:"fa-solid fa-person-running"},
+    mcq:{label:"Multiple Choice",icon:"fa-solid fa-list-check"},
+    match:{label:"Matching",icon:"fa-solid fa-link"},
+    order:{label:"Ordering",icon:"fa-solid fa-arrow-down-1-9"},
+    random:{label:"Random Image",icon:"fa-solid fa-images"},
+    wheelmcq:{label:"Wheel + Multiple Choice",icon:"fa-solid fa-dharmachakra"},
+    balloon:{label:"Balloon Pop",icon:"fa-solid fa-circle"},
+    mystery:{label:"Mystery Box",icon:"fa-solid fa-gift"},
+    bomb:{label:"Bomb Defuse",icon:"fa-solid fa-bomb"},
+    text:{label:"Written Answer",icon:"fa-solid fa-pen"},
+    voice:{label:"Speaking",icon:"fa-solid fa-microphone"},
+    audio:{label:"Audio",icon:"fa-solid fa-volume-high"},
+    video:{label:"Video",icon:"fa-solid fa-video"}
+  };
+  return map[String(type||"").trim().toLowerCase()] || {
+    label:"Activity",
+    icon:"fa-solid fa-gamepad"
+  };
+}
+
 function savedTypeTheme(type){
   const x={
     mcq:["#08744f","#e5f8f0"],match:["#155a8a","#e7f4fd"],order:["#9a4d00","#fff0df"],
@@ -9517,34 +9591,121 @@ function savedTypeTheme(type){
 }
 function savedTypeCounts(activities){
   const counts={};
-  (activities||[]).forEach(a=>(a.questions||[]).forEach(q=>{
-    const t=String(q?.type||"mcq").trim().toLowerCase();
-    if(t && t!=="wheel") counts[t]=(counts[t]||0)+1;
-  }));
+
+  (activities||[]).forEach(activity=>{
+    const types=new Set(
+      (Array.isArray(activity?.questions) ? activity.questions : [])
+        .map(q=>String(q?.type||"mcq").trim().toLowerCase())
+        .filter(type=>type && type!=="wheel")
+    );
+
+    types.forEach(type=>{
+      counts[type]=(counts[type]||0)+1;
+    });
+  });
+
   return counts;
 }
 function renderSavedTypeCards(activities){
   const host=document.getElementById("savedActivityTypeCards");
   if(!host)return;
+
   const counts=savedTypeCounts(activities);
-  const order=["listenchoose","listenrepeat","buildword","buildsentence","catchanswer","movechoose","mcq","match","order","random","wheelmcq","balloon","mystery","bomb","text","voice","audio","video"];
-  const types=order.filter(t=>(counts[t]||0)>0);
-  const total=Object.values(counts).reduce((a,b)=>a+Number(b||0),0);
-  let html=`<button type="button" class="saved-type-card all-type ${!ADMIN_SAVED_TYPE_FILTER?"active":""}" onclick="setAdminSavedTypeFilter('')">
-    <div class="saved-type-card-top"><span class="saved-type-card-icon"><i class="fa-solid fa-layer-group"></i></span><span class="saved-type-card-name">All Question Types</span></div>
-    <div class="saved-type-card-bottom"><span class="saved-type-card-count">${total} Questions</span><span class="saved-type-card-number">${total}</span></div></button>`;
-  html+=types.map(t=>{
-    const info=getGameTypeInfo(t),n=counts[t]||0,[c,b]=savedTypeTheme(t);
-    return `<button type="button" class="saved-type-card ${ADMIN_SAVED_TYPE_FILTER===t?"active":""}" style="--type-color:${c};--type-soft:${b}" onclick="setAdminSavedTypeFilter('${esc(t)}')">
-      <div class="saved-type-card-top"><span class="saved-type-card-icon"><i class="${info.icon}"></i></span><span class="saved-type-card-name">${esc(info.label)}</span></div>
-      <div class="saved-type-card-bottom"><span class="saved-type-card-count">${n} ${n===1?"Question":"Questions"}</span><span class="saved-type-card-number">${n}</span></div></button>`;
+  const order=[
+    "listenchoose","listenrepeat","buildword","buildsentence","catchanswer","movechoose",
+    "mcq","match","order","random","wheelmcq","balloon","mystery","bomb","text","voice","audio","video"
+  ];
+  const types=order.filter(type=>(counts[type]||0)>0);
+  const total=(activities||[]).length;
+
+  let html=`
+    <button type="button"
+      class="saved-type-card all-type ${!ADMIN_SAVED_TYPE_FILTER?"active":""}"
+      onclick="setAdminSavedTypeFilter('')">
+      <div class="saved-type-card-top">
+        <span class="saved-type-card-icon"><i class="fa-solid fa-layer-group"></i></span>
+        <span class="saved-type-card-name">All Question Types</span>
+      </div>
+      <div class="saved-type-card-bottom">
+        <span class="saved-type-card-count">${total} ${total===1?"Group":"Groups"}</span>
+        <span class="saved-type-card-number">${total}</span>
+      </div>
+    </button>`;
+
+  html+=types.map(type=>{
+    const info=getSavedTypeInfo(type);
+    const count=counts[type]||0;
+    const [color,soft]=savedTypeTheme(type);
+
+    return `
+      <button type="button"
+        class="saved-type-card ${ADMIN_SAVED_TYPE_FILTER===type?"active":""}"
+        style="--type-color:${color};--type-soft:${soft}"
+        onclick="setAdminSavedTypeFilter('${esc(type)}')">
+        <div class="saved-type-card-top">
+          <span class="saved-type-card-icon"><i class="${info.icon}"></i></span>
+          <span class="saved-type-card-name">${esc(info.label)}</span>
+        </div>
+        <div class="saved-type-card-bottom">
+          <span class="saved-type-card-count">${count} ${count===1?"Group":"Groups"}</span>
+          <span class="saved-type-card-number">${count}</span>
+        </div>
+      </button>`;
   }).join("");
+
   host.innerHTML=html;
 }
+
 function setAdminSavedTypeFilter(type){
   ADMIN_SAVED_TYPE_FILTER=String(type||"").trim().toLowerCase();
+
   renderAdminActivities();
+
+  const modal=document.getElementById("savedActivitiesTypeModal");
+  const body=document.getElementById("savedActivitiesTypeModalBody");
+  const title=document.getElementById("savedActivitiesTypeModalTitle");
+  const list=document.getElementById("adminActivities");
+
+  if(!modal || !body || !list)return;
+
+  const info=ADMIN_SAVED_TYPE_FILTER
+    ? getSavedTypeInfo(ADMIN_SAVED_TYPE_FILTER)
+    : null;
+
+  if(title){
+    title.innerHTML=ADMIN_SAVED_TYPE_FILTER
+      ? `<i class="${info.icon}"></i> ${esc(info.label)} — Saved Groups`
+      : `<i class="fa-solid fa-layer-group"></i> All Saved Activity Groups`;
+  }
+
+  list.classList.remove("saved-admin-list-inline-hidden");
+  body.appendChild(list);
+
+  modal.classList.add("show");
+  document.body.style.overflow="hidden";
 }
+
+function closeSavedActivitiesTypeModal(event){
+  if(event && event.target!==event.currentTarget)return;
+
+  const modal=document.getElementById("savedActivitiesTypeModal");
+  const list=document.getElementById("adminActivities");
+  const browser=document.getElementById("savedActivityTypeBrowser");
+
+  modal?.classList.remove("show");
+  document.body.style.overflow="";
+
+  if(list && browser){
+    browser.insertAdjacentElement("afterend",list);
+    list.classList.add("saved-admin-list-inline-hidden");
+  }
+}
+
+document.addEventListener("keydown",event=>{
+  if(event.key==="Escape"){
+    closeSavedActivitiesTypeModal();
+  }
+});
 function activityHasSavedType(activity,type){
   if(!type)return true;
   return (activity?.questions||[]).some(q=>String(q?.type||"mcq").trim().toLowerCase()===type);
@@ -9843,6 +10004,13 @@ function renderAdminActivities(){
       `)
       .join("");
 
+
+  if(
+    box &&
+    !box.closest("#savedActivitiesTypeModalBody")
+  ){
+    box.classList.add("saved-admin-list-inline-hidden");
+  }
 }
 
 /* ===============================
