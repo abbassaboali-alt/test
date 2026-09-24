@@ -527,6 +527,64 @@ button{cursor:pointer}
   .student-answer img{height:190px}
 }
 
+
+/* =====================================
+   QUESTION TYPE GROUP NAVIGATOR
+===================================== */
+.question-type-groups{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:12px;
+  margin:16px 0 18px;
+}
+.question-type-group-card{
+  border:1px solid var(--border);
+  border-radius:18px;
+  background:#fff;
+  padding:15px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  text-align:left;
+  color:var(--text);
+  box-shadow:0 7px 18px rgba(22,68,120,.06);
+  transition:.2s;
+}
+.question-type-group-card:hover{
+  transform:translateY(-2px);
+  border-color:#b8d1e6;
+  box-shadow:0 12px 24px rgba(22,68,120,.11);
+}
+.question-type-group-card.active{
+  border-color:var(--blue2);
+  box-shadow:0 0 0 3px rgba(36,103,165,.11),0 12px 24px rgba(22,68,120,.11);
+  background:#f8fbff;
+}
+.question-type-group-icon{
+  width:48px;height:48px;flex:0 0 48px;border-radius:14px;
+  display:grid;place-items:center;font-size:23px;background:#eef6fd;
+}
+.question-type-group-info{min-width:0;flex:1}
+.question-type-group-name{font-weight:900;font-size:14px;line-height:1.35}
+.question-type-group-count{
+  margin-top:4px;color:var(--muted);font-size:12px;font-weight:800
+}
+.question-type-group-badge{
+  min-width:34px;height:34px;padding:0 9px;border-radius:999px;
+  display:grid;place-items:center;background:var(--blue);color:#fff;font-weight:900
+}
+.question-box.type-group-hidden{display:none!important}
+@media(max-width:650px){
+  .question-type-groups{grid-template-columns:1fr 1fr;gap:8px}
+  .question-type-group-card{padding:11px;gap:9px}
+  .question-type-group-icon{width:40px;height:40px;flex-basis:40px;font-size:19px}
+  .question-type-group-name{font-size:12px}
+}
+@media(max-width:420px){
+  .question-type-groups{grid-template-columns:1fr}
+}
+
+
 /* ===============================
    Question File Import
 ================================ */
@@ -2556,11 +2614,16 @@ button{cursor:pointer}
           <option value="match">Match</option>
           <option value="order">Order / Sequence</option>
           <option value="random">Random Image Question</option>
-          <option value="wheel">🎡 Wheel of Fortune</option>
           <option value="wheelmcq">🎡✅ Wheel + Multiple Choice</option>
           <option value="balloon">🎈 Balloon Pop</option>
           <option value="mystery">🎁 Mystery Box</option>
           <option value="bomb">💣 Bomb Defuse</option>
+          <option value="listenchoose">👂 Listen &amp; Choose</option>
+          <option value="listenrepeat">🔊 Listen &amp; Repeat</option>
+          <option value="buildword">🔤 Build the Word</option>
+          <option value="buildsentence">🧩 Build the Sentence</option>
+          <option value="catchanswer">🎯 Catch the Correct Answer</option>
+          <option value="movechoose">🏃 Move &amp; Choose</option>
           <option value="smart" selected>✨ Smart — Choose Best Type Automatically</option>
 <option value="mixed">Mixed Types</option>
         </select>
@@ -2570,11 +2633,16 @@ button{cursor:pointer}
           <label class="ai-type-check"><input type="checkbox" value="match" checked> Match</label>
           <label class="ai-type-check"><input type="checkbox" value="order" checked> Order / Sequence</label>
           <label class="ai-type-check"><input type="checkbox" value="random"> Random Image Question</label>
-          <label class="ai-type-check"><input type="checkbox" value="wheel"> 🎡 Wheel of Fortune</label>
           <label class="ai-type-check"><input type="checkbox" value="wheelmcq"> 🎡✅ Wheel + Multiple Choice</label>
           <label class="ai-type-check"><input type="checkbox" value="balloon"> 🎈 Balloon Pop</label>
           <label class="ai-type-check"><input type="checkbox" value="mystery"> 🎁 Mystery Box</label>
           <label class="ai-type-check"><input type="checkbox" value="bomb"> 💣 Bomb Defuse</label>
+          <label class="ai-type-check"><input type="checkbox" value="listenchoose"> 👂 Listen &amp; Choose</label>
+          <label class="ai-type-check"><input type="checkbox" value="listenrepeat"> 🔊 Listen &amp; Repeat</label>
+          <label class="ai-type-check"><input type="checkbox" value="buildword"> 🔤 Build the Word</label>
+          <label class="ai-type-check"><input type="checkbox" value="buildsentence"> 🧩 Build the Sentence</label>
+          <label class="ai-type-check"><input type="checkbox" value="catchanswer"> 🎯 Catch the Correct Answer</label>
+          <label class="ai-type-check"><input type="checkbox" value="movechoose"> 🏃 Move &amp; Choose</label>
         </div>
         <div class="ai-type-tools">
           <button class="btn btn-light" type="button" onclick="setAIAllowedTypes(true)">Select All</button>
@@ -2855,6 +2923,7 @@ button{cursor:pointer}
   </div>
 
 
+    <div id="questionTypeGroups" class="question-type-groups"></div>
     <div id="questionsContainer"></div>
 
     <div class="actions">
@@ -3224,6 +3293,71 @@ function attachQuestionGroupControl(questionBox,groupName){
   control.innerHTML=`<label><i class="fa-solid fa-layer-group"></i> Question Group</label><select class="q-group-select" data-saved-group="${esc(wanted)}"></select>`;
   const head=questionBox.querySelector(".question-head"); if(head)head.insertAdjacentElement("afterend",control);else questionBox.prepend(control);
   renderQuizGroups(); const select=control.querySelector(".q-group-select"); if(select)select.value=wanted;
+}
+
+
+const PRUDLE_QUESTION_TYPE_META = {
+  all:{label:"All Questions",icon:"📚"},
+  mcq:{label:"Multiple Choice",icon:"✅"},
+  match:{label:"Match",icon:"🔗"},
+  order:{label:"Order / Sequence",icon:"🔢"},
+  random:{label:"Random Image",icon:"🖼️"},
+  wheelmcq:{label:"Wheel + Multiple Choice",icon:"🎡"},
+  balloon:{label:"Balloon Pop",icon:"🎈"},
+  mystery:{label:"Mystery Box",icon:"🎁"},
+  bomb:{label:"Bomb Defuse",icon:"💣"},
+  listenchoose:{label:"Listen & Choose",icon:"👂"},
+  listenrepeat:{label:"Listen & Repeat",icon:"🔊"},
+  buildword:{label:"Build the Word",icon:"🔤"},
+  buildsentence:{label:"Build the Sentence",icon:"🧩"},
+  catchanswer:{label:"Catch the Correct Answer",icon:"🎯"},
+  movechoose:{label:"Move & Choose",icon:"🏃"}
+};
+let ACTIVE_QUESTION_TYPE_GROUP = "all";
+
+function refreshQuestionTypeGroups(){
+  const host=document.getElementById("questionTypeGroups");
+  const boxes=Array.from(document.querySelectorAll("#questionsContainer .question-box"));
+  if(!host) return;
+
+  const counts={};
+  boxes.forEach(box=>{
+    const type=String(box.querySelector(".q-type")?.value || box.dataset.type || "mcq").toLowerCase();
+    counts[type]=(counts[type]||0)+1;
+  });
+
+  if(ACTIVE_QUESTION_TYPE_GROUP!=="all" && !counts[ACTIVE_QUESTION_TYPE_GROUP]){
+    ACTIVE_QUESTION_TYPE_GROUP="all";
+  }
+
+  const types=Object.keys(PRUDLE_QUESTION_TYPE_META).filter(type=>
+    type==="all" || counts[type]
+  );
+
+  host.innerHTML=types.map(type=>{
+    const meta=PRUDLE_QUESTION_TYPE_META[type] || {label:type,icon:"❓"};
+    const count=type==="all" ? boxes.length : (counts[type]||0);
+    return `<button type="button" class="question-type-group-card ${ACTIVE_QUESTION_TYPE_GROUP===type?"active":""}" onclick='selectQuestionTypeGroup(${JSON.stringify(type)})'>
+      <span class="question-type-group-icon">${meta.icon}</span>
+      <span class="question-type-group-info">
+        <span class="question-type-group-name">${esc(meta.label)}</span>
+        <span class="question-type-group-count">${count} ${count===1?"Question":"Questions"}</span>
+      </span>
+      <span class="question-type-group-badge">${count}</span>
+    </button>`;
+  }).join("");
+
+  boxes.forEach(box=>{
+    const type=String(box.querySelector(".q-type")?.value || box.dataset.type || "mcq").toLowerCase();
+    box.classList.toggle("type-group-hidden",ACTIVE_QUESTION_TYPE_GROUP!=="all" && type!==ACTIVE_QUESTION_TYPE_GROUP);
+  });
+}
+
+function selectQuestionTypeGroup(type){
+  ACTIVE_QUESTION_TYPE_GROUP=String(type||"all").toLowerCase();
+  refreshQuestionTypeGroups();
+  const first=document.querySelector("#questionsContainer .question-box:not(.type-group-hidden)");
+  if(first) first.scrollIntoView({behavior:"smooth",block:"start"});
 }
 
 
@@ -4830,6 +4964,12 @@ function addQuestion(data = null){
           <option value="balloon" ${q.type === "balloon" ? "selected" : ""}>🎈 Balloon Pop</option>
           <option value="mystery" ${q.type === "mystery" ? "selected" : ""}>🎁 Mystery Box</option>
           <option value="bomb" ${q.type === "bomb" ? "selected" : ""}>💣 Bomb Defuse</option>
+          <option value="listenchoose" ${q.type === "listenchoose" ? "selected" : ""}>👂 Listen &amp; Choose</option>
+          <option value="listenrepeat" ${q.type === "listenrepeat" ? "selected" : ""}>🔊 Listen &amp; Repeat</option>
+          <option value="buildword" ${q.type === "buildword" ? "selected" : ""}>🔤 Build the Word</option>
+          <option value="buildsentence" ${q.type === "buildsentence" ? "selected" : ""}>🧩 Build the Sentence</option>
+          <option value="catchanswer" ${q.type === "catchanswer" ? "selected" : ""}>🎯 Catch the Correct Answer</option>
+          <option value="movechoose" ${q.type === "movechoose" ? "selected" : ""}>🏃 Move &amp; Choose</option>
         </select>
         <div class="question-type-note q-type-note"></div>
 
@@ -5281,6 +5421,24 @@ else if(type === "order"){
 
     }
 
+  }else if(type === "listenchoose"){
+    note.textContent = "Add an audio URL in Question Media, then add picture/text choices and select one correct answer.";
+    labels.forEach(label=>{ label.textContent="Answer Choice"; });
+  }else if(type === "listenrepeat"){
+    note.textContent = "Add the model audio and the word/sentence to repeat. Items can be used as pronunciation prompts.";
+    labels.forEach(label=>{ label.textContent="Repeat Prompt"; });
+  }else if(type === "buildword"){
+    note.textContent = "Enter the target word as letter/items in the correct order. The activity can shuffle them for the learner.";
+    labels.forEach(label=>{ label.textContent="Letter / Part"; });
+  }else if(type === "buildsentence"){
+    note.textContent = "Enter the sentence words in the correct final order. They can be shuffled for the learner.";
+    labels.forEach(label=>{ label.textContent="Word / Phrase"; });
+  }else if(type === "catchanswer"){
+    note.textContent = "Add fast answer choices and select one correct answer for the Catch the Correct Answer game.";
+    labels.forEach(label=>{ label.textContent="Moving Answer"; });
+  }else if(type === "movechoose"){
+    note.textContent = "Write the physical movement instruction and add optional prompts/items for the classroom challenge.";
+    labels.forEach(label=>{ label.textContent="Movement Prompt / Item"; });
   }else{
 
     note.textContent =
@@ -5300,6 +5458,7 @@ else if(type === "order"){
 
   }
 
+  refreshQuestionTypeGroups();
 }
 
 function updateWheelMcqAnswerMode(questionBox){
@@ -5785,6 +5944,7 @@ function refreshQuestionNumbers(){
       downButton.disabled = index === boxes.length - 1 || !canEditCurrentQuestions();
     }
   });
+  refreshQuestionTypeGroups();
 }
 
 function flashMovedQuestion(box){
@@ -7670,7 +7830,7 @@ function setAIStatus(message, kind=""){
 }
 
 function normalizeAIQuestion(q, fallbackType="mcq"){
-  const allowed = new Set(["mcq","match","order","random","wheel","wheelmcq","balloon","mystery","bomb"]);
+  const allowed = new Set(["mcq","match","order","random","wheel","wheelmcq","balloon","mystery","bomb","listenchoose","listenrepeat","buildword","buildsentence","catchanswer","movechoose"]);
   let type = String(q?.type || q?.activityType || q?.questionType || fallbackType || "mcq")
     .trim().toLowerCase();
 
@@ -7867,11 +8027,16 @@ const PRUDLE_AI_ACTIVITY_TYPES = [
   "match",
   "order",
   "random",
-  "wheel",
   "wheelmcq",
   "balloon",
   "mystery",
-  "bomb"
+  "bomb",
+  "listenchoose",
+  "listenrepeat",
+  "buildword",
+  "buildsentence",
+  "catchanswer",
+  "movechoose"
 ];
 
 function normalizeAiActivityType(rawType){
@@ -7908,7 +8073,28 @@ function normalizeAiActivityType(rawType){
     mysterybox:"mystery",
 
     bomb:"bomb",
-    bombgame:"bomb"
+    bombgame:"bomb",
+
+    listenchoose:"listenchoose",
+    listeningchoose:"listenchoose",
+    listenandchoose:"listenchoose",
+
+    listenrepeat:"listenrepeat",
+    listenandrepeat:"listenrepeat",
+    pronunciation:"listenrepeat",
+
+    buildword:"buildword",
+    spelling:"buildword",
+
+    buildsentence:"buildsentence",
+    sentencebuilder:"buildsentence",
+
+    catchanswer:"catchanswer",
+    catchcorrectanswer:"catchanswer",
+
+    movechoose:"movechoose",
+    moveandchoose:"movechoose",
+    physicalactivity:"movechoose"
   };
 
   return map[t] || "mcq";
@@ -8228,6 +8414,12 @@ VALID STRUCTURES:
 - balloon: short fast multiple-choice challenge + 2–4 choices; exactly one correct=true.
 - mystery: reveal/guess multiple-choice challenge + 2–4 choices; exactly one correct=true.
 - bomb: short review/challenge multiple-choice question + 2–4 choices; exactly one correct=true.
+- listenchoose: listening question; prefer audio/media prompt + 2–4 choices; exactly one correct=true.
+- listenrepeat: pronunciation/repetition prompt; provide the exact word/sentence to repeat in text/items.
+- buildword: spelling task; answers/items contain letters or word parts in the CORRECT final order.
+- buildsentence: sentence-building task; answers/items contain words/phrases in the CORRECT final order.
+- catchanswer: fast recognition question + 2–4 short choices; exactly one correct=true.
+- movechoose: child-friendly physical movement instruction with short optional prompts/items.
 
 Return the actual Prudle type in every question object.
 `;
@@ -8309,6 +8501,12 @@ function inferPrudleTypeFromGeneratedQuestion(question, requestedType){
   if(/\b(balloon|pop the balloon)\b/i.test(text)) return "balloon";
   if(/\b(mystery box|mystery|reveal)\b/i.test(text)) return "mystery";
   if(/\b(bomb|defuse)\b/i.test(text)) return "bomb";
+  if(/\b(listen.*choose|hear.*choose)\b/i.test(text)) return "listenchoose";
+  if(/\b(listen.*repeat|repeat after|pronunciation)\b/i.test(text)) return "listenrepeat";
+  if(/\b(build.*word|spell|arrange.*letters)\b/i.test(text)) return "buildword";
+  if(/\b(build.*sentence|arrange.*words|sentence builder)\b/i.test(text)) return "buildsentence";
+  if(/\b(catch.*answer|catch.*correct|tap.*quick)\b/i.test(text)) return "catchanswer";
+  if(/\b(move.*choose|touch something|jump|point to|physical activity)\b/i.test(text)) return "movechoose";
   if(/\b(random|pick one|choose one at random)\b/i.test(text)) return "random";
 
   // Otherwise respect a valid explicit AI type.
