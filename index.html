@@ -2581,10 +2581,10 @@ button{cursor:pointer}
         oninput="renderAdminActivities()">
     </div>
 
-    <div class="grid grid-2" style="margin-bottom:14px">
+    <div class="grid grid-3" style="margin-bottom:14px">
       <div class="field">
         <label><i class="fa-solid fa-book-open"></i> Course / Level</label>
-        <select id="adminCourseFilter" onchange="updateAdminGroupFilter();renderAdminActivities()">
+        <select id="adminCourseFilter" onchange="refreshAdminDependentFilters();renderAdminActivities()">
           <option value="">All Courses / Levels</option>
         </select>
       </div>
@@ -2593,6 +2593,13 @@ button{cursor:pointer}
         <label><i class="fa-solid fa-layer-group"></i> Question Group</label>
         <select id="adminQuestionGroupFilter" onchange="renderAdminActivities()">
           <option value="">All Question Groups</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label><i class="fa-solid fa-tags"></i> Category / Group</label>
+        <select id="adminCategoryGroupFilter" onchange="updateAdminGroupFilter();renderAdminActivities()">
+          <option value="">All Categories / Groups</option>
         </select>
       </div>
     </div>
@@ -8694,6 +8701,36 @@ function updateAdminCourseFilter(){
   }
 }
 
+function updateAdminCategoryGroupFilter(){
+  const select = document.getElementById("adminCategoryGroupFilter");
+  if(!select) return;
+
+  const current = String(select.value || "");
+  const selectedCourse = String(
+    document.getElementById("adminCourseFilter")?.value || ""
+  ).trim();
+
+  const categories = [...new Set(
+    ACTIVITIES_CACHE
+      .filter(activity=>{
+        if(!selectedCourse) return true;
+        return String(activity?.courseName || "").trim() === selectedCourse;
+      })
+      .map(activity=>String(activity?.group || "General").trim() || "General")
+      .filter(Boolean)
+  )].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:"base"}));
+
+  select.innerHTML =
+    `<option value="">All Categories / Groups</option>` +
+    categories
+      .map(group=>`<option value="${esc(group)}">${esc(group)}</option>`)
+      .join("");
+
+  if(categories.includes(current)){
+    select.value = current;
+  }
+}
+
 function updateAdminGroupFilter(){
   const select = document.getElementById("adminQuestionGroupFilter");
   if(!select) return;
@@ -8702,10 +8739,26 @@ function updateAdminGroupFilter(){
   const selectedCourse = String(
     document.getElementById("adminCourseFilter")?.value || ""
   ).trim();
+  const selectedCategoryGroup = String(
+    document.getElementById("adminCategoryGroupFilter")?.value || ""
+  ).trim();
 
   const sourceActivities = ACTIVITIES_CACHE.filter(activity=>{
-    if(!selectedCourse) return true;
-    return String(activity?.courseName || "").trim() === selectedCourse;
+    if(
+      selectedCourse &&
+      String(activity?.courseName || "").trim() !== selectedCourse
+    ){
+      return false;
+    }
+
+    if(
+      selectedCategoryGroup &&
+      (String(activity?.group || "General").trim() || "General") !== selectedCategoryGroup
+    ){
+      return false;
+    }
+
+    return true;
   });
 
   const groups = [...new Set(
@@ -8723,8 +8776,14 @@ function updateAdminGroupFilter(){
   }
 }
 
+function refreshAdminDependentFilters(){
+  updateAdminCategoryGroupFilter();
+  updateAdminGroupFilter();
+}
+
 function refreshAdminActivityFilters(){
   updateAdminCourseFilter();
+  updateAdminCategoryGroupFilter();
   updateAdminGroupFilter();
 }
 
@@ -8905,6 +8964,12 @@ function renderAdminActivities(){
       ""
     ).trim();
 
+  const selectedCategoryGroup =
+    String(
+      document.getElementById("adminCategoryGroupFilter")?.value ||
+      ""
+    ).trim();
+
   const filteredActivities =
     ACTIVITIES_CACHE.filter(activity=>{
 
@@ -8931,12 +8996,24 @@ function renderAdminActivities(){
         return false;
       }
 
+      if(
+        selectedCategoryGroup &&
+        (String(activity?.group || "General").trim() || "General") !== selectedCategoryGroup
+      ){
+        return false;
+      }
+
       return true;
     });
 
   if(countBox){
     const hasFilters =
-      Boolean(query || selectedCourse || selectedQuestionGroup);
+      Boolean(
+        query ||
+        selectedCourse ||
+        selectedQuestionGroup ||
+        selectedCategoryGroup
+      );
 
     countBox.textContent =
       hasFilters
