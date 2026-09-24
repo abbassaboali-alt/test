@@ -277,6 +277,25 @@ button{cursor:pointer}
   padding:35px 10px;
   font-weight:800;
 }
+/* Saved Activities — interactive question type cards */
+.saved-type-browser{margin:14px 0 18px}
+.saved-type-browser-title{font-size:18px;font-weight:900;color:var(--blue);margin-bottom:3px}
+.saved-type-browser-subtitle{color:var(--muted);font-size:12px;font-weight:700;margin-bottom:12px}
+.saved-type-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.saved-type-card{position:relative;min-height:145px;padding:17px;border:1.5px solid var(--border);border-radius:22px;background:#fff;color:var(--text);text-align:left;overflow:hidden;box-shadow:0 8px 22px rgba(22,68,120,.06);transition:.2s}
+.saved-type-card:after{content:"";position:absolute;width:86px;height:86px;right:-28px;top:-28px;border-radius:50%;background:var(--type-soft,#eef6fd)}
+.saved-type-card:hover{transform:translateY(-3px);border-color:var(--type-color,var(--blue2));box-shadow:0 14px 28px rgba(22,68,120,.12)}
+.saved-type-card.active{border:2px solid var(--type-color,var(--blue2));background:linear-gradient(145deg,#fff,var(--type-soft,#f4f9fd))}
+.saved-type-card-top{position:relative;z-index:1;display:flex;align-items:center;gap:11px;padding-right:20px}
+.saved-type-card-icon{width:50px;height:50px;flex:0 0 50px;display:grid;place-items:center;border-radius:15px;background:var(--type-soft,#eef6fd);color:var(--type-color,var(--blue));font-size:22px}
+.saved-type-card-name{font-size:15px;line-height:1.35;font-weight:900;color:#102f4d}
+.saved-type-card-bottom{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:17px}
+.saved-type-card-count{color:var(--muted);font-size:12px;font-weight:800}
+.saved-type-card-number{min-width:38px;height:38px;padding:0 10px;border-radius:999px;display:grid;place-items:center;background:var(--type-color,var(--blue));color:#fff;font-weight:900}
+.saved-type-card.all-type{--type-color:#164478;--type-soft:#edf4fa}
+@media(max-width:850px){.saved-type-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.saved-type-cards{grid-template-columns:1fr}.saved-type-card{min-height:125px}}
+
 
 @media(max-width:520px){
   .activity-type-logo{
@@ -2608,26 +2627,11 @@ button{cursor:pointer}
 
     <div class="grid grid-2" style="margin-top:14px">
       <div class="field">
-        <label>Question / Game Type</label>
-        <select id="aiQuestionType">
-          <option value="mcq">Multiple Choice</option>
-          <option value="match">Match</option>
-          <option value="order">Order / Sequence</option>
-          <option value="random">Random Image Question</option>
-          <option value="wheelmcq">🎡✅ Wheel + Multiple Choice</option>
-          <option value="balloon">🎈 Balloon Pop</option>
-          <option value="mystery">🎁 Mystery Box</option>
-          <option value="bomb">💣 Bomb Defuse</option>
-          <option value="listenchoose">👂 Listen &amp; Choose</option>
-          <option value="listenrepeat">🔊 Listen &amp; Repeat</option>
-          <option value="buildword">🔤 Build the Word</option>
-          <option value="buildsentence">🧩 Build the Sentence</option>
-          <option value="catchanswer">🎯 Catch the Correct Answer</option>
-          <option value="movechoose">🏃 Move &amp; Choose</option>
-          <option value="smart" selected>✨ Smart — Choose Best Type Automatically</option>
-<option value="mixed">Mixed Types</option>
-        </select>
-        <div class="help">Use Smart for automatic selection, or choose the exact question types below that AI is allowed to mix.</div>
+        <label>Question / Game Types</label>
+        <div class="help">
+          Select one or more types. AI will generate questions only from the checked types.
+          One checked type = one format. Multiple checked types = a mixed activity using only those types.
+        </div>
         <div class="ai-type-checks" id="aiAllowedTypes">
           <label class="ai-type-check"><input type="checkbox" value="mcq" checked> Multiple Choice</label>
           <label class="ai-type-check"><input type="checkbox" value="match" checked> Match</label>
@@ -2671,8 +2675,7 @@ button{cursor:pointer}
             </div>
           </div>
         <div class="help">
-          Smart mode analyzes each generated question and automatically assigns the most suitable activity:
-          MCQ, Match, Order, Wheel, Wheel + MCQ, Balloon, Mystery, Bomb, or Random.
+          AI follows the checked question types exactly. Unchecked types are not allowed.
         </div>
       </div>
       <div class="field">
@@ -2988,6 +2991,11 @@ button{cursor:pointer}
     <div
       id="adminActivitySearchCount"
       class="activity-search-count">
+    </div>
+    <div id="savedActivityTypeBrowser" class="saved-type-browser">
+      <div class="saved-type-browser-title"><i class="fa-solid fa-shapes"></i> Activities by Question Type</div>
+      <div class="saved-type-browser-subtitle">Choose a type. Each card shows the number of saved questions inside that type.</div>
+      <div id="savedActivityTypeCards" class="saved-type-cards"></div>
     </div>
 
     <div id="adminActivities" class="activity-list"></div>
@@ -8631,16 +8639,16 @@ async function generateQuestionsWithAI(){
     const sourceType = document.getElementById("aiSourceType").value;
     const level = document.getElementById("aiLevel").value;
     const count = Math.max(1, Math.min(20, Number(document.getElementById("aiQuestionCount").value || 10)));
-    let requestedType = document.getElementById("aiQuestionType").value;
     const selectedAllowedTypes = getAIAllowedTypes();
     if(!selectedAllowedTypes.length){
       throw new Error("Select at least one Question / Game Type checkbox for AI generation.");
     }
-    // When Smart/Mixed is used, checkboxes define the exact pool AI may mix.
-    // A fixed dropdown type remains fixed, but it is also added to the allowed pool automatically.
-    if(PRUDLE_AI_ACTIVITY_TYPES.includes(requestedType) && !selectedAllowedTypes.includes(requestedType)){
-      selectedAllowedTypes.push(requestedType);
-    }
+
+    // The checkboxes are the single source of truth.
+    const requestedType =
+      selectedAllowedTypes.length === 1
+        ? selectedAllowedTypes[0]
+        : "mixed";
     const requestedMedia = String(
       document.getElementById("aiMediaChoice")?.value || "none"
     ).trim().toLowerCase();
@@ -8650,7 +8658,14 @@ async function generateQuestionsWithAI(){
     ).trim().toLowerCase();
 
   const smartTypeInstructions = buildPrudleSmartTypeInstructions(requestedType);
-    const strictTypeInstructions = buildPrudleRequestedTypeInstructions(requestedType, selectedAllowedTypes);
+    const strictTypeInstructions =
+      buildPrudleRequestedTypeInstructions(requestedType, selectedAllowedTypes) +
+      "\n\nSTRICT CHECKBOX RULE: Generate questions ONLY using these checked Prudle question types: " +
+      selectedAllowedTypes.join(", ") +
+      ". Never generate an unchecked type. " +
+      (selectedAllowedTypes.length === 1
+        ? "Every generated question MUST use exactly: " + selectedAllowedTypes[0] + "."
+        : "Use only this checked pool and distribute questions among the selected types when appropriate.");
     const language = document.getElementById("aiLanguage").value;
     let sourceText = "";
 
@@ -8721,8 +8736,11 @@ async function generateQuestionsWithAI(){
           requestedType
         );
 
-        if((requestedType === "smart" || requestedType === "mixed") && !selectedAllowedTypes.includes(item.type)){
-          item = normalizeAIQuestion({...item,type:selectedAllowedTypes[0]}, selectedAllowedTypes[0]);
+        if(!selectedAllowedTypes.includes(item.type)){
+          item = normalizeAIQuestion(
+            {...item,type:selectedAllowedTypes[0]},
+            selectedAllowedTypes[0]
+          );
         }
 
         if(requestedMedia === "none"){
@@ -9482,6 +9500,56 @@ async function loadActivities(){
   }
 }
 
+
+let ADMIN_SAVED_TYPE_FILTER="";
+
+function savedTypeTheme(type){
+  const x={
+    mcq:["#08744f","#e5f8f0"],match:["#155a8a","#e7f4fd"],order:["#9a4d00","#fff0df"],
+    random:["#6c3483","#f4e8fb"],wheelmcq:["#8a6500","#fff7d9"],balloon:["#a61f55","#ffe8f1"],
+    mystery:["#6b4b00","#fff3c9"],bomb:["#8b1e1e","#ffe8e6"],text:["#7a3e00","#fff4e7"],
+    voice:["#9b2445","#fde9ef"],audio:["#34495e","#edf2f6"],video:["#34495e","#edf2f6"],
+    listenchoose:["#2474b5","#eaf4ff"],listenrepeat:["#df2f68","#fff0f5"],
+    buildword:["#0b9b6a","#eafaf4"],buildsentence:["#9b3fc0","#f7ecfc"],
+    catchanswer:["#e86f08","#fff3e7"],movechoose:["#ef4a3b","#fff0ee"]
+  };
+  return x[type]||["#164478","#edf4fa"];
+}
+function savedTypeCounts(activities){
+  const counts={};
+  (activities||[]).forEach(a=>(a.questions||[]).forEach(q=>{
+    const t=String(q?.type||"mcq").trim().toLowerCase();
+    if(t && t!=="wheel") counts[t]=(counts[t]||0)+1;
+  }));
+  return counts;
+}
+function renderSavedTypeCards(activities){
+  const host=document.getElementById("savedActivityTypeCards");
+  if(!host)return;
+  const counts=savedTypeCounts(activities);
+  const order=["listenchoose","listenrepeat","buildword","buildsentence","catchanswer","movechoose","mcq","match","order","random","wheelmcq","balloon","mystery","bomb","text","voice","audio","video"];
+  const types=order.filter(t=>(counts[t]||0)>0);
+  const total=Object.values(counts).reduce((a,b)=>a+Number(b||0),0);
+  let html=`<button type="button" class="saved-type-card all-type ${!ADMIN_SAVED_TYPE_FILTER?"active":""}" onclick="setAdminSavedTypeFilter('')">
+    <div class="saved-type-card-top"><span class="saved-type-card-icon"><i class="fa-solid fa-layer-group"></i></span><span class="saved-type-card-name">All Question Types</span></div>
+    <div class="saved-type-card-bottom"><span class="saved-type-card-count">${total} Questions</span><span class="saved-type-card-number">${total}</span></div></button>`;
+  html+=types.map(t=>{
+    const info=getGameTypeInfo(t),n=counts[t]||0,[c,b]=savedTypeTheme(t);
+    return `<button type="button" class="saved-type-card ${ADMIN_SAVED_TYPE_FILTER===t?"active":""}" style="--type-color:${c};--type-soft:${b}" onclick="setAdminSavedTypeFilter('${esc(t)}')">
+      <div class="saved-type-card-top"><span class="saved-type-card-icon"><i class="${info.icon}"></i></span><span class="saved-type-card-name">${esc(info.label)}</span></div>
+      <div class="saved-type-card-bottom"><span class="saved-type-card-count">${n} ${n===1?"Question":"Questions"}</span><span class="saved-type-card-number">${n}</span></div></button>`;
+  }).join("");
+  host.innerHTML=html;
+}
+function setAdminSavedTypeFilter(type){
+  ADMIN_SAVED_TYPE_FILTER=String(type||"").trim().toLowerCase();
+  renderAdminActivities();
+}
+function activityHasSavedType(activity,type){
+  if(!type)return true;
+  return (activity?.questions||[]).some(q=>String(q?.type||"mcq").trim().toLowerCase()===type);
+}
+
 function renderAdminActivities(){
 
   const box =
@@ -9556,6 +9624,10 @@ function renderAdminActivities(){
         return false;
       }
 
+      if(ADMIN_SAVED_TYPE_FILTER && !activityHasSavedType(activity,ADMIN_SAVED_TYPE_FILTER)){
+        return false;
+      }
+
       return true;
     });
 
@@ -9573,6 +9645,15 @@ function renderAdminActivities(){
         ? `${filteredActivities.length} of ${ACTIVITIES_CACHE.length} activities`
         : `${ACTIVITIES_CACHE.length} saved activities`;
   }
+
+  const typeBrowserActivities=ACTIVITIES_CACHE.filter(activity=>{
+    if(!activityMatchesNameSearch(activity,query))return false;
+    if(selectedCourse && String(activity?.courseName||"").trim()!==selectedCourse)return false;
+    if(selectedQuestionGroup && !getActivityQuestionGroups(activity).includes(selectedQuestionGroup))return false;
+    if(selectedCategoryGroup && (String(activity?.group||"General").trim()||"General")!==selectedCategoryGroup)return false;
+    return true;
+  });
+  renderSavedTypeCards(typeBrowserActivities);
 
   if(!ACTIVITIES_CACHE.length){
 
