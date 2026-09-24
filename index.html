@@ -2550,6 +2550,10 @@ button{cursor:pointer}
         <i class="fa-solid fa-floppy-disk"></i> Save Activity
       </button>
 
+      <button class="btn btn-success" type="button" onclick="testCurrentActivityWithoutSaving()">
+        <i class="fa-solid fa-play"></i> Test Activity — No Save
+      </button>
+
       <button class="btn btn-light" onclick="resetEditor()">
         <i class="fa-solid fa-rotate"></i> New Activity
       </button>
@@ -2575,6 +2579,22 @@ button{cursor:pointer}
         placeholder="Search by activity name..."
         autocomplete="off"
         oninput="renderAdminActivities()">
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:14px">
+      <div class="field">
+        <label><i class="fa-solid fa-book-open"></i> Course / Level</label>
+        <select id="adminCourseFilter" onchange="updateAdminGroupFilter();renderAdminActivities()">
+          <option value="">All Courses / Levels</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label><i class="fa-solid fa-layer-group"></i> Question Group</label>
+        <select id="adminQuestionGroupFilter" onchange="renderAdminActivities()">
+          <option value="">All Question Groups</option>
+        </select>
+      </div>
     </div>
 
     <div
@@ -2826,6 +2846,7 @@ const ACTIVITIES_COLLECTION = "FunActivities";
 const COURSES_COLLECTION = "Courses";
 const RESULTS_COLLECTION = "FunActivityResults";
 let QUIZ_GROUPS = ["General"];
+let IS_UNSAVED_TEST_MODE = false;
 function normalizePrudleUsername(value){ return String(value || "").trim().toLowerCase(); }
 function getCurrentPrudleUsername(){ return String(localStorage.getItem("username") || "").trim(); }
 function getActivityLockOwner(activity){ return normalizePrudleUsername(activity?.lockedByUsername || activity?.lockedByNormalized || activity?.lockedBy || ""); }
@@ -8625,6 +8646,190 @@ timerTotalSeconds,
    Display Activities in Admin
 ================================ */
 
+
+function getActivityQuestionGroups(activity){
+  const groups = [];
+
+  if(Array.isArray(activity?.quizGroups)){
+    activity.quizGroups.forEach(group=>{
+      const value = String(group || "").trim();
+      if(value) groups.push(value);
+    });
+  }
+
+  if(Array.isArray(activity?.questions)){
+    activity.questions.forEach(question=>{
+      const value = String(question?.group || "General").trim() || "General";
+      groups.push(value);
+    });
+  }
+
+  if(!groups.length){
+    groups.push("General");
+  }
+
+  return [...new Set(groups)];
+}
+
+function updateAdminCourseFilter(){
+  const select = document.getElementById("adminCourseFilter");
+  if(!select) return;
+
+  const current = String(select.value || "");
+
+  const courseNames = [...new Set(
+    ACTIVITIES_CACHE
+      .map(activity=>String(activity?.courseName || "").trim())
+      .filter(Boolean)
+  )].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:"base"}));
+
+  select.innerHTML =
+    `<option value="">All Courses / Levels</option>` +
+    courseNames
+      .map(name=>`<option value="${esc(name)}">${esc(name)}</option>`)
+      .join("");
+
+  if(courseNames.includes(current)){
+    select.value = current;
+  }
+}
+
+function updateAdminGroupFilter(){
+  const select = document.getElementById("adminQuestionGroupFilter");
+  if(!select) return;
+
+  const current = String(select.value || "");
+  const selectedCourse = String(
+    document.getElementById("adminCourseFilter")?.value || ""
+  ).trim();
+
+  const sourceActivities = ACTIVITIES_CACHE.filter(activity=>{
+    if(!selectedCourse) return true;
+    return String(activity?.courseName || "").trim() === selectedCourse;
+  });
+
+  const groups = [...new Set(
+    sourceActivities.flatMap(activity=>getActivityQuestionGroups(activity))
+  )].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:"base"}));
+
+  select.innerHTML =
+    `<option value="">All Question Groups</option>` +
+    groups
+      .map(group=>`<option value="${esc(group)}">${esc(group)}</option>`)
+      .join("");
+
+  if(groups.includes(current)){
+    select.value = current;
+  }
+}
+
+function refreshAdminActivityFilters(){
+  updateAdminCourseFilter();
+  updateAdminGroupFilter();
+}
+
+function getEditorTimerSettings(){
+  const timerType =
+    document.getElementById("activityTimerType")?.value || "open";
+
+  const timerMinutes = Math.max(
+    0,
+    Number(document.getElementById("activityTimerMinutes")?.value || 0)
+  );
+
+  const timerSeconds = Math.max(
+    0,
+    Math.min(
+      59,
+      Number(document.getElementById("activityTimerSeconds")?.value || 0)
+    )
+  );
+
+  const timerTotalSeconds =
+    timerType === "limited"
+      ? (timerMinutes * 60 + timerSeconds)
+      : 0;
+
+  if(timerType === "limited" && timerTotalSeconds <= 0){
+    throw new Error("Enter a valid quiz time.");
+  }
+
+  return {
+    timerType,
+    timerMinutes,
+    timerSeconds,
+    timerTotalSeconds
+  };
+}
+
+function testCurrentActivityWithoutSaving(){
+  try{
+    const courseId =
+      String(document.getElementById("courseSelect")?.value || "").trim();
+
+    if(!courseId){
+      throw new Error("Select an open course before starting the test preview.");
+    }
+
+    const course =
+      OPEN_COURSES_CACHE.find(item=>item.id === courseId);
+
+    if(!course){
+      throw new Error("Unable to find the selected course.");
+    }
+
+    const questions = canEditCurrentQuestions()
+      ? collectQuestions()
+      : cloneQuestions(LOCKED_QUESTIONS_SNAPSHOT);
+
+    if(!questions.length){
+      throw new Error("Add at least one question before testing the activity.");
+    }
+
+    const timer = getEditorTimerSettings();
+    const tempId = "__prudle_test_" + Date.now();
+
+    const testActivity = {
+      id:tempId,
+      ...timer,
+      title:readText("activityTitle") || "Test Activity",
+      courseId:course.id,
+      courseName:getCourseName(course),
+      trainerName:readText("trainerName") || getTrainer(course),
+      branch:getBranch(course),
+      section:getSection(course),
+      period:getPeriod(course),
+      courseType:getCourseType(course),
+      description:readText("activityDescription"),
+      gameMode:document.getElementById("activityGameMode")?.value || "normal",
+      group:document.getElementById("activityGroup")?.value || "General",
+      quizGroups:getQuizGroups(),
+      status:"open",
+      questionsLocked:false,
+      questions:cloneQuestions(questions),
+      questionCount:questions.length,
+      __unsavedTest:true
+    };
+
+    IS_UNSAVED_TEST_MODE = true;
+
+    // Keep the temporary activity only in memory. Nothing is written to Firestore.
+    ACTIVITIES_CACHE = [
+      testActivity,
+      ...ACTIVITIES_CACHE.filter(item=>item.id !== tempId)
+    ];
+
+    showSection("student");
+    startActivity(tempId,course.id);
+
+    toast("Test mode — activity and result will not be saved");
+
+  }catch(error){
+    console.error(error);
+    alert(error.message || "Unable to start the test activity.");
+  }
+}
+
 async function loadActivities(){
   const box = document.getElementById("adminActivities");
 
@@ -8641,6 +8846,7 @@ async function loadActivities(){
       questionsLocked:Boolean(doc.data().questionsLocked)
     }));
 
+    refreshAdminActivityFilters();
     renderAdminActivities();
 
   }catch(error){
@@ -8655,6 +8861,7 @@ async function loadActivities(){
         questionsLocked:Boolean(doc.data().questionsLocked)
       }));
 
+      refreshAdminActivityFilters();
       renderAdminActivities();
 
     }catch(secondError){
@@ -8686,18 +8893,53 @@ function renderAdminActivities(){
       ""
     ).trim();
 
+  const selectedCourse =
+    String(
+      document.getElementById("adminCourseFilter")?.value ||
+      ""
+    ).trim();
+
+  const selectedQuestionGroup =
+    String(
+      document.getElementById("adminQuestionGroupFilter")?.value ||
+      ""
+    ).trim();
+
   const filteredActivities =
-    ACTIVITIES_CACHE.filter(
-      activity=>
-        activityMatchesNameSearch(
+    ACTIVITIES_CACHE.filter(activity=>{
+
+      if(
+        !activityMatchesNameSearch(
           activity,
           query
         )
-    );
+      ){
+        return false;
+      }
+
+      if(
+        selectedCourse &&
+        String(activity?.courseName || "").trim() !== selectedCourse
+      ){
+        return false;
+      }
+
+      if(
+        selectedQuestionGroup &&
+        !getActivityQuestionGroups(activity).includes(selectedQuestionGroup)
+      ){
+        return false;
+      }
+
+      return true;
+    });
 
   if(countBox){
+    const hasFilters =
+      Boolean(query || selectedCourse || selectedQuestionGroup);
+
     countBox.textContent =
-      query
+      hasFilters
         ? `${filteredActivities.length} of ${ACTIVITIES_CACHE.length} activities`
         : `${ACTIVITIES_CACHE.length} saved activities`;
   }
@@ -8784,6 +9026,12 @@ function renderAdminActivities(){
               👥 ${esc(
                 activity.group ||
                 "General"
+              )}
+            </span>
+
+            <span class="mini">
+              🗂️ ${esc(
+                getActivityQuestionGroups(activity).join(", ")
               )}
             </span>
 
@@ -13361,6 +13609,15 @@ async function finishActivity(){
 
   launchBigConfetti();
 
+  if(IS_UNSAVED_TEST_MODE || CURRENT_ACTIVITY?.__unsavedTest){
+    toast("Test completed — no activity or result was saved");
+    window.scrollTo({
+      top:0,
+      behavior:"smooth"
+    });
+    return;
+  }
+
   try{
 
     await db
@@ -13572,6 +13829,9 @@ function restartGame(){
 
 function backToActivities(){
 
+  const returnToEditor =
+    Boolean(IS_UNSAVED_TEST_MODE || CURRENT_ACTIVITY?.__unsavedTest);
+
   clearRandomQuestionTimers();
   stopActivityTimer();
   stopRaceObserver();
@@ -13610,7 +13870,13 @@ function backToActivities(){
     .classList
     .remove("hidden");
 
-  loadStudentActivities();
+  if(returnToEditor){
+    IS_UNSAVED_TEST_MODE = false;
+    showSection("admin");
+    toast("Returned to editor — test data was not saved");
+  }else{
+    loadStudentActivities();
+  }
 
   window.scrollTo({
     top:0,
