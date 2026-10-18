@@ -1,10 +1,21 @@
-<style>
-/* =========================================================
-   PRUDLE — FULL WIDTH / FULL SCREEN + ULTRA NARROW MARGINS
-   Weebly / Caspio Safe + Mobile Friendly
-========================================================= */
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<script>(function(){const allowed=location.protocol==='https:'&&new Set(['www.prudle-education.com','prudle-education.com','abbassaboali-alt.github.io']).has(location.hostname.toLowerCase());if(!allowed){window.stop();location.replace('https://www.prudle-education.com/log-in-out');}})();</script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>PRUDLE | Attendance View (Read-Only)</title>
 
-/* 1) الصفحة بكامل العرض بدون أي هوامش */
+<!-- FontAwesome -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+<!-- Tajawal -->
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet" />
+
+<style>
+/* ===============================
+   FULL WIDTH / FULL SCREEN FIX
+   + NARROW MARGINS
+=============================== */
 html, body{
   margin:0 !important;
   padding:0 !important;
@@ -12,2732 +23,1667 @@ html, body{
   max-width:100% !important;
   overflow-x:hidden !important;
 }
-
-/* 2) كل العناصر داخل الصفحة لا تكسر العرض */
 *,
 *::before,
-*::after{
-  box-sizing:border-box !important;
-}
+*::after{ box-sizing:border-box !important; }
 
-/* 3) كسر أي حاويات من القالب قد تقيد العرض */
-.container, .section, .wrapper, .content, .main-content,
-#page, #main, #body, #content,
-[class*="container"], [class*="wrapper"], [class*="content"]{
+.container,.section,.wrapper,.content,.main-content,
+div, section, header, footer, table{ max-width:100% !important; }
+
+.container,.section,.wrapper,.content,.main-content{
   width:100% !important;
-  max-width:100% !important;
-  margin:0 !important;
-  padding:0 !important;
+  margin:0 auto !important;
+  padding-left:8px;
+  padding-right:8px;
 }
 
-/* 4) هوامش داخلية عامة (تضييق الهوامش) */
-:root{
-  --gutter: 6px;          /* ✅ غيّرها 4px أو 8px حسب رغبتك */
-  --radius: 14px;
-}
-
-/* أي عنصر رئيسي في الصفحة خليه يستفيد من الـ gutter */
-body{
-  font-family:'Tajawal', sans-serif;
-  background:#f4f6fb;
-  padding:var(--gutter) !important;  /* ✅ يديك هامش صغير جدًا حول الصفحة */
-}
-
-/* 5) تقليل هوامش عناصر واجهتك (بدون ما تخرب التصميم) */
-.logout-badge,
-.header,
-.actions,
-.stats,
-.filters,
-.wrap{
-  margin:var(--gutter) !important;
-}
-
-/* 6) تحسين العرض على الجوال (هوامش أضيق + تكبير لمس) */
-@media (max-width: 768px){
-  :root{ --gutter: 4px; }
-  .header{ font-size:18px !important; }
-  .header img{ width:58px !important; height:58px !important; }
-  .btn{ padding:10px 12px !important; }
-}
-
-/* 7) الجدول: اجعله يتمدد ولا يخرج خارج الشاشة */
-table{
-  width:max-content;
-  max-width:100%;
-}
-.course-body{
-  overflow-x:auto !important;
-  -webkit-overflow-scrolling:touch;
-}
-
-/* 8) منع أي عنصر يسبب سكرول أفقي بالقوة */
-img, video, canvas{
-  max-width:100% !important;
-  height:auto !important;
-}
-</style>
-
-
-
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Prudle Professional Dashboard</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800;900&display=swap" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-
-<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore-compat.js"></script>
-<script>
-if (!firebase.apps.length) {
-  firebase.initializeApp({
-    apiKey:"AIzaSyCCFBvZosI8dwShZjxvZzI-SU5igEbcOKk",
-    authDomain:"prudle-system.firebaseapp.com",
-    projectId:"prudle-system"
-  });
-}
-
-const db = firebase.firestore();
-</script>
-
-<style>
-*{
-  box-sizing:border-box;
-}
-
+/* ===== Base ===== */
 html,body{
-  margin:0;
-  padding:0;
   font-family:'Tajawal',sans-serif;
-  background:linear-gradient(135deg,#eef4ff,#f8fbff,#edf3ff);
-  min-height:100vh;
-  color:#10233f;
+  background:#f4f6fb;
+  overflow-x:hidden;
 }
-
-/* ===== APP LAYOUT ===== */
-.app{
-  display:flex;
-  min-height:100vh;
-  width:100%;
-}
-
-/* ===== SIDEBAR ===== */
-.sidebar{
-  width:260px;
-  background:linear-gradient(180deg,#164478,#1b568f);
+/* ===== Logout Badge ===== */
+.logout-badge{
+  background:#164478;
   color:#fff;
-  padding:24px 16px;
-  box-shadow:0 0 25px rgba(0,0,0,.12);
-  position:relative;
-  z-index:2;
-}
-
-.brand{
-  text-align:center;
-  margin-bottom:22px;
-  padding-bottom:18px;
-  border-bottom:1px solid rgba(255,255,255,.15);
-}
-
-.brand h1{
-  margin:0;
-  font-size:26px;
-  font-weight:900;
-  letter-spacing:.5px;
-}
-
-.brand p{
-  margin:8px 0 0;
-  font-size:13px;
-  opacity:.9;
-  font-weight:700;
-}
-
-.menu-title{
-  margin:14px 8px 10px;
-  font-size:13px;
-  opacity:.9;
-  font-weight:800;
-}
-
-.side-btn{
-  width:100%;
+  padding:7px 18px;
+  border-radius:30px;
   border:none;
-  background:rgba(255,255,255,.10);
-  color:#fff;
-  padding:16px 14px;
-  margin-bottom:12px;
-  border-radius:18px;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  font-size:17px;
-  font-weight:900;
-  transition:.25s ease;
-  text-align:right;
-  box-shadow:0 8px 18px rgba(0,0,0,.08);
-}
-
-.side-btn i{
-  font-size:20px;
-  min-width:24px;
-  text-align:center;
-}
-
-.side-btn:hover{
-  transform:translateX(-4px);
-  background:rgba(255,255,255,.18);
-}
-
-.side-btn.active{
-  background:#fff;
-  color:#164478;
-  box-shadow:0 12px 24px rgba(0,0,0,.18);
-}
-
-
-/* ===== SIDEBAR BOTTOM UTILITIES ===== */
-.sidebar-bottom{
-  margin-top:22px;
-  padding-top:18px;
-  border-top:1px solid rgba(255,255,255,.18);
-}
-
-.sidebar-bottom .side-btn{
-  margin-bottom:10px;
-}
-
-#supervisoryBtnSide{
-  background:linear-gradient(135deg,#0f766e,#14b8a6);
-}
-
-#newStudentsBtnSide{
-  background:linear-gradient(135deg,#2563eb,#3b82f6);
-}
-#backupBtnSide{
-  background:linear-gradient(135deg,#7c3aed,#9333ea);
-}
-
-#credentialsBtnSide{
-  background:linear-gradient(135deg,#334155,#64748b);
-}
-
-/* ===== COLORFUL SIDEBAR — SAME DESIGN ===== */
-#reportsBtnSide{background:linear-gradient(135deg,#164478,#2f78be);}
-#activitiesBtnSide{background:linear-gradient(135deg,#2e5d8d,#3f78aa);}
-#placementBtnSide{background:linear-gradient(135deg,#7c3aed,#a855f7)!important;color:#fff!important;}
-#examsBtnSide{background:linear-gradient(135deg,#315f8c,#4578a6);}
-#certificatesBtnSide{background:linear-gradient(135deg,#315f8c,#4578a6);}
-#crmBtnSide{background:linear-gradient(135deg,#f7d27c,#eab308)!important;color:#164478!important;}
-#onlineBtnSide{background:linear-gradient(135deg,#0891b2,#06b6d4)!important;color:#fff!important;}
-#bookingBtnSide{background:linear-gradient(135deg,#315f8c,#4578a6);}
-#tasksBtnSide{background:linear-gradient(135deg,#315f8c,#4578a6);}
-#adminBtnSide{background:linear-gradient(135deg,#315f8c,#4578a6);}
-#transferBtnSide{background:linear-gradient(135deg,#0f766e,#14b8a6);}
-#breakTimeBtnSide{background:linear-gradient(135deg,#ea580c,#f59e0b);}
-
-#reportsBtnSide.active,
-#activitiesBtnSide.active,
-#placementBtnSide.active,
-#examsBtnSide.active,
-#certificatesBtnSide.active,
-#onlineBtnSide.active,
-#bookingBtnSide.active,
-#tasksBtnSide.active,
-#adminBtnSide.active,
-#transferBtnSide.active,
-#breakTimeBtnSide.active{
-  background:#fff!important;
-  color:#164478!important;
-}
-
-@media(max-width:980px){
-  #supervisoryBtnMobile{background:linear-gradient(135deg,#0f766e,#14b8a6);}
-  #newStudentsBtnMobile{background:linear-gradient(135deg,#2563eb,#3b82f6);}
-  #backupBtnMobile{background:linear-gradient(135deg,#7c3aed,#9333ea);}
-  #credentialsBtnMobile{background:linear-gradient(135deg,#334155,#64748b);}
-  #transferBtnMobile{background:linear-gradient(135deg,#0f766e,#14b8a6);}
-  #breakTimeBtnMobile{background:linear-gradient(135deg,#ea580c,#f59e0b);}
-}
-
-/* ===== MAIN ===== */
-.main{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  min-width:0;
-}
-
-/* ===== TOPBAR ===== */
-.topbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  padding:18px 24px;
-  background:rgba(255,255,255,.72);
-  backdrop-filter:blur(10px);
-  border-bottom:1px solid rgba(22,68,120,.08);
-  position:sticky;
-  top:0;
-  z-index:5;
-}
-
-.topbar-left{
-  display:flex;
-  flex-direction:column;
-  gap:4px;
-}
-
-.topbar-left h2{
-  margin:0;
-  color:#164478;
-  font-size:24px;
-  font-weight:900;
-}
-
-.topbar-left p{
-  margin:0;
-  color:#5d6f86;
-  font-weight:700;
   font-size:14px;
-}
-
-.logout{
-  border:none;
-  background:linear-gradient(135deg,#164478,#2469ad);
-  color:#fff;
-  padding:12px 20px;
-  border-radius:16px;
-  font-weight:900;
+  font-weight:700;
   cursor:pointer;
-  font-size:15px;
-  box-shadow:0 10px 20px rgba(22,68,120,.2);
-  transition:.25s;
-}
-
-.logout:hover{
-  transform:translateY(-2px);
-}
-
-.lang-toggle{
-  border:none;
-  background:linear-gradient(135deg,#f7d27c,#ffe7a6);
-  color:#164478;
-  padding:12px 18px;
-  border-radius:16px;
-  font-weight:900;
-  cursor:pointer;
-  font-size:15px;
-  box-shadow:0 10px 20px rgba(22,68,120,.14);
-  transition:.25s;
-  margin-inline-end:8px;
-}
-.lang-toggle:hover{
-  transform:translateY(-2px);
-}
-.topbar-actions{
   display:flex;
   align-items:center;
   gap:8px;
-}
-
-/* ===== HERO ===== */
-.hero{
-  margin:24px;
-  padding:26px 24px;
-  border-radius:28px;
-  background:linear-gradient(135deg,#164478,#1f5f9d,#2f78be);
-  color:#fff;
-  position:relative;
-  overflow:hidden;
-  box-shadow:0 20px 40px rgba(22,68,120,.20);
-}
-
-.hero::before{
-  content:"";
-  position:absolute;
-  width:280px;
-  height:280px;
-  border-radius:50%;
-  background:rgba(255,255,255,.08);
-  top:-90px;
-  left:-70px;
-}
-
-.hero::after{
-  content:"";
-  position:absolute;
-  width:180px;
-  height:180px;
-  border-radius:50%;
-  background:rgba(255,255,255,.08);
-  bottom:-60px;
-  right:-40px;
-}
-
-.hero-content{
-  position:relative;
-  z-index:2;
-}
-
-.hero h3{
-  margin:0 0 12px;
-  font-size:30px;
-  font-weight:900;
-}
-
-.hero p{
-  margin:0;
-  font-size:17px;
-  line-height:1.8;
-  font-weight:700;
-  opacity:.97;
-}
-
-/* ===== النص المتحرك الخرافي ===== */
-.ticker{
-  margin-top:18px;
-  overflow:hidden;
-  border-radius:30px;
-  position:relative;
-  background:rgba(255,255,255,0.15);
-  backdrop-filter:blur(12px);
-}
-
-.ticker-track{
-  white-space:nowrap;
-  display:inline-block;
-  padding:14px 0;
-  font-size:22px;
-  font-weight:900;
-
-  background:linear-gradient(90deg,#f7d27c,#fff,#f7d27c);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-
-  text-shadow:0 0 15px rgba(247,210,124,0.8);
-
-  animation:tickerMove 75s linear infinite;
-}
-
-@keyframes tickerMove{
-  0%{transform:translateX(0);}
-  100%{transform:translateX(50%);}
-}
-.ticker:hover .ticker-track{
-  animation-play-state:paused;
-}
-/* ===== CONTENT AREA ===== */
-.content-wrap{
-  padding:0 24px 28px;
-}
-
-.section-title{
-  font-size:22px;
-  font-weight:900;
-  color:#164478;
-  margin:4px 0 18px;
-}
-
-.cards{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:20px;
-}
-
-.card{
-  background:#fff;
-  border-radius:26px;
-  padding:26px 18px;
-  text-align:center;
-  box-shadow:0 14px 28px rgba(0,0,0,.08);
-  border:3px solid transparent;
-  transition:.28s ease;
-  min-height:220px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-}
-
-.card:hover{
-  transform:translateY(-8px) scale(1.01);
-  box-shadow:0 20px 36px rgba(0,0,0,.12);
-}
-
-.card .icon-box{
-  width:74px;
-  height:74px;
-  margin:0 auto 14px;
-  border-radius:22px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:linear-gradient(135deg,#edf4ff,#dbe9ff);
-  color:#164478;
-  font-size:30px;
-}
-
-.card h3{
-  margin:0 0 10px;
-  font-size:20px;
-  color:#164478;
-  font-weight:900;
-  line-height:1.5;
-}
-
-.card .desc{
-  margin:0 0 18px;
-  color:#66788e;
-  font-size:14px;
-  font-weight:700;
-  line-height:1.7;
-  min-height:44px;
-}
-
-.card button{
-  border:none;
-  background:linear-gradient(135deg,#164478,#2469ad);
-  color:#fff;
-  padding:13px 18px;
-  border-radius:14px;
-  font-size:15px;
-  font-weight:900;
-  cursor:pointer;
+  box-shadow:0 3px 8px rgba(0,0,0,0.18);
   transition:.25s;
+  margin:8px 8px 0;
 }
-
-.card button:hover{
-  transform:translateY(-2px);
-}
-
-/* ===== COLORS ===== */
-.green{ border-color:#32d47b; }
-.red{ border-color:#ff6b57; }
-.gold{ border-color:#f7d27c; }
-.blue{ border-color:#4e8cff; }
-.purple{ border-color:#9b59b6; }
-.orange{ border-color:#f39c12; }
-.online{ border-color:#1abc9c; }
-.weak-followup{
-  border-color:#e11d48;
-  background:linear-gradient(180deg,#ffffff,#fff1f4);
-  box-shadow:0 14px 30px rgba(225,29,72,.13);
-}
-.weak-followup .icon-box{
-  background:linear-gradient(135deg,#ffe4e9,#fecdd6);
-  color:#be123c;
-}
-.weak-followup h3{color:#be123c;}
-.weak-followup button{
-  background:linear-gradient(135deg,#be123c,#e11d48);
-}
-.weak-followup:hover{
-  box-shadow:0 20px 38px rgba(225,29,72,.22);
-}
+.logout-badge i{font-size:15px}
+.logout-badge:hover{background:#1e5799;transform:translateY(-2px)}
 
 
-/* ===== MOBILE TOP BUTTONS ===== */
-.mobile-menu{
-  display:none;
-  padding:14px 16px 0;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-.mobile-menu button{
-  border:none;
-  background:#e8f0fb;
-  color:#164478;
-  padding:12px 14px;
-  border-radius:14px;
-  font-weight:900;
-  cursor:pointer;
-}
-
-.mobile-menu button.active{
+/* ===== Header ===== */
+.header{
   background:#164478;
   color:#fff;
-}
-
-/* ===== RESPONSIVE ===== */
-@media(max-width:980px){
-  .app{
-    flex-direction:column;
-  }
-
-  .sidebar{
-    display:none;
-  }
-
-  .mobile-menu{
-    display:grid;
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    gap:9px;
-    padding:12px 12px 4px;
-  }
-
-  .mobile-menu button{
-    width:100%;
-    min-height:48px;
-    margin:0;
-    padding:10px 8px;
-    color:#fff;
-    border:2px solid rgba(255,255,255,.72);
-    box-shadow:0 7px 16px rgba(22,68,120,.16);
-    line-height:1.35;
-  }
-
-  #reportsBtnMobile{
-    background:linear-gradient(135deg,#164478,#2f78be);
-  }
-
-  #activitiesBtnMobile{
-    background:linear-gradient(135deg,#0f766e,#14b8a6);
-  }
-
-  #placementBtnMobile{
-    background:linear-gradient(135deg,#7c3aed,#a855f7);
-  }
-
-  #examsBtnMobile{
-    background:linear-gradient(135deg,#1d4f91,#3b82f6);
-  }
-
-  #certificatesBtnMobile{
-    background:linear-gradient(135deg,#d97706,#f59e0b);
-  }
-
-  #onlineBtnMobile{
-    background:linear-gradient(135deg,#0891b2,#06b6d4);
-  }
-
-  #crmBtnMobile{
-    background:linear-gradient(135deg,#f7d27c,#eab308);
-    color:#164478;
-  }
-
-  #bookingBtnMobile{
-    background:linear-gradient(135deg,#2563eb,#60a5fa);
-  }
-
-  #adminBtnMobile{
-    background:linear-gradient(135deg,#334155,#64748b);
-  }
-
-  .mobile-menu button.active{
-    outline:3px solid #fff;
-    box-shadow:0 0 0 3px rgba(22,68,120,.28),0 9px 20px rgba(22,68,120,.22);
-    transform:translateY(-2px);
-  }
-
-  .topbar{
-    padding:16px;
-  }
-
-  .hero{
-    margin:16px;
-    padding:22px 18px;
-  }
-
-  .hero h3{
-    font-size:24px;
-  }
-
-  .hero p{
-    font-size:15px;
-  }
-
-  .content-wrap{
-    padding:0 16px 24px;
-  }
-}
-
-@media(max-width:600px){
-  .mobile-menu{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:8px;
-    padding:10px 8px 4px;
-  }
-
-  .mobile-menu button{
-    min-height:46px;
-    font-size:12px;
-    border-radius:13px;
-  }
-
-  .topbar{
-    padding:12px 10px;
-    flex-direction:column;
-    align-items:stretch;
-    gap:10px;
-  }
-
-  .topbar-left{
-    text-align:center;
-  }
-
-  .topbar-actions{
-    width:100%;
-    justify-content:center;
-  }
-
-  .logout,
-  .lang-toggle{
-    flex:1;
-    min-width:0;
-    padding:10px 8px;
-    font-size:12px;
-    margin:0;
-  }
-
-  .hero{
-    margin:10px 8px;
-    padding:18px 14px;
-    border-radius:20px;
-  }
-
-  .hero h3{
-    font-size:20px;
-    line-height:1.55;
-  }
-
-  .ticker{
-    margin-top:12px;
-  }
-
-  .ticker-track{
-    padding:10px 0;
-    font-size:15px;
-  }
-
-  .content-wrap{
-    padding:0 8px 22px !important;
-  }
-
-  .section-title{
-    font-size:19px;
-    margin:12px 3px 10px;
-  }
-
-  .cards{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:10px;
-  }
-
-  .card{
-    min-width:0;
-    min-height:238px;
-    padding:15px 9px 11px;
-    border-width:2px;
-    border-radius:19px;
-    box-shadow:0 9px 20px rgba(22,68,120,.11);
-  }
-
-  .card:hover{
-    transform:none;
-  }
-
-  .card .icon-box{
-    width:54px;
-    height:54px;
-    margin-bottom:10px;
-    border-radius:17px;
-    font-size:23px;
-  }
-
-  .card h3{
-    margin-bottom:7px;
-    font-size:15px;
-    line-height:1.45;
-    overflow-wrap:anywhere;
-  }
-
-  .card .desc{
-    margin-bottom:10px;
-    min-height:46px;
-    font-size:11px;
-    line-height:1.55;
-    overflow-wrap:anywhere;
-  }
-
-  .card button{
-    width:100%;
-    padding:10px 5px;
-    border-radius:11px;
-    font-size:11.5px;
-    line-height:1.35;
-  }
-
-  .card.green{
-    background:linear-gradient(180deg,#ffffff,#effdf5);
-  }
-
-  .card.red{
-    background:linear-gradient(180deg,#ffffff,#fff1ef);
-  }
-
-  .card.gold{
-    background:linear-gradient(180deg,#ffffff,#fff9e8);
-  }
-
-  .card.blue{
-    background:linear-gradient(180deg,#ffffff,#eff6ff);
-  }
-
-  .card.purple{
-    background:linear-gradient(180deg,#ffffff,#faf2ff);
-  }
-
-  .card.orange{
-    background:linear-gradient(180deg,#ffffff,#fff7e8);
-  }
-
-  .card.online{
-    background:linear-gradient(180deg,#ffffff,#edfffb);
-  }
-
-  .topbar-left h2{
-    font-size:20px;
-  }
-
-  .marquee{
-    font-size:17px;
-  }
-}
-@keyframes liveBlink{
-  0%{opacity:1;}
-  50%{
-    opacity:.4;
-    transform:scale(1.05);
-  }
-  100%{opacity:1;}
-}
-
-.live-online{
-  animation:liveBlink 1s infinite;
-  border:3px solid #ff3b30 !important;
-  box-shadow:0 0 20px #ff3b30 !important;
-  position:relative;
-}
-
-.live-online::after{
-  content:"LIVE";
-  position:absolute;
-  top:-8px;
-  left:-8px;
-  background:#ff3b30;
-  color:#fff;
-  padding:4px 8px;
-  border-radius:10px;
-  font-size:11px;
+  text-align:center;
+  padding:12px;
+  font-size:20px;
   font-weight:900;
-}
-
-/* ===== TASK ASSIGNMENT NOTIFICATION ===== */
-.task-nav-wrap{
-  position:relative;
-}
-.task-alert-btn{
-  position:relative;
-}
-.task-count-badge{
-  display:none;
-  min-width:24px;
-  height:24px;
-  padding:0 7px;
-  border-radius:999px;
+  display:flex;
   align-items:center;
   justify-content:center;
-  background:#ff3b30;
-  color:#fff;
-  font-size:11px;
-  font-weight:900;
-  margin-inline-start:auto;
-  box-shadow:0 0 0 3px rgba(255,255,255,.18);
+  gap:12px;
+  flex-wrap:wrap;
+  margin:8px 8px 0;
+  border-radius:14px;
+  box-shadow:0 10px 24px rgba(0,0,0,.06);
 }
-.task-alert-btn.has-task-count .task-count-badge{
-  display:inline-flex;
-}
-
-/* وميض لحظي حسب أولوية آخر مهمة تم إسنادها */
-.task-alert-btn.task-flash-high{
-  animation:taskBlinkHigh .55s ease-in-out 10;
-  border:3px solid #ff3b30 !important;
-  background:linear-gradient(135deg,#b91c1c,#ef4444) !important;
-  color:#fff !important;
-  box-shadow:0 0 0 4px rgba(255,59,48,.20),0 0 28px rgba(255,59,48,.95) !important;
-}
-.task-alert-btn.task-flash-medium{
-  animation:taskBlinkMedium .55s ease-in-out 10;
-  border:3px solid #f59e0b !important;
-  background:linear-gradient(135deg,#b45309,#f59e0b) !important;
-  color:#fff !important;
-  box-shadow:0 0 0 4px rgba(245,158,11,.20),0 0 28px rgba(245,158,11,.95) !important;
-}
-.task-alert-btn.task-flash-low{
-  animation:taskBlinkLow .55s ease-in-out 10;
-  border:3px solid #22c55e !important;
-  background:linear-gradient(135deg,#15803d,#22c55e) !important;
-  color:#fff !important;
-  box-shadow:0 0 0 4px rgba(34,197,94,.20),0 0 28px rgba(34,197,94,.95) !important;
-}
-.task-alert-btn.task-flash-high .task-count-badge{
-  background:#7f1d1d !important;
-}
-.task-alert-btn.task-flash-medium .task-count-badge{
-  background:#92400e !important;
-}
-.task-alert-btn.task-flash-low .task-count-badge{
-  background:#166534 !important;
+.header img{
+  width:70px;height:70px;
+  border-radius:14px;
+  background:#fff;padding:4px;
 }
 
-@keyframes taskBlinkHigh{
-  0%,100%{transform:scale(1);filter:brightness(1)}
-  50%{transform:scale(1.045);filter:brightness(1.35)}
+/* ===== Actions ===== */
+.actions{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+  margin:0 8px 8px;
 }
-@keyframes taskBlinkMedium{
-  0%,100%{transform:scale(1);filter:brightness(1)}
-  50%{transform:scale(1.045);filter:brightness(1.30)}
-}
-@keyframes taskBlinkLow{
-  0%,100%{transform:scale(1);filter:brightness(1)}
-  50%{transform:scale(1.045);filter:brightness(1.25)}
-}
-
-.task-assignee-popover{
-  display:none;
-  position:absolute;
-  right:100%;
-  top:0;
-  width:300px;
-  max-height:340px;
-  overflow:auto;
-  margin-right:10px;
-  padding:12px;
+.badge-info{
   background:#fff;
-  color:#16324d;
-  border:1px solid #dbe6f2;
-  border-radius:16px;
-  box-shadow:0 18px 44px rgba(0,0,0,.18);
-  z-index:9999;
-}
-.task-nav-wrap:hover .task-assignee-popover{
-  display:block;
-}
-.task-assignee-popover h4{
-  margin:0 0 9px;
+  border:1px dashed #cfd6e6;
   color:#164478;
-  font-size:14px;
+  padding:8px 12px;
+  border-radius:12px;
+  font-weight:900;
 }
-.task-assignee-item{
+.btn{
+  background:#164478;
+  color:#fff;
+  border:none;
+  padding:8px 14px;
+  border-radius:10px;
+  font-weight:900;
+  cursor:pointer;
+  box-shadow:0 6px 16px rgba(22,68,120,.18);
+  transition:.2s;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn.purple{background:#8e44ad}
+.btn.gray{background:#7f8c8d}
+.btn.green{background:#27ae60}
+.btn.red{background:#c0392b}
+
+/* ===== Stats Bar ===== */
+.stats{
+  margin:0 8px 8px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.stat-chip{
+  background:#fff;
+  border:1px solid #e6ecfb;
+  border-radius:12px;
+  padding:8px 12px;
+  font-weight:900;
+  color:#164478;
+  box-shadow:0 10px 24px rgba(0,0,0,.04);
+}
+.stat-chip b{color:#0b2b52}
+.stat-chip.green{border-color:#b7f0cf;color:#1f7a3d}
+.stat-chip.red{border-color:#f4b7b7;color:#a32727}
+.stat-chip.orange{border-color:#ffd9a8;color:#b45309}
+.stat-chip.gray{border-color:#e3e7ef;color:#586074}
+
+/* ===== Filters ===== */
+.filters{
+  background:#fff;
+  margin:8px;
+  padding:12px;
+  border-radius:14px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(175px,1fr));
+  gap:10px;
+  box-shadow:0 10px 24px rgba(0,0,0,.06);
+}
+.filters input,.filters select{
   padding:9px 10px;
   border-radius:10px;
-  background:#f6f9fd;
-  margin-bottom:7px;
-  font-size:12px;
-  font-weight:800;
-  line-height:1.55;
-  border-right:4px solid #94a3b8;
-}
-.task-assignee-item.priority-high{
-  border-right-color:#ef4444;
-  background:#fff1f2;
-}
-.task-assignee-item.priority-medium{
-  border-right-color:#f59e0b;
-  background:#fffbeb;
-}
-.task-assignee-item.priority-low{
-  border-right-color:#22c55e;
-  background:#f0fdf4;
-}
-.task-assignee-item small{
-  display:block;
-  color:#718096;
-  font-size:10px;
-  font-weight:700;
-}
-.task-assignee-empty{
-  color:#718096;
-  font-size:12px;
-}
-.task-ticker-note{
-  margin-top:10px;
-  padding:10px 14px;
-  border-radius:14px;
-  background:rgba(255,255,255,.14);
-  border:1px solid rgba(255,255,255,.2);
-  overflow:hidden;
-  white-space:nowrap;
-  font-size:13px;
+  border:1px solid #ccd3e2;
   font-weight:900;
-  transition:.25s ease;
+  outline:none;
+  background:#fff;
 }
-.task-ticker-note.priority-high{
-  background:rgba(239,68,68,.24);
-  border-color:rgba(255,255,255,.45);
-}
-.task-ticker-note.priority-medium{
-  background:rgba(245,158,11,.24);
-  border-color:rgba(255,255,255,.45);
-}
-.task-ticker-note.priority-low{
-  background:rgba(34,197,94,.24);
-  border-color:rgba(255,255,255,.45);
-}
-.task-ticker-note span{
-  display:inline-block;
-  min-width:100%;
-  animation:taskNamesMove 22s linear infinite;
-}
-@keyframes taskNamesMove{
-  from{transform:translateX(-15%)}
-  to{transform:translateX(105%)}
-}
-@media(max-width:980px){
-  .task-assignee-popover{display:none !important}
-  .task-count-badge{
-    position:absolute;
-    top:-7px;
-    left:-7px;
-    margin:0;
-  }
-  .task-alert-btn{position:relative}
+.filters input:focus,.filters select:focus{border-color:#164478}
+
+/* ===== Wrap ===== */
+.wrap{
+  width:calc(100% - 16px);
+  margin:8px;
+  background:#fff;
+  padding:10px;
+  border-radius:14px;
+  overflow:auto;
+  max-height:78vh;
+  display:none;
+  box-shadow:0 10px 24px rgba(0,0,0,.06);
 }
 
-/* =========================================================
-   MOBILE STABILITY PATCH — منع اهتزاز الشاشة على الجوال
-   Chrome / Safari / iPhone / Android
-========================================================= */
-@media (max-width:980px){
+/* ===== Course Block ===== */
+.course-block{
+  border:1px solid #e6ecfb;
+  border-radius:14px;
+  overflow:hidden;
+  margin:10px 0;
+  box-shadow:0 8px 20px rgba(0,0,0,.04);
+}
+.course-head{
+  background:#164478;
+  color:#fff;
+  padding:10px 12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  font-weight:900;
+}
+.course-head small{
+  opacity:.95;
+  font-weight:800;
+}
+.course-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.mini-btn{
+  background:#fff;
+  color:#164478;
+  border:none;
+  padding:6px 10px;
+  border-radius:10px;
+  font-weight:900;
+  cursor:pointer;
+}
+.mini-btn:hover{opacity:.92}
+.course-body{padding:10px;background:#fff}
 
-  html,body{
-    overflow-x:hidden !important;
-    width:100% !important;
-    max-width:100% !important;
-    -webkit-text-size-adjust:100%;
-    text-size-adjust:100%;
-  }
-
-  .app,
-  .main,
-  .content-wrap,
-  #content,
-  .cards,
-  .card,
-  .mobile-menu,
-  .hero,
-  .topbar{
-    width:100% !important;
-    max-width:100% !important;
-    min-width:0 !important;
-  }
-
-  /* لا نستخدم حركة تغيّر حجم العنصر على الجوال */
-  .task-alert-btn.task-flash-high,
-  .task-alert-btn.task-flash-medium,
-  .task-alert-btn.task-flash-low{
-    transform:none !important;
-    will-change:auto !important;
-  }
-
-  /* وميض لوني فقط بدون scale حتى لا تتحرك الصفحة */
-  @keyframes taskBlinkHigh{
-    0%,100%{filter:brightness(1);opacity:1}
-    50%{filter:brightness(1.28);opacity:.78}
-  }
-
-  @keyframes taskBlinkMedium{
-    0%,100%{filter:brightness(1);opacity:1}
-    50%{filter:brightness(1.22);opacity:.80}
-  }
-
-  @keyframes taskBlinkLow{
-    0%,100%{filter:brightness(1);opacity:1}
-    50%{filter:brightness(1.18);opacity:.82}
-  }
-
-  /* منع القفزة عند الزر النشط */
-  .mobile-menu button.active{
-    transform:none !important;
-  }
-
-  /* تعطيل تأثيرات hover التي قد يفسرها Safari كلمس */
-  .side-btn:hover,
-  .card:hover,
-  .logout:hover,
-  .lang-toggle:hover,
-  .card button:hover{
-    transform:none !important;
-  }
-
-  /* منع أي حركة من تغيير عرض الصفحة */
-  .task-ticker-note{
-    width:100%;
-    max-width:100%;
-    overflow:hidden !important;
-    contain:layout paint;
-  }
-
-  .task-ticker-note span{
-    min-width:100%;
-    max-width:none;
-    will-change:transform;
-  }
-
-  .ticker{
-    width:100%;
-    max-width:100%;
-    overflow:hidden !important;
-    contain:layout paint;
-  }
-
-  .ticker-track{
-    will-change:transform;
-  }
-
-  /* تثبيت الأزرار والبادج */
-  .task-alert-btn{
-    transform:translateZ(0);
-    backface-visibility:hidden;
-    -webkit-backface-visibility:hidden;
-  }
-
-  .task-count-badge{
-    transform:none !important;
-  }
+/* ===== Table Wrapper (Horizontal Scroll) ===== */
+.course-body{
+  padding:10px;
+  background:#fff;
+  overflow-x:auto;
+  overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;
 }
 
-/* على الشاشات الصغيرة جدًا نقلل الحركات أكثر */
-@media (max-width:600px){
-  .task-ticker-note span{
-    animation-duration:28s;
-  }
-
-  .ticker-track{
-    animation-duration:90s;
-  }
-
-  .mobile-menu button{
-    -webkit-tap-highlight-color:transparent;
-    touch-action:manipulation;
-  }
+/* ===== Table ===== */
+table{
+  border-collapse:collapse;
+  font-size:12px;
+  direction:ltr;
+  min-width:max-content;
+  width:max-content;
 }
 
+/* ===== Cells ===== */
+th,td{
+  padding:5px 4px;
+  border:1px solid #e1e6f2;
+  text-align:center;
+  white-space:nowrap;
+  direction:rtl;
+  vertical-align:middle;
+}
+
+/* ===== Sticky Header ===== */
+thead th{
+  background:#164478;
+  color:#fff;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+/* =========================
+   ✅ STICKY NAME COLUMN + Arabic/English full display
+========================= */
+:root{
+  --nameW: 380px;   /* عرض عمود الاسم */
+  --checkW: 60px;   /* عرض عمود التحديد */
+  --numW: 60px;     /* عرض عمود الرقم */
+}
+
+/* ✅ عمود الاسم: ثابت + يظهر كامل */
+th:nth-child(3),
+td:nth-child(3){
+  position:sticky;
+  right:0;                 /* RTL */
+  z-index:40;
+  min-width:var(--nameW);
+  max-width:520px;
+  text-align:right;
+  font-weight:900;
+  background:#fff;
+  box-shadow:-6px 0 14px rgba(0,0,0,.10);
+
+  /* ✅ إظهار الاسم كامل */
+  white-space:normal !important;
+  word-break:break-word;
+  line-height:1.35;
+  padding:8px 10px !important;
+}
+
+/* هيدر الاسم يبقى أزرق */
+th:nth-child(3){
+  background:#164478 !important;
+  color:#fff !important;
+  z-index:60;
+}
+
+/* ✅ عمود التحديد ثابت بعد الاسم */
+th:nth-child(2),
+td:nth-child(2){
+  position:sticky;
+  right:var(--nameW);
+  z-index:55;
+  background:#fff;
+  box-shadow:-3px 0 10px rgba(0,0,0,.06);
+}
+
+/* ✅ عمود الرقم ثابت بعد التحديد */
+th:nth-child(1),
+td:nth-child(1){
+  position:sticky;
+  right:calc(var(--nameW) + var(--checkW));
+  z-index:56;
+  background:#fff;
+  box-shadow:-3px 0 10px rgba(0,0,0,.06);
+}
+
+/* ✅ تنسيق الاسم EN/AR داخل العمود */
+.name-en{
+  font-weight:900;
+  font-size:12px;
+  direction:ltr;
+  text-align:left;
+}
+.name-ar{
+  font-size:11px;
+  font-weight:800;
+  color:#444;
+  direction:rtl;
+  text-align:right;
+  margin-top:2px;
+}
+
+/* Zebra */
+tbody tr:nth-child(even){ background:#f3f6fc; }
+
+/* Mobile */
+@media (max-width:768px){
+  :root{ --nameW: 280px; }
+  .name-en{font-size:11px}
+  .name-ar{font-size:10px}
+}
+
+/* Attendance cells */
+.cell{
+  width:22px;height:22px;
+  border-radius:6px;
+  font-weight:1000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:default;
+  pointer-events:none;
+}
+.cell.none{background:#eee}
+.cell.present{background:#1abc9c;color:#fff}
+.cell.late{background:#f39c12;color:#fff}
+.cell.absent{background:#e74c3c;color:#fff}
+
+/* Weekend */
+.weekend{background:#fff1e6!important}
+
+/* WhatsApp per row */
+.wa-row-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid #16a34a;
+  background:#ecfdf5;
+  color:#065f46;
+  font-weight:900;
+  cursor:pointer;
+  font-size:12px;
+  box-shadow:0 6px 16px rgba(16,185,129,.12);
+  transition:.2s;
+}
+.wa-row-btn i{color:#16a34a}
+.wa-row-btn:hover{background:#16a34a;color:#fff;transform:translateY(-1px)}
+.wa-row-btn:hover i{color:#fff}
+.wa-row-btn.disabled{opacity:.45;pointer-events:none}
+
+/* ✅ تمييز زر واتس حسب "اليوم المختار" */
+.wa-row-btn.day-absent{background:#e74c3c;border-color:#c0392b;color:#fff}
+.wa-row-btn.day-absent i{color:#fff}
+.wa-row-btn.day-absent:hover{background:#c0392b;color:#fff}
+.wa-row-btn.day-present{background:#27ae60;border-color:#1e874b;color:#fff}
+.wa-row-btn.day-present i{color:#fff}
+.wa-row-btn.day-present:hover{background:#1e874b;color:#fff}
+
+/* ✅ تمييز الاسم حسب "اليوم المختار" */
+.name-day-absent{
+  background:#e74c3c !important;
+  color:#fff !important;
+  border-radius:8px;
+  padding:6px 8px !important;
+}
+.name-day-present{
+  background:#27ae60 !important;
+  color:#fff !important;
+  border-radius:8px;
+  padding:6px 8px !important;
+}
+
+/* ✅ تلوين العمود المختار */
+.col-selected{
+  outline:2px solid rgba(22,68,120,.25);
+  background:#eef6ff !important;
+}
+th.col-selected{
+  background:#0f3563 !important;
+}
+
+/* ✅ جعل عنوان اليوم قابل للنقر */
+.th-day{
+  cursor:pointer;
+  user-select:none;
+}
+.th-day:hover{filter:brightness(1.05)}
+
+/* Hidden chart canvas for PDF */
+#chartCanvasWrap{
+  position:fixed;
+  left:-9999px;
+  top:-9999px;
+  width:900px;
+  height:380px;
+  background:#fff;
+  padding:10px;
+  border-radius:12px;
+}
+#prudleAuthGate{position:fixed;inset:0;z-index:999999;background:#f4f6fb;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;padding:20px;text-align:center;font-weight:800;color:#164478}
+body.prudle-auth-pending > :not(#prudleAuthGate):not(script){visibility:hidden!important}
+#prudleAuthGate .btn{max-width:220px}
 </style>
 </head>
 
-<body>
+<body class="prudle-auth-pending">
+<button class="logout-badge" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+<div id="prudleAuthGate" role="status">جاري التحقق من صلاحيات الدخول...</div>
 
-<div class="app">
-
-  <!-- ===== SIDEBAR ===== -->
-  <aside class="sidebar">
-    <div class="brand">
-      <h1>Prudle</h1>
-      <p id="brandSub">Control Panel</p>
-    </div>
-
-    <div class="menu-title" id="mainMenuTitle">القائمة الرئيسية</div>
-
-<button id="reportsBtnSide"
-        class="side-btn active"
-        onclick="load('reports')">
-
-  <i class="fa-solid fa-chart-column"></i>
-  <span id="reportsSideText">قسم التقارير</span>
-
-</button>
-<!-- ===== زر قسم النشاطات ===== -->
-<button id="activitiesBtnSide"
-        class="side-btn"
-        onclick="load('activities')">
-
-  <i class="fa-solid fa-gamepad"></i>
-  <span id="activitiesSideText">قسم النشاطات</span>
-
-</button>
-<button
-  id="placementBtnSide"
-  class="side-btn"
-  onclick="load('placement')"
-  style="
-    background:linear-gradient(135deg,#7c3aed,#9333ea);
-    color:#fff;
-  "
->
-  <i class="fa-solid fa-graduation-cap"></i>
-  <span id="placementSideText">اختبار تحديد المستوى CEFR</span>
-</button>
-
-<button id="examsBtnSide"
-        class="side-btn"
-        onclick="load('exams')">
-  <i class="fa-solid fa-file-signature"></i>
-  <span id="examsSideText">الاختبارات والتقييم النهائي</span>
-</button>
-
-<button id="certificatesBtnSide"
-        class="side-btn"
-        onclick="load('certificates')">
-  <i class="fa-solid fa-certificate"></i>
-  <span id="certificatesSideText"> <span id="certificatesMobileText">الشهادات</span> </span>
-</button>
-<button id="crmBtnSide"
-        class="side-btn"
-        onclick="load('crm')"
-        style="
-          background:linear-gradient(135deg,#f7d27c,#eab308);
-          color:#164478;
-          font-weight:900;
-        ">
-  <i class="fa-solid fa-headset"></i>
-  <span id="crmSideText">CRM خدمة علاقات العملاء</span>
-</button>
-<button id="onlineBtnSide"
-        class="side-btn"
-        onclick="load('online')"
-        style="
-          background:linear-gradient(135deg,#06b6d4,#0891b2);
-          color:#fff;
-        ">
-  <i class="fa-solid fa-video"></i>
-  <span id="onlineSideText">قسم الأونلاين والاجتماعات</span>
-</button>
-    <button id="bookingBtnSide" class="side-btn" onclick="load('booking')">
-      <i class="fa-solid fa-calendar-check"></i>
-      <span id="bookingSideText">قسم الحجوزات</span>
-    </button>
-
-    <div class="task-nav-wrap">
-      <button id="tasksBtnSide" class="side-btn task-alert-btn" onclick="load('tasks')">
-        <i class="fa-solid fa-list-check"></i>
-        <span id="tasksSideText">إسناد المهام</span>
-        <span id="tasksCountSide" class="task-count-badge">0</span>
-      </button>
-      <div class="task-assignee-popover" id="taskAssigneePopover">
-        <h4>المهام المسندة حالياً</h4>
-        <div id="taskAssigneeList" class="task-assignee-empty">لا توجد مهام مسندة حالياً</div>
-      </div>
-    </div>
-
-    <button id="adminBtnSide" class="side-btn" onclick="load('admin')">
-      <i class="fa-solid fa-gear"></i>
-      <span id="adminSideText">قسم الإدارة</span>
-    </button>
-    <button id="transferBtnSide" class="side-btn" onclick="load('transfer')">
-      <i class="fa-solid fa-right-left"></i>
-      <span id="transferSideText">الترحيل</span>
-    </button>
-
-    <button id="breakTimeBtnSide" class="side-btn"
-            onclick="openPage('https://www.prudle-education.com/break-time')">
-      <i class="fa-solid fa-mug-hot"></i>
-      <span id="breakTimeSideText">أوقات الراحة للفصول</span>
-    </button>
-
-
-    <div class="sidebar-bottom">
-      <button id="newStudentsBtnSide" class="side-btn" onclick="load('newstudents')">
-        <i class="fa-solid fa-user-plus"></i>
-        <span id="newStudentsSideText">المستجدين</span>
-      </button>
-
-      <button id="supervisoryBtnSide" class="side-btn" onclick="openPage('https://www.prudle-education.com/gm-dashboard')">
-        <i class="fa-solid fa-user-tie"></i>
-        <span id="supervisorySideText">الجهة الإشرافية</span>
-      </button>
-
-      <button id="backupBtnSide" class="side-btn" onclick="openPage('https://www.prudle-education.com/rb')">
-        <i class="fa-solid fa-database"></i>
-        <span id="backupSideText">النسخ الاحتياطي</span>
-      </button>
-
-      <button id="credentialsBtnSide" class="side-btn" onclick="openPage('https://www.prudle-education.com/users')">
-        <i class="fa-solid fa-key"></i>
-        <span id="credentialsSideText">اسم المستخدم وكلمة المرور</span>
-      </button>
-    </div>
-  </aside>
-
-  <!-- ===== MAIN ===== -->
-  <main class="main">
-
-    <!-- ===== MOBILE MENU ===== -->
-    <div class="mobile-menu">
-
-  <button id="placementBtnMobile" onclick="load('placement')">
-    اختبار CEFR
-  </button>
-
-  <button id="reportsBtnMobile" class="active" onclick="load('reports')">
-    التقارير
-  </button>
-<button id="activitiesBtnMobile" onclick="load('activities')">
-  النشاطات
-</button>
-  <button id="examsBtnMobile" onclick="load('exams')">
-    الاختبارات
-  </button>
-
-  <button id="certificatesBtnMobile" onclick="load('certificates')">
-    الشهادات
-  </button>
-
-  <button id="onlineBtnMobile" onclick="load('online')">
-    الأونلاين
-  </button>
-<button id="crmBtnMobile" onclick="load('crm')">
-  <span id="crmMobileText">CRM</span>
-</button>
-  <button id="bookingBtnMobile" onclick="load('booking')">
-    الحجوزات
-  </button>
-
-  <button id="tasksBtnMobile" class="task-alert-btn" onclick="load('tasks')">
-    <span id="tasksMobileText">المهام</span>
-    <span id="tasksCountMobile" class="task-count-badge">0</span>
-  </button>
-
-  <button id="adminBtnMobile" onclick="load('admin')">
-    الإدارة
-  </button>
-  <button id="transferBtnMobile" onclick="load('transfer')">
-    <span id="transferMobileText">الترحيل</span>
-  </button>
-
-  <button id="breakTimeBtnMobile"
-          onclick="openPage('https://www.prudle-education.com/break-time')">
-    <span id="breakTimeMobileText">أوقات الراحة</span>
-  </button>
-
-
-  <button id="newStudentsBtnMobile" onclick="load('newstudents')">
-    <span id="newStudentsMobileText">المستجدين</span>
-  </button>
-
-  <button id="supervisoryBtnMobile" onclick="openPage('https://www.prudle-education.com/gm-dashboard')">
-    <span id="supervisoryMobileText">الجهة الإشرافية</span>
-  </button>
-
-  <button id="backupBtnMobile" onclick="openPage('https://www.prudle-education.com/rb')">
-    <span id="backupMobileText">النسخ الاحتياطي</span>
-  </button>
-
-  <button id="credentialsBtnMobile" onclick="openPage('https://www.prudle-education.com/users')">
-    <span id="credentialsMobileText">اسم المستخدم وكلمة المرور</span>
-  </button>
-
+<div class="header">
+  Student Attendance – View Only
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJprpZXU4pTSCYXKhzWCpqdZ_mnPHMwqsACA&amp;s" />
 </div>
 
-    <!-- ===== TOPBAR ===== -->
-    <div class="topbar">
-      <div class="topbar-left">
-        <h2 id="pageTitle">لوحة التحكم</h2>
-      </div>
+<div class="actions">
+  <span class="badge-info" id="infoBox">⚠ اختر فلترة أولاً لعرض البيانات</span>
 
-      <div class="topbar-actions">
-        <button class="lang-toggle" id="langToggleBtn" onclick="toggleDashboardLanguage()">
-          English
-        </button>
+  <button class="btn" onclick="selectAll()">تحديد الكل</button>
+  <button class="btn gray" onclick="clearSelection()">إلغاء التحديد</button>
 
-        <button class="logout" id="logoutBtn" onclick="logout()">
-          <i class="fa-solid fa-right-from-bracket"></i>
-          <span id="logoutText">تسجيل الخروج</span>
-        </button>
-      </div>
-    </div>
+  <button class="btn green" onclick="selectByDay('present')">تحديد (حاضر) اليوم المختار</button>
+  <button class="btn red" onclick="selectByDay('absent')">تحديد (غائب) اليوم المختار</button>
 
-    <!-- ===== HERO ===== -->
-    <section class="hero">
-      <div class="hero-content">
-        <h3 id="heroWelcome">مرحبا بك في نظام برودل التعليمي</h3>
-        <p id="heroSub">.</p>
+  <button class="btn purple" onclick="exportSelectedPDF()">PDF المحدد فقط</button>
+  <button class="btn green" onclick="exportAllDisplayedPDF()">PDF جميع المعروض</button>
 
-<div class="ticker">
-  <div class="ticker-track" id="movingText">
-    □ مرحبًا بك في Prudle —
-  </div>
+  <button class="btn green" onclick="exportBySelectedDayPDF('present','Prudle_Day_Present.pdf')">PDF (حاضر) اليوم المختار</button>
+  <button class="btn red" onclick="exportBySelectedDayPDF('absent','Prudle_Day_Absent.pdf')">PDF (غائب) اليوم المختار</button>
 </div>
 
-<div class="task-ticker-note" id="taskTickerNote" style="display:none">
-  <span id="taskTickerNames"></span>
-</div>
-      </div>
-    </section>
+<div class="stats" id="statsBox">
+  <div class="stat-chip">الدورات: <b id="stCourses">0</b></div>
+  <div class="stat-chip gray">الطلاب: <b id="stStudents">0</b></div>
+  <div class="stat-chip">المحدد: <b id="stSelected">0</b></div>
 
-    <!-- ===== CONTENT ===== -->
-    <div class="content-wrap">
-      <div id="content"></div>
-    </div>
-
-  </main>
+  <div class="stat-chip gray">اليوم المختار: <b id="stDay">—</b></div>
+  <div class="stat-chip green">حاضر: <b id="stDayPresent">0</b></div>
+  <div class="stat-chip orange">متأخر: <b id="stDayLate">0</b></div>
+  <div class="stat-chip red">غائب: <b id="stDayAbsent">0</b></div>
+  <div class="stat-chip gray">بدون رصد: <b id="stDayNone">0</b></div>
+  <div class="stat-chip">نسبة الحضور: <b id="stDayRate">0%</b></div>
 </div>
+
+<div class="filters">
+  <!-- ✅ البحث الفوري (عربي/انجليزي/هوية) -->
+  <input id="searchInput" oninput="renderAllCourses()" placeholder="بحث بالهوية أو الاسم عربي / English" />
+
+  <select id="branchFilter" onchange="applyFilter()"><option value="">الفرع</option></select>
+  <select id="sectionFilter" onchange="applyFilter()"><option value="">القسم</option></select>
+  <select id="trainerFilter" onchange="applyFilter()"><option value="">المدرب</option></select>
+  <select id="courseFilter" onchange="applyFilter()"><option value="">الدورة</option></select>
+  <select id="periodFilter" onchange="applyFilter()"><option value="">الفترة</option></select>
+  <select id="startDateFilter" onchange="applyFilter()"><option value="">تاريخ البدء</option></select>
+
+  <!-- ✅ اختيار عمود اليوم (اختياري) -->
+  <select id="dayColumnFilter" onchange="renderAllCourses()">
+    <option value="">اليوم (اختياري)</option>
+  </select>
+</div>
+
+<div class="wrap" id="tableWrap">
+  <div id="coursesContainer"></div>
+</div>
+
+<div id="chartCanvasWrap">
+  <canvas id="pdfChart" width="900" height="380"></canvas>
+</div>
+
+<!-- PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
 <script>
-/* =========================================================
-   ✨ الشريط المتحرك — عرض الدورات المفتوحة تلقائياً من Firestore
-========================================================= */
-function getCourseTickerLabel(c){
-  const courseName =
-    c.TrainingCourse ||
-    c.CourseName ||
-    c.courseName ||
-    c.Level ||
-    c.level ||
-    "";
+/* =========================
+   Prudle Worker + verified UID auth bootstrap
+   Read-only attendance; no Logout button
+========================= */
+const PRUDLE_WORKER = "https://api-prudle.abbassaboali.workers.dev";
+const PRUDLE_LOGIN = "https://www.prudle-education.com/log-in-out";
+const PRUDLE_HOSTS = new Set(["www.prudle-education.com","prudle-education.com","abbassaboali-alt.github.io"]);
+const PRUDLE_SESSION_MS = 86400000;
+let PRUDLE_READY = false;
+function prudleStartTime(raw){
+  if(!raw)return NaN;
+  let n=Number(raw);
+  if(!Number.isFinite(n))n=Date.parse(raw);
+  if(Number.isFinite(n)&&n>0&&n<1e11)n*=1000;
+  return n;
+}
+function prudleSessionValid(){
+  const raw=localStorage.getItem("prudleDeviceSessionStartedAt") || sessionStorage.getItem("prudleDeviceSessionStartedAt");
+  const n=prudleStartTime(raw);
+  return Number.isFinite(n)&&n>0&&n<=Date.now()+60000&&Date.now()-n<PRUDLE_SESSION_MS;
+}
+function prudleToken(){return (sessionStorage.getItem("firebaseToken")||"").trim();}
+function prudleUid(){return (sessionStorage.getItem("firebaseUid")||localStorage.getItem("authUid")||localStorage.getItem("firebaseUid")||"").trim();}
+function prudleGoLogin(){location.replace(PRUDLE_LOGIN);}
+async function logout(){
+  const session=sessionStorage.getItem("prudleSessionId")||localStorage.getItem("prudleSessionId")||"";
+  try{
+    if(session)await fetch(PRUDLE_WORKER+"/auth/logout",{method:"POST",headers:{"Content-Type":"application/json","X-Prudle-Session":session},signal:AbortSignal.timeout(4000)});
+  }catch(_){/* Continue local logout on connectivity failure. */}
+  for(const store of [sessionStorage,localStorage]){
+    for(const key of ["firebaseToken","firebaseUid","authUid","prudleSessionId","prudleDeviceSessionStartedAt","username","role","loginDate"]){store.removeItem(key);}
+  }
+  prudleGoLogin();
+}
+function prudleError(message, retry){
+  PRUDLE_READY=false;
+  document.body.classList.add("prudle-auth-pending");
+  const gate=document.getElementById("prudleAuthGate");
+  gate.style.display="flex";
+  gate.replaceChildren();
+  const label=document.createElement("p");label.textContent=message;gate.appendChild(label);
+  if(retry){const b=document.createElement("button");b.className="btn";b.textContent="إعادة المحاولة";b.onclick=prudleBootstrap;gate.appendChild(b);}
+}
+async function prudleDb(body){
+  if(!prudleSessionValid()){prudleGoLogin();throw Error("SESSION_EXPIRED");}
+  const token=prudleToken();
+  if(!token){prudleGoLogin();throw Error("TOKEN_MISSING");}
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),15000);
+  let res,payload;
+  try{
+    res=await fetch(PRUDLE_WORKER+"/db",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify(body),signal:controller.signal});
+    payload=await res.json().catch(()=>({}));
+  }catch(e){throw Error(e.name==="AbortError"?"انتهت مهلة الاتصال بالخادم":"تعذر الاتصال بالخادم");}
+  finally{clearTimeout(timer);}
+  if(res.status===401){prudleGoLogin();throw Error("UNAUTHORIZED");}
+  if(res.status===403)throw Error("لا توجد صلاحية لعرض هذه البيانات");
+  if(!res.ok||payload.success===false||payload.ok===false)throw Error(String(payload.error||payload.message||"فشل طلب البيانات: "+res.status));
+  return payload.data??payload;
+}
+function prudleDocs(result){
+  const arr=Array.isArray(result?.documents)?result.documents:Array.isArray(result)?result:[];
+  return arr.map(d=>{
+    const data=d?.data&&typeof d.data==="object"?d.data:d;
+    return {...data,id:String(d.id||d.documentId||data.id||d.name?.split("/").pop()||"")};
+  });
+}
+function prudleRoles(user){
+  let roles=Array.isArray(user.roles)?user.roles:[];
+  if(typeof user.roles==="string"){
+    try{const parsed=JSON.parse(user.roles);roles=Array.isArray(parsed)?parsed:[user.roles];}
+    catch{roles=[user.roles];}
+  }
+  if(user.role)roles=[...roles,user.role];
+  return roles.map(r=>String(r).trim().toLowerCase());
+}
+async function prudleBootstrap(){
+  prudleError("جاري التحقق من صلاحيات الدخول...",false);
+  try{
+    if(location.protocol!=="https:"||!PRUDLE_HOSTS.has(location.hostname.toLowerCase())){prudleGoLogin();return;}
+    if(!prudleSessionValid()||!prudleToken()||!prudleUid()){prudleGoLogin();return;}
+    const users=prudleDocs(await prudleDb({action:"query",collection:"USERS",filters:[{field:"authUid",op:"==",value:prudleUid()}],limit:2}));
+    if(users.length!==1)throw Error("تعذر التحقق من حساب المستخدم عبر USERS");
+    if(!prudleRoles(users[0]).includes("admin")){prudleError("هذه الصفحة مخصصة للمشرف بصلاحية admin فقط",false);return;}
+    await loadAttendanceData();
+    PRUDLE_READY=true;
+    document.body.classList.remove("prudle-auth-pending");
+    document.getElementById("prudleAuthGate").style.display="none";
+  }catch(e){
+    if(["SESSION_EXPIRED","TOKEN_MISSING","UNAUTHORIZED"].includes(e.message))return;
+    prudleError(e.message||"تعذر تحميل البيانات",true);
+  }
+}
+window.addEventListener("pageshow",()=>{if(PRUDLE_READY&&!prudleSessionValid())prudleGoLogin();});
+window.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="s")e.preventDefault();},{capture:true});
 
-  const section =
-    c.Section ||
-    c.section ||
-    c.Gender ||
-    c.gender ||
-    "";
+/* =========================
+   CONFIG
+========================= */
+const LOGO_URL = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2cRc2rxfALVprygCmO_V7cJra9eZF1MUzpuJ3NnWd&s";
+const DIRECTOR_NAME = "Prudle Institute Administration";
 
-  const branch =
-    c.Branch ||
-    c.branch ||
-    "";
+/* Database reads are performed only by prudleDb(). */
 
-  const period =
-    c.Period ||
-    c.period ||
-    "";
+/* =========================
+   State
+========================= */
+let COURSES = [];
+let STUDENTS = [];
+let ACTIVE_COURSES = [];
+let SELECTED_IDS = new Set();
+let chartInstance = null;
 
-  const parts = [];
+/* =========================
+   Helpers
+========================= */
+const normalize = s => (s||"").toString().toLowerCase()
+  .replace(/[أإآ]/g,"ا").replace(/ة/g,"ه").replace(/\s+/g," ").trim();
 
-  if(courseName) parts.push(courseName);
-  if(section) parts.push(section);
-  if(branch) parts.push(branch);
-  if(period) parts.push(period);
+const isWeekend = d => [5,6].includes(new Date(d).getDay());
+const dayNameAr = d => new Date(d).toLocaleDateString("ar",{weekday:"short"});
+const dayNameEn = d => new Date(d).toLocaleDateString("en-US",{weekday:"short"});
 
-  return parts.join(" - ");
+function dateRange(s,e){
+  let a=[],d=new Date(s),x=new Date(e);
+  if(isNaN(d.getTime()) || isNaN(x.getTime())) return a;
+  while(d<=x){
+    a.push(d.toISOString().split("T")[0]);
+    d.setDate(d.getDate()+1);
+  }
+  return a;
+}
+function getRec(s,d){
+  return (s.records||[]).filter(r=>r.date===d).pop() || {};
+}
+function safePhone(p){
+  let x=String(p||"").trim();
+  if(!x) return "";
+  x=x.replace(/\s+/g,"");
+  if(x.startsWith("0")) x=x.slice(1);
+  if(!x.startsWith("966")) x="966"+x;
+  return x;
 }
 
-function renderOpenCoursesTicker(courses){
-  const movingText = document.getElementById("movingText");
-  if(!movingText) return;
+/* ===== Period smart sort ===== */
+function periodRank(v){
+  const s = String(v||"").toLowerCase();
+  if(s.includes("صباح") || s.includes("am") || s.includes("morning")) return 1;
+  if(s.includes("ظهر") || s.includes("noon")) return 2;
+  if(s.includes("عصر")) return 3;
+  if(s.includes("مساء") || s.includes("pm") || s.includes("evening") || s.includes("night")) return 4;
+  const num = (s.match(/\d+/)||[])[0];
+  if(num) return 10 + Number(num);
+  return 99;
+}
+function sortSmart(arr){
+  return (arr||[]).slice().sort((a,b)=>{
+    const ra = periodRank(a);
+    const rb = periodRank(b);
+    if(ra !== rb) return ra - rb;
+    return String(a||"").localeCompare(String(b||""), "ar", {numeric:true, sensitivity:"base"});
+  });
+}
+const uniq = a => [...new Set((a||[]).filter(Boolean))];
 
-  const t = UI_TEXT[DASH_LANG];
+/* =========================
+   PDF: English Name Only
+========================= */
+function pdfStudentName(s){
+  // ✅ مطابق للواجهة لكن إنجليزي فقط
+  return String(s?.name || "-").trim();
+}
 
-  if(!courses || !courses.length){
-    movingText.textContent = t.tickerEmpty;
+/* =========================
+   Load Data
+========================= */
+async function prudleAllDocs(collection,filters=[]){
+  const docs=[];
+  const seenIds=new Set();
+  const seenCursors=new Set();
+  let cursor=null;
+  for(let page=0;page<1000;page++){
+    const body={action:"query",collection,filters,limit:400,paginate:true};
+    if(cursor!==null)body.cursor=cursor;
+    const result=await prudleDb(body);
+    if(!result||!Array.isArray(result.documents)||typeof result.hasMore!=="boolean"){
+      throw Error("BACKEND_PAGINATION_REQUIRED: صيغة ترقيم صفحات Worker غير متوافقة؛ لم تُعرض بيانات ناقصة");
+    }
+    for(const doc of prudleDocs(result)){
+      if(!doc.id)throw Error("مستند بلا معرف من Worker");
+      if(!seenIds.has(doc.id)){seenIds.add(doc.id);docs.push(doc);}
+    }
+    if(!result.hasMore)return docs;
+    const next=result.nextCursor;
+    if(!next||seenCursors.has(next))throw Error("BACKEND_PAGINATION_REQUIRED: توقف مؤشر صفحات Worker");
+    seenCursors.add(next);cursor=next;
+  }
+  throw Error("BACKEND_PAGINATION_REQUIRED: تجاوز عدد صفحات التحميل الحد الآمن");
+}
+async function loadAttendanceData(){
+  const courses=await prudleAllDocs("Courses",[{field:"status",op:"==",value:"open"}]);
+  const students=await prudleAllDocs("students",[]);
+  COURSES=courses.filter(x=>x.status==="open");
+  STUDENTS=students;
+  fillFilters();
+  applyFilter();
+}
+
+prudleBootstrap();
+
+/* =========================
+   Fill Filters
+========================= */
+function fillFilters(){
+  const fill = (el, values, sorter=null) => {
+    const first = el.options[0]?.text || "";
+    let list = uniq(values);
+    if(sorter) list = sorter(list);
+    else list = list.sort((a,b)=> String(a).localeCompare(String(b),"ar",{numeric:true,sensitivity:"base"}));
+    el.innerHTML = `<option value="">${first}</option>` + list.map(v=>`<option value="${v}">${v}</option>`).join("");
+  };
+
+  fill(branchFilter,  COURSES.map(c=>c.Branch));
+  fill(sectionFilter, COURSES.map(c=>c.Section));
+  fill(trainerFilter, COURSES.map(c=>c.Trainer));
+  fill(courseFilter,  COURSES.map(c=>c.TrainingCourse));
+  fill(periodFilter,  COURSES.map(c=>c.Period), sortSmart);
+  fill(startDateFilter,COURSES.map(c=>c.StartingDate), (x)=>x.sort((a,b)=> new Date(b)-new Date(a)));
+}
+
+/* =========================
+   Apply Filter
+========================= */
+function applyFilter(){
+  const hasFilter =
+    branchFilter.value ||
+    sectionFilter.value ||
+    trainerFilter.value ||
+    courseFilter.value ||
+    periodFilter.value ||
+    startDateFilter.value;
+
+  if(!hasFilter){
+    tableWrap.style.display="none";
+    coursesContainer.innerHTML="";
+    infoBox.textContent="⚠ اختر فلترة أولاً لعرض البيانات";
+    ACTIVE_COURSES = [];
+    SELECTED_IDS.clear();
+    fillDayColumnFilter();
+    updateStats(0,0,0,"",0,0,0,0,"0%");
     return;
   }
 
-  movingText.textContent =
-    t.tickerPrefix +
-    courses.join("   •   ") +
-    "   —   ";
+  ACTIVE_COURSES = COURSES.filter(c =>
+    (!branchFilter.value   || c.Branch === branchFilter.value) &&
+    (!sectionFilter.value  || c.Section === sectionFilter.value) &&
+    (!trainerFilter.value  || c.Trainer === trainerFilter.value) &&
+    (!courseFilter.value   || c.TrainingCourse === courseFilter.value) &&
+    (!periodFilter.value   || c.Period === periodFilter.value) &&
+    (!startDateFilter.value|| c.StartingDate === startDateFilter.value)
+  );
+
+  ACTIVE_COURSES = ACTIVE_COURSES.slice().sort((a,b)=>{
+    const ra = periodRank(a.Period);
+    const rb = periodRank(b.Period);
+    if(ra !== rb) return ra - rb;
+
+    const ca = String(a.TrainingCourse||"");
+    const cb = String(b.TrainingCourse||"");
+    const cc = ca.localeCompare(cb, "ar", {numeric:true, sensitivity:"base"});
+    if(cc !== 0) return cc;
+
+    const ta = String(a.Trainer||"");
+    const tb = String(b.Trainer||"");
+    return ta.localeCompare(tb, "ar", {numeric:true, sensitivity:"base"});
+  });
+
+  SELECTED_IDS.clear();
+
+  if(!ACTIVE_COURSES.length){
+    tableWrap.style.display="none";
+    coursesContainer.innerHTML="";
+    infoBox.textContent="لا توجد نتائج مطابقة للفلترة";
+    fillDayColumnFilter();
+    updateStats(0,0,0,"",0,0,0,0,"0%");
+    return;
+  }
+
+  fillDayColumnFilter();
+  tableWrap.style.display="block";
+  renderAllCourses();
 }
 
-function loadOpenCoursesTicker(){
+/* =========================
+   Fill Day Column Filter
+========================= */
+function fillDayColumnFilter(){
+  const select = document.getElementById("dayColumnFilter");
+  const keep = select.value || "";
 
-  const movingText =
-    document.getElementById("movingText");
+  let allDays = [];
+  ACTIVE_COURSES.forEach(c=>{
+    const days = dateRange(c.StartingDate, c.EndingDate);
+    allDays = allDays.concat(days);
+  });
 
-  if(!movingText) return;
+  allDays = [...new Set(allDays)].sort((a,b)=> new Date(a) - new Date(b));
 
-  movingText.textContent = UI_TEXT[DASH_LANG].tickerLoading;
+  select.innerHTML =
+    `<option value="">اليوم (اختياري)</option>` +
+    allDays.map(d=>`<option value="${d}">${d} - ${dayNameAr(d)}</option>`).join("");
 
-  db.collection("Courses")
-    .where("status","==","open")
-    .onSnapshot(snapshot=>{
+  if(keep && allDays.includes(keep)) select.value = keep;
+  else select.value = "";
+}
 
-      const courses = [];
+function setSelectedDay(d){
+  const sel = document.getElementById("dayColumnFilter");
+  if(!d) return;
+  const opt = [...sel.options].some(o=>o.value===d);
+  if(!opt) return;
+  sel.value = d;
+  renderAllCourses();
+}
 
-      snapshot.forEach(doc=>{
+/* =========================
+   Stats
+========================= */
+function updateStats(totalCourses, totalStudents, selectedCount, day, p,l,a,n, rateStr){
+  stCourses.textContent = String(totalCourses||0);
+  stStudents.textContent = String(totalStudents||0);
+  stSelected.textContent = String(selectedCount||0);
 
-        const c = doc.data() || {};
-        const label = getCourseTickerLabel(c);
+  stDay.textContent = day ? `${day} (${dayNameAr(day)})` : "—";
+  stDayPresent.textContent = String(p||0);
+  stDayLate.textContent = String(l||0);
+  stDayAbsent.textContent = String(a||0);
+  stDayNone.textContent = String(n||0);
+  stDayRate.textContent = rateStr || "0%";
+}
 
-        if(label){
-          courses.push(label);
-        }
+/* =========================
+   ✅ Selection Helpers + ✅ Instant Search (AR/EN/ID)
+========================= */
+function getVisibleStudentsForCourse(course, q){
+  const students = STUDENTS.filter(s=>s.courseId === course.id);
+  const qq = normalize(q||"");
+  return students.filter(s=>{
+    if(!qq) return true;
 
+    const fields = [
+      s.iqama,
+      s.identity,
+      s.name,
+      s.name_ar,
+      s.name_en
+    ];
+
+    return fields.some(v => normalize(v).includes(qq));
+  });
+}
+
+function selectAll(){
+  if(!ACTIVE_COURSES.length){
+    alert("اختر فلترة أولاً");
+    return;
+  }
+  SELECTED_IDS.clear();
+  const q = normalize(searchInput.value);
+  ACTIVE_COURSES.forEach(course=>{
+    const list = getVisibleStudentsForCourse(course, q);
+    list.forEach(s=>SELECTED_IDS.add(s.id));
+  });
+  renderAllCourses();
+}
+function clearSelection(){
+  SELECTED_IDS.clear();
+  renderAllCourses();
+}
+function toggleCourseAll(courseId, checked){
+  const course = ACTIVE_COURSES.find(c=>c.id===courseId);
+  if(!course) return;
+  const q = normalize(searchInput.value);
+  const list = getVisibleStudentsForCourse(course, q);
+  if(checked) list.forEach(s=>SELECTED_IDS.add(s.id));
+  else list.forEach(s=>SELECTED_IDS.delete(s.id));
+  renderAllCourses();
+}
+
+function selectByDay(statusNeed){
+  if(!ACTIVE_COURSES.length){
+    alert("اختر فلترة أولاً");
+    return;
+  }
+  const selectedDay = dayColumnFilter.value;
+  if(!selectedDay){
+    alert("اختر اليوم من القائمة (اليوم اختياري لكن للتحديد لازم تختاره)");
+    return;
+  }
+
+  SELECTED_IDS.clear();
+  const q = normalize(searchInput.value);
+
+  ACTIVE_COURSES.forEach(course=>{
+    const days = dateRange(course.StartingDate, course.EndingDate);
+    if(!days.includes(selectedDay)) return;
+
+    const visible = getVisibleStudentsForCourse(course, q);
+    visible.forEach(s=>{
+      const st = (getRec(s,selectedDay).status||"").toLowerCase();
+      if(st===statusNeed){
+        SELECTED_IDS.add(s.id);
+      }
+    });
+  });
+
+  renderAllCourses();
+}
+
+/* =========================
+   ✅ Render ALL courses blocks
+   ✅ عمود الاسم: EN فوق + AR تحت
+========================= */
+function renderAllCourses(){
+  if(!ACTIVE_COURSES.length){
+    tableWrap.style.display="none";
+    updateStats(0,0,0,"",0,0,0,0,"0%");
+    return;
+  }
+
+  const q = normalize(searchInput.value);
+  const selectedDay = dayColumnFilter.value || "";
+  coursesContainer.innerHTML = "";
+
+  let totalStudentsShown = 0;
+  let totalCoursesShown  = 0;
+
+  let dayP=0, dayL=0, dayA=0, dayN=0, dayTotal=0;
+
+  ACTIVE_COURSES.forEach(course=>{
+    const days = dateRange(course.StartingDate, course.EndingDate);
+    const visibleStudents = getVisibleStudentsForCourse(course, q);
+
+    totalCoursesShown++;
+    totalStudentsShown += visibleStudents.length;
+
+    const dayInCourse = selectedDay && days.includes(selectedDay);
+
+    if(dayInCourse){
+      visibleStudents.forEach(s=>{
+        const st = (getRec(s,selectedDay).status||"none").toLowerCase();
+        if(st==="present") dayP++;
+        else if(st==="late") dayL++;
+        else if(st==="absent") dayA++;
+        else dayN++;
+        dayTotal++;
       });
-
-      /* إزالة التكرار */
-      const uniqueCourses =
-        [...new Set(courses)];
-
-      window.OPEN_TICKER_COURSES = uniqueCourses;
-      renderOpenCoursesTicker(uniqueCourses);
-
-    },error=>{
-
-      console.error(
-        "Open courses ticker error:",
-        error
-      );
-
-      movingText.textContent = UI_TEXT[DASH_LANG].tickerError;
-
-    });
-}
-
-/* =========================================================
-   بيانات الأقسام
-========================================================= */
-let LIVE_MEET_LINK = "";
-
-/* =========================================================
-   🌐 Arabic / English Dashboard Language
-========================================================= */
-let DASH_LANG = localStorage.getItem("prudleDashboardLang") || "ar";
-
-const UI_TEXT = {
-  ar:{
-    dir:"rtl",
-    langBtn:"English",
-    brandSub:"لوحة التحكم",
-    mainMenuTitle:"القائمة الرئيسية",
-    pageTitle:"لوحة التحكم",
-    heroWelcome:"مرحبا بك في نظام برودل التعليمي",
-    heroSub:".",
-    logout:"تسجيل الخروج",
-
-    reports:"قسم التقارير",
-    activities:"قسم النشاطات",
-    placement:"اختبار تحديد المستوى CEFR",
-    exams:"الاختبارات والتقييم النهائي",
-    certificates:"الشهادات",
-    crm:"CRM خدمة علاقات العملاء",
-    online:"قسم الأونلاين والاجتماعات",
-    booking:"قسم الحجوزات",
-    admin:"قسم الإدارة",
-    transfer:"الترحيل",
-    breakTime:"أوقات الراحة للفصول",
-    tasks:"إسناد المهام",
-    newstudents:"المستجدين",
-    supervisory:"الجهة الإشرافية",
-    backup:"النسخ الاحتياطي",
-    credentials:"اسم المستخدم وكلمة المرور",
-
-    reportsMobile:"التقارير",
-    activitiesMobile:"النشاطات",
-    placementMobile:"اختبار CEFR",
-    examsMobile:"الاختبارات",
-    certificatesMobile:"الشهادات",
-    crmMobile:"CRM",
-    onlineMobile:"الأونلاين",
-    bookingMobile:"الحجوزات",
-    adminMobile:"الإدارة",
-    transferMobile:"الترحيل",
-    breakTimeMobile:"أوقات الراحة",
-    tasksMobile:"المهام",
-    newstudentsMobile:"المستجدين",
-    supervisoryMobile:"الجهة الإشرافية",
-    backupMobile:"النسخ الاحتياطي",
-    credentialsMobile:"اسم المستخدم وكلمة المرور",
-
-    tickerPrefix:"🔥 الدورات المفتوحة الآن — ",
-    tickerLoading:"⏳ جاري تحميل الدورات المفتوحة...",
-    tickerEmpty:"لا توجد دورات مفتوحة حالياً",
-    tickerError:"تعذر تحميل الدورات المفتوحة حالياً",
-    openSection:"فتح القسم",
-
-    sectionTitles:{
-      reports:"قسم التقارير",
-      activities:"قسم النشاطات",
-      placement:"اختبار تحديد المستوى CEFR",
-      exams:"الاختبارات والتقييم النهائي",
-      certificates:"الشهادات",
-      crm:"خدمة علاقات العملاء CRM",
-      online:"قسم الأونلاين",
-      booking:"قسم الحجوزات",
-      admin:"قسم الإدارة",
-      transfer:"الترحيل",
-      tasks:"إسناد المهام",
-      newstudents:"المستجدين"
     }
-  },
 
-  en:{
-    dir:"ltr",
-    langBtn:"العربية",
-    brandSub:"Control Panel",
-    mainMenuTitle:"Main Menu",
-    pageTitle:"Dashboard",
-    heroWelcome:"Welcome to the Prudle Education System",
-    heroSub:".",
-    logout:"Logout",
+    const title = `${course.TrainingCourse||"-"} | ${course.Period||"-"} | ${course.Trainer||"-"}`;
+    const meta  = `الفرع: ${course.Branch||"-"} | القسم: ${course.Section||"-"} | ${course.StartingDate||"-"} → ${course.EndingDate||"-"} | طلاب: ${visibleStudents.length} | أيام: ${days.length}`;
 
-    reports:"Reports",
-    activities:"Activities",
-    placement:"CEFR Placement Test",
-    exams:"Exams & Final Evaluation",
-    certificates:"Certificates",
-    crm:"CRM Customer Relations",
-    online:"Online & Meetings",
-    booking:"Bookings",
-    admin:"Administration",
-    transfer:"Transfers",
-    breakTime:"Class Break Times",
-    tasks:"Task Assignment",
-    newstudents:"New Students",
-    supervisory:"Supervisory Authority",
-    backup:"Backup",
-    credentials:"Username & Password",
+    const allChecked = visibleStudents.length
+      ? visibleStudents.every(s=>SELECTED_IDS.has(s.id))
+      : false;
 
-    reportsMobile:"Reports",
-    activitiesMobile:"Activities",
-    placementMobile:"CEFR",
-    examsMobile:"Exams",
-    certificatesMobile:"Certificates",
-    crmMobile:"CRM",
-    onlineMobile:"Online",
-    bookingMobile:"Bookings",
-    adminMobile:"Admin",
-    transferMobile:"Transfers",
-    breakTimeMobile:"Break Times",
-    tasksMobile:"Tasks",
-    newstudentsMobile:"New Students",
-    supervisoryMobile:"Supervision",
-    backupMobile:"Backup",
-    credentialsMobile:"Username & Password",
+    const theadHTML = `
+      <thead>
+        <tr>
+          <th style="min-width:44px">#</th>
+          <th style="min-width:52px">
+            <input type="checkbox" ${allChecked?"checked":""}
+              onclick="toggleCourseAll('${course.id}', this.checked)">
+          </th>
 
-    tickerPrefix:"🔥 Open Courses Now — ",
-    tickerLoading:"⏳ Loading open courses...",
-    tickerEmpty:"No open courses are currently available",
-    tickerError:"Unable to load open courses right now",
-    openSection:"Open Section",
+          <!-- ✅ هيدر الاسم -->
+          <th style="min-width:300px;text-align:right">الطالب</th>
 
-    sectionTitles:{
-      reports:"Reports",
-      activities:"Activities",
-      placement:"CEFR Placement Test",
-      exams:"Exams & Final Evaluation",
-      certificates:"Certificates",
-      crm:"CRM Customer Relations",
-      online:"Online",
-      booking:"Bookings",
-      admin:"Administration",
-      transfer:"Transfers",
-      tasks:"Task Assignment",
-      newstudents:"New Students"
-    }
-  }
-};
+          ${days.map(d=>`
+            <th class="th-day ${isWeekend(d)?'weekend':''} ${selectedDay===d?'col-selected':''}"
+                onclick="setSelectedDay('${d}')"
+                title="اضغط لاختيار هذا اليوم للتقرير والتحديد">
+              <div style="font-weight:900">${dayNameAr(d)}</div>
+              <div style="font-size:10px">${d}</div>
+            </th>
+          `).join("")}
+          <th style="min-width:100px">واتس</th>
+        </tr>
+      </thead>
+    `;
 
-const EN_ITEM_TEXT = {
-  "الحضور":"Attendance",
-  "الدرجات":"Grades",
-  "الواجبات":"Homework",
-  "واتس":"WhatsApp",
-  "الخطة":"Study Plan",
-  "الأعداد":"Student Numbers",
-  "الاستعلام الاكاديمي العام":"Academic Inquiry",
-  "تقارير المحادثة المدخلة":"Conversation Reports",
-  "تقارير تقييم الطلاب لمهارات اللغة":"Language Skills Reports",
-  "تقارير أداء المدربين":"Trainer Performance Reports",
-  "تقارير تعليقات المدرب ":"Trainer Comments",
-  "متابعة الطلاب الضعاف":"Weak Students Follow-up",
-  "الرواتب":"Salaries",
-  "المتأخرات":"Overdue Payments",
+    const bodyRows = visibleStudents.map((s,idx)=>{
+      let dayStatus = "";
+      if(selectedDay && days.includes(selectedDay)){
+        dayStatus = (getRec(s,selectedDay).status||"").toLowerCase();
+      }
 
-  "إنشاء النشاطات":"Create Activities",
-  "نتائج النشاطات":"Activity Results",
-  "الطلاب المشاركون بالأنشطة":"Activity Participants",
+      const isDayAbsent = (dayStatus === "absent");
+      const isDayPresent = (dayStatus === "present");
 
-  "الاختبارات":"Exams",
-  "نتائج الاختبارات":"Exam Results",
+      const cells = days.map(d=>{
+        const r = getRec(s,d);
+        const st = (r.status||"none").toLowerCase();
+        const code = st==="present" ? "P" : st==="late" ? "L" : st==="absent" ? "A" : "";
+        const selClass = (selectedDay && d===selectedDay) ? "col-selected" : "";
+        return `
+          <td class="${isWeekend(d)?'weekend':''} ${selClass}">
+            <div class="cell ${st}">${code}</div>
+          </td>
+        `;
+      }).join("");
 
-  "إصدار الشهادات":"Issue Certificates",
-  "الاستعلام عن الشهادات":"Certificate Inquiry",
+      const phone = safePhone(s.phone);
+      let waClass = phone ? "wa-row-btn" : "wa-row-btn disabled";
+      if(phone && isDayAbsent) waClass += " day-absent";
+      if(phone && isDayPresent) waClass += " day-present";
 
-  "CRM التواصل مع العملاء":"CRM Customer Communication",
+      const nameClass =
+        isDayAbsent ? "name-day-absent" :
+        isDayPresent ? "name-day-present" : "";
 
-  "إنشاء رابط اجتماع":"Create Meeting Link",
-  "Google Meet Attendance":"Google Meet Attendance",
-  "تسجيلات الفيديو":"Video Recordings",
+      // ✅ SAME AS FINANCIAL CODE EXACTLY
+      const nameEN = (s.name || "");
+      const nameAR = (s.name_ar || "");
 
-  "اختبار CEFR":"CEFR Test",
-  "نتائج اختبارات CEFR":"CEFR Results",
+      return `
+        <tr>
+          <td>${idx+1}</td>
+          <td>
+            <input type="checkbox"
+              ${SELECTED_IDS.has(s.id)?"checked":""}
+              onclick="this.checked?SELECTED_IDS.add('${s.id}'):SELECTED_IDS.delete('${s.id}')">
+          </td>
 
-  "الحمدانية رجال":"Al-Hamdaniya Men",
-  "الحمدانية سيدات":"Al-Hamdaniya Women",
-  "عسفان":"Asfan",
-  "الجموم":"Al-Jumum",
-  "أونلاين":"Online",
+          <!-- ✅ الاسم EN فوق + AR تحت + إظهار كامل -->
+          <td class="${nameClass}" style="text-align:right;font-weight:900">
+            <div class="name-en">${nameEN}</div>
+            <div class="name-ar">${nameAR}</div>
 
-  "ترحيل الطلاب – حضوري رجال":"Move Students – Men",
-  "ترحيل الطلاب – حضوري سيدات":"Move Students – Women",
-  "ترحيل الطلاب – فرع عسفان":"Move Students – Asfan",
-  "ترحيل الطلاب – فرع الجموم":"Move Students – Al-Jumum",
-  "ترحيل الطلاب – أونلاين":"Move Students – Online",
-  "الدورات":"Courses",
-  "حذف الدورات":"Delete Courses",
-  "السجلات":"Records",
-  "متابعة حضور المدربين":"Trainer Attendance",
-  "الكويزات":"Quizzes",
-  "المستخدمين":"Users",
+            <div style="font-weight:800;font-size:11px;margin-top:4px;opacity:.95">
+              ${s.iqama||s.identity||""}
+              ${selectedDay && days.includes(selectedDay) && isDayAbsent ? ` | غائب: ${selectedDay}` : ""}
+              ${selectedDay && days.includes(selectedDay) && isDayPresent ? ` | حاضر: ${selectedDay}` : ""}
+            </div>
+          </td>
 
-  "الانضمام للاجتماع المباشر":"Join Live Meeting",
-  "إسناد مهمة جديدة":"Assign New Task",
-  "استعراض المهام":"View Tasks",
-  "إضافة مستجد":"Add New Student",
-  "تسكين الطلاب في الفصول":"Student Classroom Placement"
-};
+          ${cells}
+          <td>
+            <button class="${waClass}" onclick="sendWhatsAppOne('${course.id}','${s.id}')">
+              <i class="fa-brands fa-whatsapp"></i>
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join("");
 
-const EN_HEADING_TEXT = {
-  "التقارير":"Reports",
-  "النشاطات التعليمية والترفيهية":"Educational & Recreational Activities",
-  "الاختبارات والتقييم":"Exams & Evaluation",
-  "إدارة الشهادات":"Certificate Management",
-  "CRM التواصل مع العملاء":"CRM Customer Communication",
-  "الفصول والتسجيلات":"Classes & Recordings",
-  "اختبارات تحديد المستوى":"Placement Tests",
-  "الحجوزات":"Bookings",
-  "تفاصيل الترحيل":"Student Transfer",
-  "الإدارة":"Administration",
-  "إسناد المهام":"Task Assignment",
-  "المستجدين":"New Students"
-};
-
-function setText(id,value){
-  const el = document.getElementById(id);
-  if(el) el.textContent = value;
-}
-
-function applyDashboardLanguage(){
-  const t = UI_TEXT[DASH_LANG];
-
-  document.documentElement.lang = DASH_LANG === "ar" ? "ar" : "en";
-  document.documentElement.dir = t.dir;
-
-  setText("langToggleBtn",t.langBtn);
-  setText("brandSub",t.brandSub);
-  setText("mainMenuTitle",t.mainMenuTitle);
-  setText("pageTitle",t.pageTitle);
-  setText("heroWelcome",t.heroWelcome);
-  setText("heroSub",t.heroSub);
-  setText("logoutText",t.logout);
-
-  setText("reportsSideText",t.reports);
-  setText("activitiesSideText",t.activities);
-  setText("placementSideText",t.placement);
-  setText("examsSideText",t.exams);
-  setText("certificatesSideText",t.certificates);
-  setText("crmSideText",t.crm);
-  setText("onlineSideText",t.online);
-  setText("bookingSideText",t.booking);
-  setText("adminSideText",t.admin);
-  setText("transferSideText",t.transfer);
-  setText("breakTimeSideText",t.breakTime);
-  setText("tasksSideText",t.tasks);
-  setText("newStudentsSideText",t.newstudents);
-  setText("supervisorySideText",t.supervisory);
-  setText("backupSideText",t.backup);
-  setText("credentialsSideText",t.credentials);
-
-  setText("reportsMobileText",t.reportsMobile);
-  setText("activitiesMobileText",t.activitiesMobile);
-  setText("placementMobileText",t.placementMobile);
-  setText("examsMobileText",t.examsMobile);
-  setText("certificatesMobileText",t.certificatesMobile);
-  setText("crmMobileText",t.crmMobile);
-  setText("onlineMobileText",t.onlineMobile);
-  setText("bookingMobileText",t.bookingMobile);
-  setText("adminMobileText",t.adminMobile);
-  setText("transferMobileText",t.transferMobile);
-  setText("breakTimeMobileText",t.breakTimeMobile);
-  setText("tasksMobileText",t.tasksMobile);
-  setText("newStudentsMobileText",t.newstudentsMobile);
-  setText("supervisoryMobileText",t.supervisoryMobile);
-  setText("backupMobileText",t.backupMobile);
-  setText("credentialsMobileText",t.credentialsMobile);
-
-  // Re-render current section only after the dashboard is initialized
-  if(window.CURRENT_SECTION && typeof load === "function"){
-    load(window.CURRENT_SECTION);
-  }
-
-  // Refresh ticker text with selected language
-  if(window.OPEN_TICKER_COURSES && typeof renderOpenCoursesTicker === "function"){
-    renderOpenCoursesTicker(window.OPEN_TICKER_COURSES);
-  }
-}
-
-function logout(){
-
-  try{
-
-    window.parent.postMessage(
-      "PRUDLE_LOGOUT",
-      "https://www.prudle-education.com"
-    );
-
-  }catch(error){
-
-    console.error(
-      "Logout message error:",
-      error
-    );
-
-    window.location.replace(
-      "https://www.prudle-education.com/log-in-out"
-    );
-
-  }
-
-}
-
-function toggleDashboardLanguage(){
-  DASH_LANG = DASH_LANG === "ar" ? "en" : "ar";
-  localStorage.setItem("prudleDashboardLang",DASH_LANG);
-  applyDashboardLanguage();
-}
-
-/* =========================================================
-   🔔 إشعار لحظي عند إسناد مهمة — اللون حسب الأولوية
-   High = أحمر | Medium = برتقالي | Low = أخضر
-========================================================= */
-let TASKS_SNAPSHOT = [];
-let TASKS_LISTENER_READY = false;
-let TASK_FLASH_TIMER = null;
-
-function safeTaskText(v){
-  return String(v == null ? "" : v).trim();
-}
-
-function taskPriorityValue(priority){
-  const p = safeTaskText(priority).toLowerCase();
-  if(p === "high") return 3;
-  if(p === "medium") return 2;
-  return 1;
-}
-
-function normalizeTaskPriority(priority){
-  const p = safeTaskText(priority).toLowerCase();
-  if(p === "high" || p === "medium" || p === "low") return p;
-  return "medium";
-}
-
-function highestTaskPriority(tasks){
-  if(!tasks || !tasks.length) return "medium";
-  return tasks
-    .map(t=>normalizeTaskPriority(t.priority))
-    .sort((a,b)=>taskPriorityValue(b)-taskPriorityValue(a))[0] || "medium";
-}
-
-function priorityArabic(priority){
-  return ({
-    high:"عالية",
-    medium:"متوسطة",
-    low:"منخفضة"
-  })[normalizeTaskPriority(priority)];
-}
-
-function flashTaskAssignment(priority){
-  const p = normalizeTaskPriority(priority);
-  const sideBtn = document.getElementById("tasksBtnSide");
-  const mobileBtn = document.getElementById("tasksBtnMobile");
-
-  [sideBtn,mobileBtn].forEach(btn=>{
-    if(!btn) return;
-    btn.classList.remove("task-flash-high","task-flash-medium","task-flash-low");
-    requestAnimationFrame(function(){
-      btn.classList.add("task-flash-"+p);
-    });
-  });
-
-  if(TASK_FLASH_TIMER) clearTimeout(TASK_FLASH_TIMER);
-
-  /* الوميض لحظي لمدة تقريباً 5.5 ثانية ثم يعود الزر لطبيعته */
-  TASK_FLASH_TIMER = setTimeout(()=>{
-    [sideBtn,mobileBtn].forEach(btn=>{
-      if(btn) btn.classList.remove("task-flash-high","task-flash-medium","task-flash-low");
-    });
-  },5600);
-}
-
-function renderTaskAssignmentAlert(){
-  const sideBtn = document.getElementById("tasksBtnSide");
-  const mobileBtn = document.getElementById("tasksBtnMobile");
-  const sideBadge = document.getElementById("tasksCountSide");
-  const mobileBadge = document.getElementById("tasksCountMobile");
-  const listBox = document.getElementById("taskAssigneeList");
-  const tickerNote = document.getElementById("taskTickerNote");
-  const tickerNames = document.getElementById("taskTickerNames");
-
-  const activeTasks = TASKS_SNAPSHOT.filter(t =>
-    t.status === "assigned" || t.status === "in_progress"
-  );
-
-  const waitingTasks = TASKS_SNAPSHOT.filter(t =>
-    t.status === "assigned"
-  );
-
-  const alertCount = waitingTasks.length;
-
-  if(sideBadge) sideBadge.textContent = alertCount;
-  if(mobileBadge) mobileBadge.textContent = alertCount;
-
-  [sideBtn,mobileBtn].forEach(btn=>{
-    if(!btn) return;
-    btn.classList.toggle("has-task-count",alertCount > 0);
-  });
-
-  /* التجميع الآن حسب اسم الموظف فقط — بدون رقم موظف */
-  const byEmployee = new Map();
-
-  activeTasks.forEach(t=>{
-    const name = safeTaskText(t.employeeName) || "غير محدد";
-    const key = name.toLowerCase();
-    const priority = normalizeTaskPriority(t.priority);
-
-    const current = byEmployee.get(key) || {
-      name,
-      count:0,
-      assigned:0,
-      progress:0,
-      priorities:[]
-    };
-
-    current.count++;
-    current.priorities.push(priority);
-
-    if(t.status === "assigned") current.assigned++;
-    if(t.status === "in_progress") current.progress++;
-
-    byEmployee.set(key,current);
-  });
-
-  const employees = [...byEmployee.values()]
-    .map(e=>({
-      ...e,
-      priority:highestTaskPriority(e.priorities.map(priority=>({priority})))
-    }))
-    .sort((a,b)=>
-      taskPriorityValue(b.priority)-taskPriorityValue(a.priority) ||
-      b.count-a.count ||
-      a.name.localeCompare(b.name,"ar")
-    );
-
-  if(listBox){
-    if(!employees.length){
-      listBox.className = "task-assignee-empty";
-      listBox.innerHTML = "لا توجد مهام مسندة حالياً";
-    }else{
-      listBox.className = "";
-      listBox.innerHTML = employees.map(e=>`
-        <div class="task-assignee-item priority-${e.priority}">
-          ${e.name}
-          <small>
-            أولوية ${priorityArabic(e.priority)}
-            • ${e.count} مهمة
-            ${e.assigned ? ` • ${e.assigned} بانتظار الاستلام` : ""}
-            ${e.progress ? ` • ${e.progress} قيد الإجراء` : ""}
-          </small>
+    const block = document.createElement("div");
+    block.className = "course-block";
+    block.innerHTML = `
+      <div class="course-head">
+        <div>
+          ${title}
+          <div><small>${meta}</small></div>
         </div>
-      `).join("");
-    }
-  }
-
-  if(tickerNote && tickerNames){
-    if(employees.length){
-      const topPriority = highestTaskPriority(activeTasks);
-
-      tickerNote.style.display = "block";
-      tickerNote.classList.remove("priority-high","priority-medium","priority-low");
-      tickerNote.classList.add("priority-"+topPriority);
-
-      tickerNames.textContent =
-        "🔔 مهام مسندة إلى: " +
-        employees.map(e=>`${e.name} — ${priorityArabic(e.priority)} (${e.count})`).join("  •  ") +
-        "   —   ";
-    }else{
-      tickerNote.style.display = "none";
-      tickerNote.classList.remove("priority-high","priority-medium","priority-low");
-      tickerNames.textContent = "";
-    }
-  }
-}
-
-db.collection("EmployeeTasks")
-  .onSnapshot(snapshot=>{
-
-    /* أول تحميل لا يسبب وميض للمهام القديمة */
-    if(TASKS_LISTENER_READY){
-      const justAssigned = snapshot.docChanges()
-        .filter(change =>
-          change.type === "added" &&
-          ((change.doc.data() && change.doc.data().status) || "assigned") === "assigned"
-        )
-        .map(change=>({
-          id:change.doc.id,
-          ...(change.doc.data() || {})
-        }));
-
-      if(justAssigned.length){
-        flashTaskAssignment(highestTaskPriority(justAssigned));
-      }
-    }
-
-    TASKS_SNAPSHOT = snapshot.docs.map(doc=>({
-      id:doc.id,
-      ...(doc.data() || {})
-    }));
-
-    renderTaskAssignmentAlert();
-    TASKS_LISTENER_READY = true;
-
-  },error=>{
-    console.error("EmployeeTasks notification error:",error);
-  });
-
-
-const DATA = {
-
-activities: {
-  title: "قسم النشاطات",
-  sections: [
-    {
-      heading: "النشاطات التعليمية والترفيهية",
-      items: [
-
-        [
-          "إنشاء النشاطات",
-          "fa-gamepad",
-          "https://www.prudle-education.com/quizzez",
-          "gold",
-          "إنشاء وإدارة النشاطات التعليمية والترفيهية"
-        ],
-
-        [
-          "نتائج النشاطات",
-          "fa-chart-line",
-          "https://www.prudle-education.com/activities-results",
-          "blue",
-          "عرض نتائج الطلاب في النشاطات"
-        ],
-
-        [
-          "الطلاب المشاركون بالأنشطة",
-          "fa-users",
-          "https://www.prudle-education.com/activity-performance",
-          "green",
-          "عرض الطلاب المشاركين في الأنشطة حسب الدورة والمدرب"
-        ]
-
-      ]
-    }
-  ]
-},
-
-exams: {
-  title: "الاختبارات والتقييم النهائي",
-  sections: [
-    {
-      heading: "الاختبارات والتقييم",
-      items: [
-
-        [
-          "الاختبارات",
-          "fa-file-pen",
-          "https://www.prudle-education.com/create-a-quiz",
-          "blue",
-          "إدارة وإنشاء الاختبارات"
-        ],
-
-        [
-          "نتائج الاختبارات",
-          "fa-chart-line",
-          "https://www.prudle-education.com/homework-reports",
-          "gold",
-          "عرض نتائج الطلاب"
-        ]
-
-      ]
-    }
-  ]
-},
-
-certificates: {
-  title: "الشهادات",
-  sections: [
-    {
-      heading: "إدارة الشهادات",
-      items: [
-
-        [
-          "إصدار الشهادات",
-          "fa-certificate",
-          "https://www.prudle-education.com/certificates",
-          "purple",
-          "إصدار واعتماد الشهادات"
-        ],
-
-        [
-          "الاستعلام عن الشهادات",
-          "fa-magnifying-glass",
-          "https://www.prudle-education.com/certificates-results",
-          "orange",
-          "التحقق من الشهادات"
-        ]
-
-      ]
-    }
-  ]
-},
-crm: {
-  title: "خدمة علاقات العملاء CRM",
-  sections: [
-    {
-      heading: "CRM التواصل مع العملاء",
-      items: [
-
-        [
-          "CRM التواصل مع العملاء",
-          "fa-headset",
-          "https://www.prudle-education.com/crm",
-          "blue",
-          "إدارة العملاء والمتابعة وخدمة العملاء"
-        ]
-
-      ]
-    }
-  ]
-},
-online: {
-  title: "قسم الأونلاين",
-  sections: [
-    {
-      heading: "الفصول والتسجيلات",
-      items: [
-[
-  "إنشاء رابط اجتماع",
-  "fa-video",
-  "https://www.prudle-education.com/create-google-meet-link-gm",
-  "red",
-  "إنشاء وإدارة رابط اجتماع Google Meet"
-],
-        [
-          "Google Meet Attendance",
-          "fa-video",
-          "https://www.prudle-education.com/google-meet-attendance-gm",
-          "online",
-          "متابعة حضور الطلاب في Google Meet"
-        ],
-
-        [
-          "تسجيلات الفيديو",
-          "fa-circle-play",
-          "https://www.prudle-education.com/recording-video.html",
-          "purple",
-          "إدارة ورفع ومشاهدة تسجيلات المحاضرات"
-        ]
-
-      ]
-    }
-  ]
-},
-  reports: {
-    title: "قسم التقارير",
-    sections: [
-      {
-        heading: "التقارير",
-        items: [
-          ["الحضور","fa-user-check","https://www.prudle-education.com/attendance-report","blue","تقارير حضور الطلاب والمدربين"],
-          ["الدرجات","fa-file-lines","https://www.prudle-education.com/grades-report","green","عرض ومتابعة نتائج الدرجات"],
-          ["الواجبات","fa-book","https://www.prudle-education.com/homework-reports","gold","متابعة الواجبات والتسليمات"],
-          ["واتس","fa-whatsapp","https://www.prudle-education.com/weak-students","online","متابعة الطلاب عبر الواتساب"],
-          ["الخطة","fa-calendar","https://www.prudle-education.com/courses-plan-t","purple","عرض الخطة الدراسية"],
-          ["الأعداد","fa-chart-bar","https://www.prudle-education.com/students-numbers","orange","إحصائيات وأعداد الطلاب"],
-          ["الاستعلام الاكاديمي العام","fa-chart-bar","https://www.prudle-education.com/dashboard-students","orange","الشهادات والدرجات"],
-          ["تقارير المحادثة المدخلة","fa-chart-bar"," https://www.prudle-education.com/coversation-resulrs-mg","orange","التقييم لدورة المحادثة"],
-          ["تقارير تقييم الطلاب لمهارات اللغة","fa-chart-bar"," https://www.prudle-education.com/skills-evaluation","orange","تقييم مهارات اللغة"],
-          ["تقارير أداء المدربين","fa-chart-bar","https://www.prudle-education.com/activities-results","orange","تقييم أداء المدربين"],
-         ["تقارير تعليقات المدرب ","fa-chart-bar","https://www.prudle-education.com/comments-reports","orange","التعليقات والملاحظات"],
-          ["متابعة الطلاب الضعاف","fa-user-shield","https://www.prudle-education.com/week-students-report","weak-followup","متابعة حالات الطلاب الضعاف وملاحظات المدربين وإجراءات المتابعة"],
-
-
-          ["الرواتب","fa-money-bill","https://www.prudle-education.com/edit-salary","green","متابعة الرواتب والساعات"],
-          ["المتأخرات","fa-triangle-exclamation","https://www.prudle-education.com/payments","red","عرض المتأخرات والتنبيهات"]
-        ]
-      }
-    ]
-  },
-placement: {
-
-  title:"اختبار تحديد المستوى CEFR",
-
-  sections:[
-
-    {
-
-      heading:"اختبارات تحديد المستوى",
-
-      items:[
-
-        [
-          "اختبار CEFR",
-          "fa-graduation-cap",
-          "https://www.prudle-education.com/placement-test",
-          "purple",
-          "اختبار تحديد مستوى اللغة الإنجليزية"
-        ],
-
-        [
-          "نتائج اختبارات CEFR",
-          "fa-chart-line",
-          "https://www.prudle-education.com/placement-test-gm",
-          "gold",
-          "عرض نتائج اختبارات تحديد المستوى"
-        ]
-
-      ]
-
-    }
-
-  ]
-
-},
-
-
-  tasks: {
-    title: "إسناد المهام",
-    sections: [
-      {
-        heading: "إسناد المهام",
-        items: [
-          [
-            "إسناد مهمة جديدة",
-            "fa-user-plus",
-            "https://www.prudle-education.com/new-mission",
-            "gold",
-            "إنشاء مهمة جديدة وإسنادها لموظف مع ملاحظات الإدارة"
-          ],
-          [
-            "استعراض المهام",
-            "fa-list-check",
-            "https://www.prudle-education.com/recieved-mission",
-            "blue",
-            "استعراض جميع المهام ومتابعة الاستلام والتنفيذ والإنهاء"
-          ]
-        ]
-      }
-    ]
-  },
-
-  newstudents: {
-    title: "المستجدين",
-    sections: [
-      {
-        heading: "المستجدين",
-        items: [
-          [
-            "إضافة مستجد",
-            "fa-user-plus",
-            "https://www.prudle.edu.sa/registration4",
-            "green",
-            "إضافة وتسجيل طالب مستجد"
-          ],
-          [
-            "تسكين الطلاب في الفصول",
-            "fa-chart-column",
-            "https://www.prudle-education.com/student-housing",
-            "blue",
-            "عرض ومتابعة تقارير وسجلات المستجدين"
-          ]
-        ]
-      }
-    ]
-  },
-
-  booking: {
-    title: "قسم الحجوزات",
-    sections: [
-      {
-        heading: "الحجوزات",
-        items: [
-          ["الحمدانية رجال","fa-user","https://www.prudle-education.com/male-section","blue","حجز برامج فرع الحمدانية رجال"],
-          ["الحمدانية سيدات","fa-user-group","https://www.prudle-education.com/female-and-kids-section","purple","حجز برامج فرع الحمدانية سيدات"],
-          ["عسفان","fa-building","https://www.prudle-education.com/osfan-section","orange","حجز برامج فرع عسفان"],
-          ["الجموم","fa-location-dot","https://www.prudle-education.com/al-jumum-section","green","حجز برامج فرع الجموم"],
-          ["أونلاين","fa-laptop","https://www.prudle-education.com/online-section","online","الحجوزات الخاصة بالدورات الأونلاين"]
-        ]
-      }
-    ]
-  },
-
-  transfer: {
-    title: "الترحيل",
-    sections: [
-      {
-        heading: "تفاصيل الترحيل",
-        items: [
-          ["ترحيل الطلاب – حضوري رجال","fa-user","https://www.prudle-education.com/move-to-male-section","blue","إدارة ترحيل الطلاب لفرع الرجال"],
-          ["ترحيل الطلاب – حضوري سيدات","fa-user-group","https://www.prudle-education.com/move-to-female-section","purple","إدارة ترحيل الطالبات"],
-          ["ترحيل الطلاب – فرع عسفان","fa-building","https://www.prudle-education.com/move-to-asfan","orange","إدارة ترحيل طلاب فرع عسفان"],
-          ["ترحيل الطلاب – فرع الجموم","fa-location-dot","https://www.prudle-education.com/move-to-al-jumum-section","green","إدارة ترحيل طلاب فرع الجموم"],
-          ["ترحيل الطلاب – أونلاين","fa-laptop","https://www.prudle-education.com/move-to-online-courses","online","إدارة ترحيل الطلاب الأونلاين"]
-        ]
-      }
-    ]
-  },
-
-  admin: {
-    title: "قسم الإدارة",
-    sections: [
-      {
-        heading: "الإدارة",
-        items: [
-          ["الدورات","fa-layer-group","https://www.prudle-education.com/create-new-course","blue","إدارة وإنشاء الدورات"],
-          ["حذف الدورات","fa-trash","https://www.prudle-education.com/edit-and-delete-courses","red","حذف وإغلاق الدورات واضافة الطلاب "],
-["السجلات","fa-file-invoice-dollar","https://www.prudle-education.com/studentss-edit","gold","عرض السجلات والعمليات"],
-          ["متابعة حضور المدربين","fa-calendar-check","https://www.prudle-education.com/edit-timesheet","green","ادارة ومتابعة حضور المدربين"],
-          ["الدرجات","fa-star","https://www.prudle-education.com/grades-reports","purple","إدارة درجات الطلاب"],
-          ["الكويزات","fa-paperclip","https://www.prudle-education.com/create-a-quiz","orange","إدارة الواجبات والاختبارات"],
-          ["الرواتب","fa-clock","https://www.prudle-education.com/edit-timesheet","green","الرواتب والحسابات"],
-          ["المستخدمين","fa-users","https://www.prudle-education.com/users","online","إدارة المستخدمين والصلاحيات"]
-        ]
-      }
-    ]
-  }
-};
-
-/* =========================================================
-َ
-========================================================= */
-function activateButtons(type){
-
-const allSide = [
-  "onlineBtnSide",
-  "reportsBtnSide",
-  "activitiesBtnSide",
-  "bookingBtnSide",
-  "adminBtnSide",
-  "placementBtnSide",
-  "examsBtnSide",
-  "certificatesBtnSide",
-  "crmBtnSide",
-  "tasksBtnSide",
-  "newStudentsBtnSide",
-  "transferBtnSide",
-  "breakTimeBtnSide"
-];
-
-const allMobile = [
-  "reportsBtnMobile",
-  "activitiesBtnMobile",
-  "bookingBtnMobile",
-  "adminBtnMobile",
-  "placementBtnMobile",
-  "onlineBtnMobile",
-  "examsBtnMobile",
-  "certificatesBtnMobile",
-  "crmBtnMobile",
-  "tasksBtnMobile",
-  "newStudentsBtnMobile",
-  "transferBtnMobile",
-  "breakTimeBtnMobile"
-];
-
-  allSide.forEach(id=>{
-    const el = document.getElementById(id);
-    if(el) el.classList.remove("active");
-  });
-
-  allMobile.forEach(id=>{
-    const el = document.getElementById(id);
-    if(el) el.classList.remove("active");
-  });
-
-  if(type==="reports"){
-    document.getElementById("reportsBtnSide")?.classList.add("active");
-    document.getElementById("reportsBtnMobile")?.classList.add("active");
-  }
-  if(type==="activities"){
-  document
-    .getElementById("activitiesBtnSide")
-    ?.classList.add("active");
-
-  document
-    .getElementById("activitiesBtnMobile")
-    ?.classList.add("active");
-}
-
-  if(type==="booking"){
-    document.getElementById("bookingBtnSide")?.classList.add("active");
-    document.getElementById("bookingBtnMobile")?.classList.add("active");
-  }
-
-  if(type==="admin"){
-    document.getElementById("adminBtnSide")?.classList.add("active");
-    document.getElementById("adminBtnMobile")?.classList.add("active");
-  }
-
-  if(type==="transfer"){
-    document.getElementById("transferBtnSide")?.classList.add("active");
-    document.getElementById("transferBtnMobile")?.classList.add("active");
-  }
-
-
-  if(type==="placement"){
-    document.getElementById("placementBtnSide")?.classList.add("active");
-    document.getElementById("placementBtnMobile")?.classList.add("active");
-  }
-
- if(type==="exams"){
-  document.getElementById("examsBtnSide")?.classList.add("active");
-  document.getElementById("examsBtnMobile")?.classList.add("active");
-}
-
-  if(type==="certificates"){
-    document.getElementById("certificatesBtnSide")?.classList.add("active");
-    document.getElementById("certificatesBtnMobile")?.classList.add("active");
-  }
-if(type==="online"){
-  document.getElementById("onlineBtnSide")?.classList.add("active");
-  document.getElementById("onlineBtnMobile")?.classList.add("active");
-}
-if(type==="crm"){
-  document.getElementById("crmBtnSide")?.classList.add("active");
-  document.getElementById("crmBtnMobile")?.classList.add("active");
-}
-if(type==="tasks"){
-  document.getElementById("tasksBtnSide")?.classList.add("active");
-  document.getElementById("tasksBtnMobile")?.classList.add("active");
-}
-if(type==="newstudents"){
-  document.getElementById("newStudentsBtnSide")?.classList.add("active");
-  document.getElementById("newStudentsBtnMobile")?.classList.add("active");
-}
-}
-/* PRUDLE — Temporary availability policy: four active cards only. */
-const PRUDLE_ACTIVE_CARD_URLS = new Set([
-  "https://www.prudle-education.com/attendance-report",
-  "https://www.prudle-education.com/grades-report",
-  "https://www.prudle-education.com/edit-and-delete-courses",
-  "https://www.prudle-education.com/studentss-edit"
-]);
-function prudleCardIsActive(url){
-  return PRUDLE_ACTIVE_CARD_URLS.has(String(url || "").trim().replace(/\/$/, ""));
-}
-function prudleMaintenanceNotice(){
-  alert(DASH_LANG === "en" ? "This section is currently under maintenance." : "هذا القسم تحت الصيانة حالياً.");
-}
-/* =========================================================
-   إنشاء كرت
-========================================================= */
-function card(item){
-  const originalName = item[0];
-  const name = DASH_LANG === "en"
-    ? (EN_ITEM_TEXT[originalName] || originalName)
-    : originalName;
-  const icon = item[1];
-  const link = item[2];
-  const cls = item[3] || "";
-  const desc = item[4] || "";
-  const active = prudleCardIsActive(link);
-  const safeName = String(name).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-  const action = active
-    ? `openPage(${JSON.stringify(link)})`
-    : `prudleMaintenanceNotice()`;
-  const buttonText = active ? UI_TEXT[DASH_LANG].openSection : (DASH_LANG === "en" ? "Under Maintenance" : "تحت الصيانة");
-  return `
-    <div class="card ${cls} ${active ? 'prudle-card-active' : 'prudle-card-maintenance'}">
-      <div>
-        <div class="icon-box"><i class="fa-solid ${icon}"></i></div>
-        <h3>${safeName}</h3>
-        <p class="desc">${desc}</p>
+        <div class="course-actions">
+          <button class="mini-btn" onclick="exportPDFSingleCourse('${course.id}')">PDF لهذه الدورة</button>
+        </div>
       </div>
-      <button type="button" onclick='${action.replace(/'/g,"&#39;")}' ${active ? '' : 'aria-disabled="true"'}>
-        <i class="fa-solid ${active ? 'fa-arrow-up-right-from-square' : 'fa-screwdriver-wrench'}"></i>
-        ${buttonText}
-      </button>
-    </div>`;
+      <div class="course-body">
+        <table>
+          ${theadHTML}
+          <tbody>${bodyRows || `<tr><td colspan="${days.length+4}" style="padding:14px;font-weight:900;color:#666">لا يوجد طلاب مطابقين للبحث</td></tr>`}</tbody>
+        </table>
+      </div>
+    `;
+
+    coursesContainer.appendChild(block);
+  });
+
+  const selCount = SELECTED_IDS.size;
+
+  infoBox.textContent =
+    `الدورات المعروضة: ${totalCoursesShown} | إجمالي الطلاب المعروضين: ${totalStudentsShown}` +
+    (searchInput.value ? " | (نتائج البحث مفعّلة)" : "") +
+    (selCount ? ` | المحدد: ${selCount}` : "") +
+    (dayColumnFilter.value ? ` | اليوم المختار: ${dayColumnFilter.value}` : "");
+
+  const rate = dayTotal ? (((dayP + dayL) / dayTotal) * 100).toFixed(1) : "0.0";
+  updateStats(totalCoursesShown, totalStudentsShown, selCount, selectedDay, dayP, dayL, dayA, dayN, `${rate}%`);
 }
 
-/* =========================================================
-   النسخ الاحتياطي المباشر من لوحة التحكم
-========================================================= */
-async function backupFirestoreFromDashboard(){
-  const collections = [
-    "Courses",
-    "students",
-    "Trainers",
-    "TrainersRates",
-    "BreakSettings",
-    "users",
-    "questions",
-    "exams",
-    "cefr_results",
-    "EmployeeTasks",
-    "AdminMeetLinks",
-    "FakeRegistrations",
-    "FakePromotions"
-  ];
+/* =========================
+   WhatsApp per row
+========================= */
+function sendWhatsAppOne(courseId, studentId){
+  const course = ACTIVE_COURSES.find(c=>c.id===courseId) || COURSES.find(c=>c.id===courseId) || {};
+  const students = STUDENTS.filter(s=>s.courseId===courseId);
+  const s = students.find(x=>x.id===studentId);
+  if(!s){ alert("لم يتم العثور على الطالب"); return; }
 
-  const backup = {
-    projectId:"prudle-system",
-    exportedAt:new Date().toISOString(),
-    collections:{}
-  };
+  const phone = safePhone(s.phone);
+  if(!phone){ alert("لا يوجد رقم جوال لهذا الطالب"); return; }
 
-  const failed = [];
+  const selectedDay = dayColumnFilter.value || "";
+  const days = dateRange(course.StartingDate, course.EndingDate);
 
-  try{
-    for(const collectionName of collections){
-      try{
-        const snap = await db.collection(collectionName).get();
-        backup.collections[collectionName] = {};
+  let note = "متابعة الحضور";
+  let d = "";
 
-        snap.forEach(doc=>{
-          backup.collections[collectionName][doc.id] = doc.data();
-        });
-      }catch(error){
-        console.warn("Backup skipped:",collectionName,error);
-        failed.push(collectionName);
+  if(selectedDay && days.includes(selectedDay)){
+    const st = (getRec(s,selectedDay).status||"").toLowerCase();
+    d = selectedDay;
+    if(st==="absent") note = `تنبيه: غياب في اليوم المحدد (${selectedDay})`;
+    else if(st==="present") note = `تأكيد: حضور في اليوم المحدد (${selectedDay})`;
+    else if(st==="late") note = `تنبيه: تأخر في اليوم المحدد (${selectedDay})`;
+    else note = `متابعة رصد اليوم المحدد (${selectedDay})`;
+  }else{
+    const lastDay = days.length ? days[days.length-1] : "";
+    if(lastDay){
+      const st = (getRec(s,lastDay).status||"").toLowerCase();
+      d = lastDay;
+      if(st==="absent") note = `تنبيه: غياب في آخر يوم رصد (${lastDay})`;
+      else if(st==="present") note = `تأكيد: حضور في آخر يوم رصد (${lastDay})`;
+      else if(st==="late") note = `تنبيه: تأخر في آخر يوم رصد (${lastDay})`;
+      else note = `متابعة رصد آخر يوم (${lastDay})`;
+    }
+  }
+
+  const msg =
+`السلام عليكم
+
+${note}
+
+الطالب: ${s.name_ar || s.name_en || s.name || "-"}
+الهوية: ${s.iqama || s.identity || "-"}
+
+الدورة: ${course.TrainingCourse || "-"}
+المدرب: ${course.Trainer || "-"}
+الفترة: ${course.Period || "-"}
+الفرع: ${course.Branch || "-"}
+القسم: ${course.Section || "-"}
+اليوم: ${d || "-"}
+
+نرجو الإفادة / العذر إن وجد.
+
+شاكرين تعاونكم
+إدارة معهد برودل`;
+
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank");
+}
+
+/* =========================
+   Chart image for PDF
+========================= */
+async function buildPieChartImage(totals){
+  const canvas = document.getElementById("pdfChart");
+  const ctx = canvas.getContext("2d");
+  if(chartInstance) chartInstance.destroy();
+
+  chartInstance = new Chart(ctx,{
+    type:"doughnut",
+    data:{
+      labels:["Present","Late","Absent","No Record"],
+      datasets:[{ data:[totals.present, totals.late, totals.absent, totals.none] }]
+    },
+    options:{
+      responsive:false,
+      animation:false,
+      cutout:"62%",
+      plugins:{
+        legend:{ position:"right" },
+        title:{
+          display:true,
+          text:"Attendance Summary",
+          font:{ size:18, weight:"bold" }
+        }
       }
     }
-
-    const blob = new Blob(
-      [JSON.stringify(backup,null,2)],
-      {type:"application/json;charset=utf-8"}
-    );
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    const now = new Date();
-    const stamp = [
-      now.getFullYear(),
-      String(now.getMonth()+1).padStart(2,"0"),
-      String(now.getDate()).padStart(2,"0"),
-      "_",
-      String(now.getHours()).padStart(2,"0"),
-      String(now.getMinutes()).padStart(2,"0")
-    ].join("");
-
-    a.href = url;
-    a.download = `prudle-firestore-backup-${stamp}.json`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(()=>URL.revokeObjectURL(url),1500);
-
-    if(failed.length){
-      alert("تم تنزيل النسخة الاحتياطية، وتعذر الوصول إلى بعض المجموعات: " + failed.join(", "));
-    }else{
-      alert("تم تنزيل النسخة الاحتياطية بنجاح");
-    }
-  }catch(error){
-    console.error("Backup error:",error);
-    alert("تعذر إنشاء النسخة الاحتياطية. تحقق من صلاحيات Firestore ثم حاول مرة أخرى.");
-  }
-}
-
-/* =========================================================
-   فتح رابط
-========================================================= */
-function openPage(url){
-  location.href = url;
-}
-/* =========================================================
-   تحميل القسم
-========================================================= */
-function load(type){
-  window.CURRENT_SECTION = type;
-  activateButtons(type);
-
-  const section = DATA[type];
-  if(!section) return;
-
-  document.getElementById("pageTitle").textContent =
-    UI_TEXT[DASH_LANG].sectionTitles[type] || section.title;
-
-  let html = "";
-
-  section.sections.forEach(sec=>{
-    const heading = DASH_LANG === "en"
-      ? (EN_HEADING_TEXT[sec.heading] || sec.heading)
-      : sec.heading;
-    html += `<div class="section-title">${heading}</div>`;
-    html += `<div class="cards">`;
-sec.items.forEach(item=>{
-  html += card(item);
-});
-
-if(type === "online" && LIVE_MEET_LINK){
-  html += card([
-    "الانضمام للاجتماع المباشر",
-    "fa-circle-play",
-    LIVE_MEET_LINK,
-    "red",
-    "اضغط هنا للدخول إلى Google Meet المباشر"
-  ]);
-}    html += `</div>`;
   });
 
-  document.getElementById("content").innerHTML = html;
+  await new Promise(res=>setTimeout(res,80));
+  return canvas.toDataURL("image/png", 1.0);
 }
 
-/* =========================================================
-   تسجيل الخروج
-========================================================= */
-function logout(){
+/* =========================
+   PDF Buttons (Selected / All Displayed)
+========================= */
+async function exportSelectedPDF(){
+  if(!ACTIVE_COURSES.length){
+    alert("يجب اختيار فلترة أولاً");
+    return;
+  }
+  if(!SELECTED_IDS.size){
+    alert("لم يتم تحديد أي سجل");
+    return;
+  }
+
+  const q = normalize(searchInput.value);
+
+  const exportGroups = ACTIVE_COURSES.map(course=>{
+    const visible = getVisibleStudentsForCourse(course, q);
+    const selected = visible.filter(s=>SELECTED_IDS.has(s.id));
+    return { course, students:selected };
+  }).filter(g=>g.students.length);
+
+  if(!exportGroups.length){
+    alert("لا يوجد طلاب محددين ضمن الفلترة الحالية");
+    return;
+  }
+
+  await exportPDFGroupsExecutive(exportGroups, "Prudle_Selected_Executive.pdf");
+}
+
+async function exportAllDisplayedPDF(){
+  if(!ACTIVE_COURSES.length){
+    alert("يجب اختيار فلترة أولاً");
+    return;
+  }
+
+  const q = normalize(searchInput.value);
+
+  const exportGroups = ACTIVE_COURSES.map(course=>{
+    const visible = getVisibleStudentsForCourse(course, q);
+    return { course, students:visible };
+  }).filter(g=>g.students.length);
+
+  if(!exportGroups.length){
+    alert("لا توجد بيانات معروضة للتصدير");
+    return;
+  }
+
+  await exportPDFGroupsExecutive(exportGroups, "Prudle_AllDisplayed_Executive.pdf");
+}
+
+/* Single course PDF */
+async function exportPDFSingleCourse(courseId){
+  if(!ACTIVE_COURSES.length){
+    alert("يجب اختيار فلترة أولاً");
+    return;
+  }
+
+  const course = ACTIVE_COURSES.find(c=>c.id===courseId);
+  if(!course){ alert("الدورة غير موجودة ضمن الفلترة"); return; }
+
+  const q = normalize(searchInput.value);
+  const visible = getVisibleStudentsForCourse(course, q);
+
+  let list = [];
+  if(SELECTED_IDS.size){
+    list = visible.filter(s=>SELECTED_IDS.has(s.id));
+    if(!list.length) list = visible;
+  }else{
+    list = visible;
+  }
+
+  if(!list.length){
+    alert("لا توجد سجلات للتصدير لهذه الدورة");
+    return;
+  }
+
+  const safeName = (course.TrainingCourse||"Course").replace(/[^\w\u0600-\u06FF]+/g,"_");
+  const safePeriod = (course.Period||"Period").replace(/[^\w\u0600-\u06FF]+/g,"_");
+  await exportPDFGroupsExecutive([{course, students:list}], `Prudle_Attendance_${safeName}_${safePeriod}.pdf`);
+}
+
+/* =========================
+   PROFESSIONAL DAILY REPORT PDF
+   ✅ الاسم في PDF: EN فوق + AR تحت + التفاف أسطر
+========================= */
+async function exportBySelectedDayPDF(statusNeed, filename){
+  if(!ACTIVE_COURSES.length){
+    alert("يجب اختيار فلترة أولاً");
+    return;
+  }
+
+  const selectedDay = dayColumnFilter.value;
+  if(!selectedDay){
+    alert("اختر اليوم من القائمة أولاً");
+    return;
+  }
+
+  const q = normalize(searchInput.value);
+  const rows = [];
+
+  ACTIVE_COURSES.forEach(course=>{
+    const days = dateRange(course.StartingDate, course.EndingDate);
+    if(!days.includes(selectedDay)) return;
+
+    let list = getVisibleStudentsForCourse(course, q);
+
+    if(SELECTED_IDS.size){
+      const sub = list.filter(s=>SELECTED_IDS.has(s.id));
+      if(sub.length) list = sub;
+    }
+
+    list.forEach(s=>{
+      const st = (getRec(s,selectedDay).status||"").toLowerCase();
+      if(st===statusNeed){
+        rows.push([
+          rows.length+1,
+          pdfStudentName(s),                  // ✅ FIX
+          (s.iqama || s.identity || ""),
+          safePhone(s.phone)||"",
+          course.TrainingCourse||"-",
+          course.Trainer||"-",
+          course.Period||"-",
+          selectedDay,
+          statusNeed.toUpperCase()
+        ]);
+      }
+    });
+  });
+
+  if(!rows.length){
+    alert("لا توجد نتائج مطابقة");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({orientation:"landscape",unit:"pt",format:"a4"});
+  const W = doc.internal.pageSize.getWidth();
+  const H = doc.internal.pageSize.getHeight();
+
+  doc.setFillColor(22,68,120);
+  doc.rect(0,0,W,70,"F");
+
+  doc.setTextColor(255);
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(20);
+  doc.text("PRUDLE – DAILY ATTENDANCE REPORT", W/2, 42, {align:"center"});
 
   try{
+    const logoData = await fetch(LOGO_URL)
+      .then(r=>r.blob())
+      .then(b=>new Promise(res=>{
+        const fr=new FileReader();
+        fr.onload=()=>res(fr.result);
+        fr.readAsDataURL(b);
+      }));
+    doc.addImage(logoData,"PNG",20,12,100,45);
+  }catch(e){}
 
-    window.parent.postMessage(
-      "PRUDLE_LOGOUT",
-      "https://www.prudle-education.com"
-    );
+  doc.setDrawColor(22,68,120);
+  doc.setFillColor(245,248,253);
+  doc.roundedRect(20,85,W-40,85,12,12,"FD");
 
-  }catch(error){
+  doc.setTextColor(22,68,120);
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(13);
+  doc.text("Report Details",40,110);
 
-    console.error(
-      "Logout message error:",
-      error
-    );
+  doc.setFont("helvetica","normal");
+  doc.setTextColor(0);
+  doc.setFontSize(11);
+  doc.text(`Selected Date: ${selectedDay}`,40,135);
+  doc.text(`Total Records: ${rows.length}`,40,155);
 
-    window.location.replace(
-      "https://www.prudle-education.com/log-in-out"
-    );
+  const now = new Date();
+  const formattedDate =
+    now.getDate().toString().padStart(2,'0') + " " +
+    now.toLocaleString("en-US",{month:"short"}) + " " +
+    now.getFullYear();
+  const formattedTime =
+    now.getHours().toString().padStart(2,'0') + ":" +
+    now.getMinutes().toString().padStart(2,'0');
+  const printDate = formattedDate + " | " + formattedTime;
 
+  doc.text(`Printed On: ${printDate}`, W-280, 135);
+
+  doc.autoTable({
+    startY:190,
+    head:[["#","Student","ID","Phone","Course","Trainer","Period","Date","Status"]],
+    body:rows,
+    theme:"grid",
+    margin:{left:20,right:20},
+    styles:{
+      fontSize:9,
+      cellPadding:6,
+      halign:"center",
+      valign:"middle",
+      overflow:"linebreak"     // ✅ مهم لعرض سطرين
+    },
+    headStyles:{
+      fillColor:[22,68,120],
+      textColor:255,
+      fontStyle:"bold"
+    },
+    alternateRowStyles:{
+      fillColor:[245,248,252]
+    },
+    columnStyles:{
+      0:{cellWidth:28},
+      1:{cellWidth:140, halign:"left"},  // ✅ عمود الاسم أوسع + سطرين
+      2:{cellWidth:90},
+      3:{cellWidth:95}
+    },
+    didParseCell(data){
+      if(data.section==="body" && data.column.index===8){
+        if(statusNeed==="absent"){
+          data.cell.styles.fillColor=[231,76,60];
+        }else{
+          data.cell.styles.fillColor=[39,174,96];
+        }
+        data.cell.styles.textColor=255;
+        data.cell.styles.fontStyle="bold";
+      }
+    }
+  });
+
+  const pages = doc.getNumberOfPages();
+  for(let i=1;i<=pages;i++){
+    doc.setPage(i);
+    doc.setFontSize(9);
+    doc.setTextColor(120);
+    doc.text(`Prudle Education System | Page ${i} of ${pages}`,W/2,H-15,{align:"center"});
   }
 
+  doc.save(filename);
 }
 
 /* =========================================================
-   تحميل افتراضي
+   EXECUTIVE PDF BUILDER (Landscape A4)
+   ✅ Page 1: Executive Summary (chart only here)
+   ✅ Next pages: Detailed per course (NO chart)
+   ✅ الاسم في التفاصيل: EN فوق + AR تحت
 ========================================================= */
-db.collection("AdminMeetLinks")
-.onSnapshot(snap=>{
+function countAttendanceForStudent(s, days){
+  let present=0, late=0, absent=0, none=0;
+  days.forEach(d=>{
+    const st=(getRec(s,d).status||"none").toLowerCase();
+    if(st==="present") present++;
+    else if(st==="late") late++;
+    else if(st==="absent") absent++;
+    else none++;
+  });
+  return {present,late,absent,none,total:days.length};
+}
+function totalsForStudents(students, days){
+  let P=0,L=0,A=0,N=0;
+  students.forEach(s=>{
+    const c=countAttendanceForStudent(s,days);
+    P+=c.present; L+=c.late; A+=c.absent; N+=c.none;
+  });
+  return {present:P,late:L,absent:A,none:N,totalCells:students.length*days.length};
+}
 
-  let active = false;
+async function exportPDFGroupsExecutive(groups, filename){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:"landscape", unit:"pt", format:"a4" });
 
-  snap.forEach(doc=>{
+  const W = doc.internal.pageSize.getWidth();
+  const H = doc.internal.pageSize.getHeight();
+  const M = { left:12, right:12 };
 
-    const d = doc.data() || {};
+  let logoData = null;
+  try{
+    logoData = await fetch(LOGO_URL)
+      .then(r=>r.blob())
+      .then(b=>new Promise(res=>{
+        const fr=new FileReader();
+        fr.onload=()=>res(fr.result);
+        fr.readAsDataURL(b);
+      }));
+  }catch(e){}
 
-    if(d.meetLink){
-      active = true;
-    }
-
+  const printDate = new Date().toLocaleString("en-US",{
+    year:"numeric",month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"
   });
 
-  const sideBtn =
-    document.getElementById("onlineBtnSide");
+  let grandStudents = 0;
+  let grandDaysSum = 0;
+  let grandCells = 0;
+  let grandPresent = 0;
+  let grandLate = 0;
+  let grandAbsent = 0;
+  let grandNone = 0;
 
-  const mobileBtn =
-    document.getElementById("onlineBtnMobile");
-
-  if(active){
-
-    sideBtn?.classList.add("live-online");
-    mobileBtn?.classList.add("live-online");
-
-  }else{
-
-    sideBtn?.classList.remove("live-online");
-    mobileBtn?.classList.remove("live-online");
-
-  }
-
-});
-db.collection("AdminMeetLinks")
-.orderBy("createdAt","desc")
-.limit(1)
-.onSnapshot(snap=>{
-
-  LIVE_MEET_LINK = "";
-
-  snap.forEach(doc=>{
-    const d = doc.data() || {};
-
-    if(d.meetLink){
-      LIVE_MEET_LINK = d.meetLink;
-    }
+  groups.forEach(g=>{
+    const days = dateRange(g.course.StartingDate, g.course.EndingDate);
+    const totals = totalsForStudents(g.students, days);
+    grandStudents += g.students.length;
+    grandDaysSum += days.length;
+    grandCells += (g.students.length * days.length);
+    grandPresent += totals.present;
+    grandLate += totals.late;
+    grandAbsent += totals.absent;
+    grandNone += totals.none;
   });
 
-  const sideBtn =
-    document.getElementById("onlineBtnSide");
+  const attendanceRate = grandCells ? (((grandPresent + grandLate) / grandCells) * 100).toFixed(1) : "0.0";
 
-  const mobileBtn =
-    document.getElementById("onlineBtnMobile");
+  doc.setFillColor(22,68,120);
+  doc.rect(0,0,W,62,"F");
 
-  if(LIVE_MEET_LINK){
+  doc.setTextColor(255);
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(18);
+  doc.text("PRUDLE – EXECUTIVE ATTENDANCE SUMMARY", W/2, 38, {align:"center"});
 
-    sideBtn?.classList.add("live-online");
-    mobileBtn?.classList.add("live-online");
+  doc.setFont("helvetica","normal");
+  doc.setFontSize(9);
+  doc.text(`Printed: ${printDate}`, W-12, 18, {align:"right"});
+  doc.text(`Approved by: ${DIRECTOR_NAME}`, W-12, 34, {align:"right"});
 
-  }else{
-
-    sideBtn?.classList.remove("live-online");
-    mobileBtn?.classList.remove("live-online");
-
+  if(logoData){
+    try{ doc.addImage(logoData,"PNG",M.left,10,78,42); }catch(e){}
   }
 
-});
-document.addEventListener("click", function(e){
-  const button = e.target.closest("button[onclick^=\"openPage(\"]");
-  if(!button || !button.closest(".sidebar, .mobile-menu")) return;
-  e.preventDefault(); e.stopImmediatePropagation();
-  prudleMaintenanceNotice();
-}, true);
-applyDashboardLanguage();
-load("reports");
-loadOpenCoursesTicker();
+  let y = 82;
+
+  doc.setTextColor(22,68,120);
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(14);
+  doc.text("Executive Overview", M.left, y);
+
+  y += 14;
+  doc.setDrawColor(210);
+  doc.setFillColor(245,248,253);
+  doc.roundedRect(M.left, y, W-M.left-M.right, 120, 12, 12, "FD");
+
+  doc.setFontSize(12);
+  doc.setTextColor(0);
+
+  const leftX = M.left + 16;
+  const midX  = M.left + 360;
+  const rightX= W - M.right - 220;
+
+  doc.setFont("helvetica","bold");
+  doc.text("Scope", leftX, y+26);
+  doc.setFont("helvetica","normal");
+  doc.text(`Courses: ${groups.length}`, leftX, y+48);
+  doc.text(`Total Students (sum): ${grandStudents}`, leftX, y+68);
+  doc.text(`Total Course Days (sum): ${grandDaysSum}`, leftX, y+88);
+  doc.text(`Total Attendance Cells: ${grandCells}`, leftX, y+108);
+
+  doc.setFont("helvetica","bold");
+  doc.text("Totals", midX, y+26);
+  doc.setFont("helvetica","normal");
+  doc.text(`Present (P): ${grandPresent}`, midX, y+48);
+  doc.text(`Late (L): ${grandLate}`, midX, y+68);
+  doc.text(`Absent (A): ${grandAbsent}`, midX, y+88);
+  doc.text(`No Record: ${grandNone}`, midX, y+108);
+
+  doc.setFont("helvetica","bold");
+  doc.text("KPIs", rightX, y+26);
+  doc.setFont("helvetica","normal");
+  doc.text(`Attendance Rate (P+L): ${attendanceRate}%`, rightX, y+52);
+
+  const summaryTotals = { present: grandPresent, late: grandLate, absent: grandAbsent, none: grandNone };
+  const chartImg = await buildPieChartImage(summaryTotals);
+
+  const chartBoxY = y + 140;
+  doc.setDrawColor(210);
+  doc.setFillColor(255,255,255);
+  doc.roundedRect(M.left, chartBoxY, W-M.left-M.right, 250, 12, 12, "FD");
+
+  doc.setTextColor(22,68,120);
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(12);
+  doc.text("Global Distribution", M.left+16, chartBoxY+26);
+
+  doc.addImage(chartImg, "PNG", W/2 - 190, chartBoxY+38, 380, 190);
+
+  doc.setTextColor(110);
+  doc.setFont("helvetica","normal");
+  doc.setFontSize(10);
+  doc.text("Legend: P=Present, L=Late, A=Absent.", W/2, H-34, {align:"center"});
+
+  for(let gi=0; gi<groups.length; gi++){
+    const { course, students } = groups[gi];
+    const days = dateRange(course.StartingDate, course.EndingDate);
+
+    doc.addPage();
+
+    doc.setFillColor(22,68,120);
+    doc.rect(0,0,W,54,"F");
+
+    doc.setTextColor(255);
+    doc.setFont("helvetica","bold");
+    doc.setFontSize(15);
+    doc.text("PRUDLE – ATTENDANCE REPORT (DETAIL)", W/2, 34, {align:"center"});
+
+    doc.setFont("helvetica","normal");
+    doc.setFontSize(9);
+    doc.text(`Printed: ${printDate}`, W-12, 18, {align:"right"});
+
+    if(logoData){
+      try{ doc.addImage(logoData,"PNG",M.left,8,78,40); }catch(e){}
+    }
+
+    let yy = 70;
+    doc.setDrawColor(22,68,120);
+    doc.setFillColor(245,248,253);
+    doc.roundedRect(M.left,yy, W-M.left-M.right, 82, 12, 12, "FD");
+
+    doc.setTextColor(22,68,120);
+    doc.setFont("helvetica","bold");
+    doc.setFontSize(11);
+
+    doc.text(`Course: ${course.TrainingCourse||"-"}`, M.left+14, yy+24);
+    doc.text(`Trainer: ${course.Trainer||"-"}`, M.left+14, yy+44);
+    doc.text(`Period: ${course.Period||"-"}`, M.left+14, yy+64);
+
+    doc.text(`Branch: ${course.Branch||"-"}`, M.left+310, yy+24);
+    doc.text(`Section: ${course.Section||"-"}`, M.left+310, yy+44);
+   const startDatePDF = course.StartingDate || "-";
+const endDatePDF   = course.EndingDate || "-";
+
+doc.setFont("helvetica","bold");
+doc.text("Dates:", M.left+310, yy+64);
+
+doc.setFont("helvetica","normal");
+doc.text(`${startDatePDF} - ${endDatePDF}`, M.left+355, yy+64);
+
+    doc.setTextColor(0);
+    doc.setFont("helvetica","bold");
+    doc.text(`Students: ${students.length}`, W-M.right-170, yy+28);
+    doc.text(`Days: ${days.length}`, W-M.right-170, yy+50);
+
+    const head = ["#","Student Name","ID","Phone", ...days.map(d=>dayNameEn(d))];
+    const body = students.map((s,i)=>{
+      const phone = safePhone(s.phone);
+      return [
+        i+1,
+        pdfStudentName(s),                 // ✅ FIX
+        (s.iqama || s.identity || ""),
+        phone || "",
+        ...days.map(d=>{
+          const st = (getRec(s,d).status||"").toLowerCase();
+          if(st==="present") return "P";
+          if(st==="late") return "L";
+          if(st==="absent") return "A";
+          return "";
+        })
+      ];
+    });
+
+    doc.autoTable({
+      startY: yy + 110,
+      head: [head],
+      body,
+      theme: "grid",
+      margin: { left:M.left, right:M.right },
+      styles: {
+        fontSize: 7.2,
+        cellPadding: 3,
+        halign:"center",
+        valign:"middle",
+        overflow:"linebreak",             // ✅ مهم لعرض سطرين
+        lineWidth:0.6,
+        lineColor:[190,190,190]
+      },
+      headStyles: { fillColor:[22,68,120], textColor:255, fontStyle:"bold", lineWidth:0.8 },
+      alternateRowStyles: { fillColor:[245,248,252] },
+      columnStyles: {
+        0:{cellWidth:26},
+        1:{cellWidth:175, halign:"left"},  // ✅ أوسع للـ EN+AR
+        2:{cellWidth:90},
+        3:{cellWidth:90}
+      },
+      didParseCell(data){
+        if(data.section==="body" && data.column.index>=4){
+          const v = String(data.cell.raw||"");
+          if(v==="P"){ data.cell.styles.fillColor=[26,188,156]; data.cell.styles.textColor=255; data.cell.styles.fontStyle="bold"; }
+          if(v==="L"){ data.cell.styles.fillColor=[243,156,18]; data.cell.styles.textColor=255; data.cell.styles.fontStyle="bold"; }
+          if(v==="A"){ data.cell.styles.fillColor=[231,76,60]; data.cell.styles.textColor=255; data.cell.styles.fontStyle="bold"; }
+          if(!v){ data.cell.styles.fillColor=[238,241,247]; data.cell.styles.textColor=70; }
+        }
+      }
+    });
+  }
+
+  const pages = doc.getNumberOfPages();
+  for(let p=1;p<=pages;p++){
+    doc.setPage(p);
+    doc.setFontSize(9);
+    doc.setTextColor(120);
+    doc.text(`Page ${p} / ${pages}`, W/2, H-16, {align:"center"});
+  }
+
+  doc.save(filename);
+}
 </script>
-
-
-
-<style id="prudle-premium-ui-2026">
-/* ===== PRUDLE 2026 — Professional UI refresh (visual only) ===== */
-:root{
-  --p-navy:#123d6b;--p-blue:#1e5d96;--p-sky:#eaf3fb;--p-bg:#f3f7fb;
-  --p-text:#16324d;--p-muted:#6b7f95;--p-line:#dbe6f2;--p-white:#fff;
-  --p-shadow:0 12px 34px rgba(19,61,107,.09);--p-radius:20px;
-}
-html,body{background:var(--p-bg)!important;color:var(--p-text)!important}
-body{padding:0!important}
-.app{background:var(--p-bg);gap:0}
-.sidebar{width:282px!important;position:sticky!important;top:0;height:100vh;overflow-y:auto;overflow-x:visible!important;padding:18px 14px!important;background:linear-gradient(180deg,#103b68 0%,#164b7e 55%,#123d6b 100%)!important;box-shadow:12px 0 36px rgba(18,61,107,.12)!important}
-.brand{margin:0 5px 18px!important;padding:14px 10px 20px!important;text-align:right!important}
-.brand h1{font-size:28px!important;letter-spacing:.2px}.brand p{font-size:12px!important;opacity:.72!important}
-.menu-title{font-size:11px!important;letter-spacing:.3px;margin:10px 10px 8px!important;opacity:.68!important}
-.side-btn{min-height:50px!important;padding:12px 13px!important;margin-bottom:7px!important;border-radius:14px!important;font-size:14px!important;box-shadow:none!important;background:rgba(255,255,255,.075)!important;border:1px solid rgba(255,255,255,.08)!important}
-.side-btn:hover{transform:translateX(-2px)!important;background:rgba(255,255,255,.14)!important}
-.side-btn.active{background:#fff!important;color:var(--p-navy)!important;border-color:#fff!important;box-shadow:0 9px 24px rgba(0,0,0,.14)!important}
-.sidebar-bottom{margin-top:14px!important;padding-top:14px!important}
-.main{min-height:100vh;background:var(--p-bg)}
-.topbar{margin:0!important;padding:14px 24px!important;min-height:70px;background:rgba(255,255,255,.94)!important;border-bottom:1px solid var(--p-line)!important;box-shadow:0 4px 18px rgba(18,61,107,.04)!important}
-.topbar-left h2{font-size:21px!important}.topbar-actions button{border-radius:12px!important;box-shadow:none!important}
-.hero{margin:18px 22px 16px!important;padding:22px 24px!important;border-radius:22px!important;background:linear-gradient(120deg,#123d6b,#1c5b93 72%,#2876b4)!important;box-shadow:0 14px 32px rgba(18,61,107,.16)!important}
-.hero h3{font-size:25px!important;margin-bottom:5px!important}.hero p{font-size:14px!important;opacity:.8!important}
-.ticker{margin-top:14px!important;border-radius:12px!important;background:rgba(255,255,255,.10)!important;border:1px solid rgba(255,255,255,.12)}
-.ticker-track{padding:10px 0!important;font-size:15px!important;text-shadow:none!important}
-.content-wrap{padding:2px 22px 30px!important}.section-title{font-size:18px!important;margin:16px 2px 12px!important;display:flex;align-items:center;gap:8px}.section-title:before{content:"";width:5px;height:22px;border-radius:9px;background:#1e5d96;display:inline-block}
-.cards{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))!important;gap:14px!important}
-.card{min-height:190px!important;padding:20px 16px!important;border-radius:18px!important;border:1px solid var(--p-line)!important;border-top:4px solid #4e8cff!important;box-shadow:var(--p-shadow)!important;text-align:right!important;justify-content:flex-start!important;position:relative;overflow:hidden}
-.card:hover{transform:translateY(-4px)!important;box-shadow:0 18px 38px rgba(18,61,107,.13)!important}.card .icon-box{width:52px!important;height:52px!important;margin:0 0 14px auto!important;border-radius:14px!important;font-size:21px!important}.card h3{font-size:17px!important;margin-bottom:6px!important}.card .desc{font-size:12.5px!important;line-height:1.65!important;min-height:42px!important;margin-bottom:16px!important}.card button{margin-top:auto!important;width:100%;padding:11px 14px!important;border-radius:11px!important;font-size:13px!important;box-shadow:none!important}
-.card.green{border-top-color:#22c55e!important}.card.red{border-top-color:#ef4444!important}.card.gold{border-top-color:#eab308!important}.card.purple{border-top-color:#8b5cf6!important}.card.orange{border-top-color:#f97316!important}.card.online{border-top-color:#06b6d4!important}.card.weak-followup{border-top-color:#e11d48!important}
-/* Task notification — same logic, cleaner presentation */
-.task-alert-btn{overflow:visible!important}.task-count-badge{min-width:22px!important;height:22px!important;font-size:10px!important;border:2px solid rgba(255,255,255,.9)!important;box-shadow:0 4px 10px rgba(0,0,0,.16)!important}
-.task-assignee-popover{position:fixed!important;right:294px!important;top:190px!important;width:340px!important;max-height:430px!important;margin:0!important;padding:14px!important;border:1px solid var(--p-line)!important;border-radius:18px!important;box-shadow:0 22px 55px rgba(15,45,75,.22)!important;z-index:999999!important;background:#fff!important}
-.task-assignee-popover:before{content:"";position:absolute;right:-8px;top:24px;width:16px;height:16px;background:#fff;transform:rotate(45deg);border-top:1px solid var(--p-line);border-right:1px solid var(--p-line)}
-.task-assignee-popover h4{font-size:14px!important;padding-bottom:10px;margin-bottom:10px!important;border-bottom:1px solid #edf2f7}
-.task-assignee-item{padding:11px 12px!important;margin-bottom:8px!important;border-radius:12px!important;border-right-width:4px!important}.task-assignee-item small{margin-top:3px;font-size:10.5px!important}
-.task-ticker-note{margin-top:12px!important;padding:9px 12px!important;border-radius:11px!important;font-size:12px!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
-@media(max-width:980px){
- .sidebar{display:none!important}.topbar{padding:12px!important}.hero{margin:10px 8px 12px!important;padding:18px 14px!important}.content-wrap{padding:0 8px 22px!important}.mobile-menu{background:#fff;padding:10px 8px 6px!important;border-bottom:1px solid var(--p-line)}.mobile-menu button{border-radius:11px!important;box-shadow:none!important;border:1px solid rgba(255,255,255,.35)!important}.task-assignee-popover{display:none!important}.cards{gap:9px!important}.card{min-height:205px!important;padding:14px 10px!important;border-radius:15px!important}.card .icon-box{width:46px!important;height:46px!important;font-size:19px!important}.card h3{font-size:14px!important}.card .desc{font-size:11px!important}.card button{font-size:11.5px!important}
-}
-@media(max-width:600px){.hero h3{font-size:19px!important}.cards{grid-template-columns:repeat(2,minmax(0,1fr))!important}.topbar-left h2{font-size:18px!important}}
-</style>
-<style>
-.prudle-card-maintenance{opacity:.77;filter:saturate(.65)}
-.prudle-card-maintenance button{background:#8996a6!important;cursor:not-allowed!important}
-.prudle-card-active{opacity:1}
-</style>
 </body>
 </html>
