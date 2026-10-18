@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>حجز مقعد – فرع الجموم | حضوري</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- FULL WIDTH FIX -->
+<style>
+html,body{
+  margin:0!important;padding:0!important;width:100%!important;
+  max-width:100%!important;overflow-x:hidden!important
+}
+*,*::before,*::after{box-sizing:border-box!important}
+.container,.section,.wrapper,.content,.main-content{
+  width:100%!important;max-width:100%!important;margin:0 auto!important;
+  padding-left:16px;padding-right:16px
+}
+</style>
+
+<!-- Font -->
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+.prudle-logo-img{
+  display:block;
+  margin:0 auto 15px;
+  width:140px;      /* يمكنك تكبيره أو تصغيره */
+  height:auto;
+}
+
+body{
+  font-family:'Tajawal',sans-serif;
+  background:linear-gradient(180deg,#f5f7fb,#eef3ff);
+  padding:20px;display:flex;justify-content:center
+}
+.box{
+  width:100%;max-width:640px;background:#fff;padding:26px;
+  border-radius:22px;box-shadow:0 18px 40px rgba(22,68,120,.18)
+}
+h3{text-align:center;color:#164478}
+input,select,button{
+  width:100%;padding:13px;border-radius:14px;
+  border:1.8px solid #d3d9e5;margin-top:10px;
+  font-family:Tajawal;font-weight:700
+}
+select{background:#fff}
+button{
+  background:linear-gradient(135deg,#1b4f8a,#164478);
+  color:#fff;font-weight:900;border:none;cursor:pointer
+}
+button:active{transform:scale(.98)}
+.card{
+  background:#f1f6ff;border:1px solid #c8dafc;
+  border-radius:16px;padding:14px;margin-top:14px
+}
+.hidden{display:none}
+.badge{
+  padding:6px 14px;border-radius:999px;
+  font-weight:900;display:inline-block
+}
+.ok{background:#1abc9c;color:#fff}
+.bad{background:#e74c3c;color:#fff}
+.neutral{background:#7f8c8d;color:#fff}
+.preview{
+  margin-top:10px;padding:10px;border-radius:12px;
+  background:#fff;border:1px dashed #c8dafc;font-size:14px
+}
+.small{
+  font-size:12px;color:#4b5b74;font-weight:800;margin-top:6px
+}
+.translate-status{
+  font-size:12px;color:#4b5b74;font-weight:700;
+  margin-top:6px;min-height:18px
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTWYTHxIwSwzfABmu9iITFVpmT1k3jXjzHcKQ5O0NL&s" class="prudle-logo-img" alt="Prudle Logo">
+
+<h3>حجز مقعد – فرع الجموم<br> (حضوري)</h3>
+
+<input id="iqama" placeholder="رقم الهوية / الإقامة">
+<button onclick="startRegistration()">متابعة الحجز</button>
+
+<div class="card hidden" id="fakeDataBox">
+<input id="nameAr" placeholder="الاسم بالعربي">
+<input id="nameEn" placeholder="الاسم بالإنجليزي (ترجمة تلقائية عبر Google Translate)">
+<div class="translate-status" id="translateStatus"></div>
+<input id="age" placeholder="العمر">
+<input id="phone" placeholder="الجوال (966xxxxxxxxx)">
+<div class="small" id="autoFillHint"></div>
+</div>
+
+<div class="card hidden" id="promotionBox" aria-hidden="true">
+<div>الاسم: <b id="studentName"></b></div>
+<div>الدورة: <b id="currentLevel"></b></div>
+<div>الفترة: <b id="currentPeriod"></b></div>
+<div>المدرب: <b id="currentTrainer"></b></div>
+<div>القاعة: <b id="currentRoom"></b></div>
+<div>تاريخ بداية الدورة: <b id="currentStart"></b></div>
+<div>الدرجة النهائية: <b id="finalGrade"></b></div>
+<div id="statusBadge"></div>
+</div>
+
+<div class="card hidden" id="coursesBox">
+<div>اختر دورة مفتوحة:</div>
+<select id="courseSelect" onchange="previewCourse()"></select>
+<div class="preview hidden" id="coursePreview"></div>
+<button id="submitBooking" onclick="saveSelected()">إرسال طلب الحجز</button><div class="small" id="bookingStatus" role="status"></div>
+</div>
+
+</div>
+
+<script>
+/* ================ PUBLIC WORKER API ================ */
+const API = "https://api-prudle.abbassaboali.workers.dev";
+async function publicApi(path, options={}) {
+  const response=await fetch(API+path,{...options,headers:{"Content-Type":"application/json",...(options.headers||{})}});
+  const json=await response.json().catch(()=>({}));
+  if(!response.ok||json.success===false) throw new Error(json.error||`HTTP ${response.status}`);
+  return json;
+}
+/* ================= VARIABLES ================= */
+let STUDENT=null, COURSE=null, HAS_PREVIOUS=false, allCourses=[];
+
+/* ================= DIGITS ================= */
+const toEn=s=>String(s||"").replace(/[٠-٩]/g,d=>"0123456789"["٠١٢٣٤٥٦٧٨٩".indexOf(d)]);
+age.addEventListener("input",()=>age.value=toEn(age.value).replace(/\D/g,""));
+phone.addEventListener("input",()=>{
+  let v=toEn(phone.value).replace(/\D/g,"");
+  if(!v.startsWith("966")) v="966"+v.replace(/^966*/,"");
+  phone.value=v.slice(0,12);
+});
+
+/* ================= GOOGLE TRANSLATE ================= */
+let translateTimer=null;
+let lastTranslationRequest=0;
+
+/* ترجمة الاسم العربي إلى الإنجليزية عبر Google Translate */
+async function googleTranslateArabicName(text){
+  text=String(text||"").trim();
+  if(!text) return "";
+
+  const url=
+    "https://translate.googleapis.com/translate_a/single"+
+    "?client=gtx"+
+    "&sl=ar"+
+    "&tl=en"+
+    "&dt=t"+
+    "&q="+encodeURIComponent(text);
+
+  const response=await fetch(url);
+
+  if(!response.ok){
+    throw new Error("Google Translate request failed");
+  }
+
+  const data=await response.json();
+
+  return (data?.[0]||[])
+    .map(part=>part?.[0]||"")
+    .join("")
+    .trim();
+}
+
+/* ترجمة تلقائية أثناء الكتابة */
+function translateArabicName(){
+  clearTimeout(translateTimer);
+
+  const text=nameAr.value.trim();
+
+  if(!text){
+    nameEn.value="";
+    translateStatus.textContent="";
+    return;
+  }
+
+  translateStatus.textContent="⏳ جاري ترجمة الاسم...";
+  const requestId=++lastTranslationRequest;
+
+  translateTimer=setTimeout(async()=>{
+    try{
+      const translated=await googleTranslateArabicName(text);
+
+      if(
+        requestId===lastTranslationRequest &&
+        nameAr.value.trim()===text
+      ){
+        nameEn.value=translated;
+
+        translateStatus.textContent=
+          translated
+          ? "✅ تمت الترجمة تلقائيًا عبر Google Translate"
+          : "";
+      }
+    }catch(error){
+      console.error("Google Translate error:",error);
+
+      if(requestId===lastTranslationRequest){
+        translateStatus.textContent=
+          "⚠️ تعذر الاتصال بخدمة الترجمة. يمكنك كتابة الاسم يدويًا.";
+      }
+    }
+  },500);
+}
+
+nameAr.addEventListener("input",translateArabicName);
+
+/* استخدام الاسم الإنجليزي المحفوظ، أو الترجمة عند عدم وجوده */
+async function fillEnglishName(arabicName,storedName=""){
+  if(storedName){
+    nameEn.value=storedName;
+    translateStatus.textContent=
+      "✅ تم استخدام الاسم الإنجليزي المسجل.";
+    return;
+  }
+
+  nameEn.value="";
+  if(!arabicName) return;
+
+  translateStatus.textContent="⏳ جاري ترجمة الاسم...";
+
+  try{
+    const translated=await googleTranslateArabicName(arabicName);
+
+    if(
+      nameAr.value.trim()===
+      String(arabicName).trim()
+    ){
+      nameEn.value=translated;
+    }
+
+    translateStatus.textContent=
+      translated
+      ? "✅ تمت الترجمة تلقائيًا عبر Google Translate"
+      : "";
+  }catch(error){
+    console.error("Google Translate error:",error);
+    translateStatus.textContent=
+      "⚠️ تعذر الاتصال بخدمة الترجمة.";
+  }
+}
+
+/* ================= VALIDATE ================= */
+function validateIqama(){
+  const val=toEn(iqama.value).replace(/\D/g,"");
+  iqama.value=val;
+  if(!val || val.length<10){
+    alert("رقم الهوية غير صحيح");
+    return false;
+  }
+  return true;
+}
+
+/* ================= ATTENDANCE (مثل التقرير) ================= */
+function attScore(s){
+  const r=s.records||[];
+  if(!r.length) return null;
+  return Math.floor((r.filter(x=>x.status==="present").length / r.length)*10);
+}
+
+/* ================= FINAL GRADE (نفس منطق التقرير) =================
+  - NEW: لا يوجد أي درجات إطلاقًا
+  - null: لم يتم الرصد (ناقص mid/final/listen/speak)
+  - رقم: مجموع + حضور + واجب (حد أقصى 100)
+*/
+function totalVal(s){
+  if(!s) return "NEW";
+
+  const hasAnyGrade =
+    s.midterm != null ||
+    s.finalExam != null ||
+    s.listening != null ||
+    s.speaking != null ||
+    s.hwScore != null ||
+    (s.records && s.records.length);
+
+  if(!hasAnyGrade) return "NEW";
+
+  // شرط اكتمال الرصد الأساسي
+  if([s.midterm,s.finalExam,s.listening,s.speaking].some(v=>v==null)) return null;
+
+  const total =
+    Number(s.midterm||0)+
+    Number(s.finalExam||0)+
+    Number(s.listening||0)+
+    Number(s.speaking||0)+
+    Number(s.hwScore||0)+
+    Number(attScore(s)||0);
+
+  return Math.min(total,100);
+}
+
+/* ================= PUBLIC COURSE CATALOG ================= */
+async function loadCourses(){
+  try{
+    const result=await publicApi("/public/courses");
+    allCourses=result.data?.courses||[];
+    courseSelect.replaceChildren(new Option("— اختر الدورة —",""));
+    for(const c of allCourses){
+      courseSelect.add(new Option([c.TrainingCourse,c.Period,c.Trainer,c.Room].filter(Boolean).join(" | "),c.id));
+    }
+    if(result.data?.mayBeTruncated) console.warn("Public course catalog may be truncated");
+  }catch(err){
+    courseSelect.replaceChildren(new Option("تعذر تحميل الدورات",""));
+    document.getElementById("bookingStatus").textContent="تعذر تحميل الدورات، يرجى المحاولة لاحقًا.";
+    console.error(err);
+  }
+}
+loadCourses();
+/* ================= PREVIEW COURSE ================= */
+function previewCourse(){
+  const id = courseSelect.value;
+  const box = document.getElementById("coursePreview");
+  if(!id){ box.classList.add("hidden"); box.innerHTML=""; return; }
+  const c = allCourses.find(x=>x.id===id);
+  box.innerHTML = `
+    <b>${c.TrainingCourse||"-"}</b><br>
+    الفترة: ${c.Period||"-"}<br>
+    المدرب: ${c.Trainer||"-"}<br>
+    القاعة: ${c.Room||"-"}
+  `;
+  box.classList.remove("hidden");
+}
+
+/* ================= SAFE PUBLIC BOOKING ================= */
+function startRegistration(){
+  if(!validateIqama()) return;
+  fakeDataBox.classList.remove("hidden");
+  coursesBox.classList.remove("hidden");
+  promotionBox.classList.add("hidden");
+  document.getElementById("autoFillHint").textContent="لخصوصيتك، لا تُعرض بيانات الطلاب أو درجاتهم عبر هذه الصفحة. ستراجع الإدارة طلبك وتحدد حالتك الأكاديمية.";
+}
+async function saveSelected(){
+  const button=document.getElementById("submitBooking");
+  const status=document.getElementById("bookingStatus");
+  const courseId=courseSelect.value;
+  if(!validateIqama()) return;
+  if(!courseId) return alert("اختر دورة");
+  if(!nameAr.value.trim()||!nameEn.value.trim()) return alert("أدخل الاسم بالعربية والإنجليزية");
+  if(!/^9665\d{8}$/.test(phone.value.trim())) return alert("أدخل رقم جوال سعودي صحيح بصيغة 9665xxxxxxxx");
+  if(!/^\d{1,3}$/.test(age.value.trim())||Number(age.value)<3||Number(age.value)>100) return alert("أدخل العمر الصحيح");
+  button.disabled=true;status.textContent="جاري إرسال طلب الحجز...";
+  try{
+    await publicApi("/public/booking",{method:"POST",body:JSON.stringify({
+      iqama:iqama.value.trim(),name_ar:nameAr.value.trim(),name:nameEn.value.trim(),
+      age:age.value.trim(),phone:phone.value.trim(),courseId
+    })});
+    status.textContent="تم استلام طلب الحجز بنجاح، وسيتم مراجعته من الإدارة.";
+    alert("تم إرسال طلب الحجز للمراجعة ✅");
+    button.textContent="تم إرسال الطلب";
+  }catch(error){
+    console.error(error);
+    status.textContent="تعذر إرسال الطلب: "+error.message;
+    button.disabled=false;
+  }
+}
+</script>
+</body>
+</html>
