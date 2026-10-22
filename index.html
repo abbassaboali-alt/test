@@ -384,7 +384,7 @@ function qpanel(k){
   return `<div class="qp" data-k="${k}"><h3>❓ أسئلة المصدر (${qs.length})${best!=null?" · أفضل نتيجة "+best+"%":""}</h3>
 <div class="qbar"><button class="cta" data-qstart>▶ ابدأ الاختبار</button>${ty==="a"||ty==="t"?'<button class="cta alt" data-qlisten>🔊 استمع للمقطع</button>':""}<button class="cta alt" data-qreset>↺ الأسئلة الجاهزة</button><button class="cta alt dng" data-clearqs>🗑 حذف جميع أسئلة المصدر</button><button class="cta alt dng" data-removebook>🗑 حذف المصدر بالكامل</button></div>
 <div id="qa"></div>
-<div class="qlist">${qs.map((q,i)=>`<div class="qi"><div dir="ltr" style="text-align:left"><b>${esc(q.q)}</b><small>${q.answer==null?"⚠ الإجابة غير محددة":"✔ "+esc(q.answer)}${q.ai?" · ✨ AI":""}</small>${q.image?`<img class="qimg sm" src="${q.image}" alt="">`:""}</div><button data-qdel="${i}" aria-label="حذف السؤال">🗑</button></div>`).join("")||'<p class="empty" style="padding:14px">لا توجد أسئلة بعد. ولّدها بالذكاء الاصطناعي بالأسفل.</p>'}</div>
+<div class="qlist">${qs.map((q,i)=>`<div class="qi"><div dir="ltr" style="text-align:left"><b>${esc(q.q)}</b><small>${q.answer==null?"⚠ الإجابة غير محددة":"✔ "+esc(q.answer)}${q.ai?" · ✨ AI":""}</small>${q.image?`<img class="qimg" src="${q.image}" alt="">`:""}</div><button data-qdel="${i}" aria-label="حذف السؤال">🗑</button></div>`).join("")||'<p class="empty" style="padding:14px">لا توجد أسئلة بعد. ولّدها بالذكاء الاصطناعي بالأسفل.</p>'}</div>
 <details class="gen" ${qs.length?"":"open"}><summary>✨ توليد أسئلة بالذكاء الاصطناعي</summary>
 <label>محتوى التوليد</label><select id="gScope"><option value="same">📖 أسئلة جديدة من نفس القطعة المعروضة</option><option value="new">✨ توليد قطعة جديدة مستقلة مع أسئلتها وحفظها ككتاب جديد</option><option value="import">📥 استيراد نفس أسئلة PDF / Word حرفيًا</option></select><label>عنوان أو موضوع القطعة الجديدة (عند اختيار قطعة جديدة)</label><input id="gTopic" placeholder="مثال: A day at the zoo" dir="ltr"><label>عدد الأسئلة</label><select id="gN"><option>3</option><option>5</option><option>8</option><option>10</option><option>15</option><option>20</option><option>30</option><option>40</option><option>50</option><option value="0" selected>تلقائي: جميع الأسئلة حتى 50</option></select>
 <label>نوع الأسئلة</label><select id="gT"><option value="mcq">اختيار من متعدد</option><option value="tf">صح / خطأ</option><option value="match">🔗 وصل بين العناصر</option><option value="order">🔢 ترتيب الكلمات أو الجمل</option><option value="missing">🔤 أحرف ناقصة</option></select>
@@ -396,11 +396,11 @@ function qpanel(k){
 <p style="margin:12px 0 0"><button class="cta" data-gen>✨ ولّد الأسئلة</button></p><div id="gS" class="hint"></div></details></div>`;
 }
 function panel(k,msg){const p=$("#mdb .qp");if(!p)return;p.outerHTML=qpanel(k);if(msg)$("#qa").innerHTML='<p class="hint">'+msg+"</p>"}
-function qzStart(k){const qs=qsOf(k);if(qs.some(q=>q.answer==null&&q.type==="mcq")){document.getElementById("qa").innerHTML="<p class=\"hint\">⚠ بعض الأسئلة المستوردة لا تحتوي على إجابة صحيحة مؤكدة في الملف. راجعها قبل بدء الاختبار.</p>";return}if(!qs.length){$("#qa").innerHTML='<p class="hint">لا توجد أسئلة. ولّد بعضها بالذكاء الاصطناعي.</p>';return}QZ={k,qs:qs.some(q=>q.originalImport)?qs:sh(qs),i:0,c:0};qzShow()}
+function qzStart(k){const qs=qsOf(k);if(qs.some(q=>q.answer==null&&q.type==="mcq")){document.getElementById("qa").innerHTML="<p class=\"hint\">⚠ الأسئلة الأصلية معروضة أدناه بصورها. هذا الملف لا يتضمن إجابات مؤكدة لكل سؤال؛ الاختبار التلقائي يحتاج تحديد الإجابات أولًا.</p>";return}if(!qs.length){$("#qa").innerHTML='<p class="hint">لا توجد أسئلة. ولّد بعضها بالذكاء الاصطناعي.</p>';return}QZ={k,qs:sh(qs),i:0,c:0};qzShow()}
 function qzShow(){
  const a=$("#qa");if(!a||!QZ)return;
  if(QZ.i>=QZ.qs.length){const p=Math.round(QZ.c/QZ.qs.length*100);S.sc[QZ.k]=Math.max(S.sc[QZ.k]||0,p);save();favDirty=true;a.innerHTML=`<div class="qres"><div class="big">${p>=80?"🏆":p>=50?"👍":"💪"}</div><b>${QZ.c} / ${QZ.qs.length}</b> (${p}%)<br><button class="cta" data-qstart style="margin-top:10px">↻ مرة أخرى</button></div>`;return}
- const q=QZ.qs[QZ.i],type=q.type||"mcq";QZ.d=0;QZ.selected=[];QZ.o=q.originalImport?(q.options||[]):sh(q.options||[]);
+ const q=QZ.qs[QZ.i],type=q.type||"mcq";QZ.d=0;QZ.selected=[];QZ.o=sh(q.options||[]);
  const head=`<small>${QZ.i+1} / ${QZ.qs.length} · ${type}</small>${q.image?`<img class="qimg" src="${q.image}" alt="">`:""}<p>${esc(q.q)}</p>${q.audioUrl?`<audio controls preload="none" src="${esc(q.audioUrl)}"></audio>`:`<button class="cta alt" data-speakq>🔊 استمع للسؤال</button>`}`;
  let content="";
  if(type==="order"){QZ.o=sh(q.parts||q.options||[]);content=`<div class="qo" id="parts">${QZ.o.map((x,j)=>`<button data-part="${j}">${esc(x)}</button>`).join("")}</div><p id="chosen" dir="ltr" style="min-height:50px;background:#ffffff15;padding:10px;border-radius:12px"></p><button class="cta" data-checkorder>تحقق من الترتيب</button> <button class="cta alt" data-clearorder>مسح</button>`}
@@ -478,21 +478,16 @@ async function readPdf(f){
     lines.sort((a,b)=>b.y-a.y);const rows=lines.map(z=>({y:z.y,text:z.parts.sort((a,b)=>a.x-b.x).map(a=>a.str).join(" ")}));
     const pageText=rows.map(z=>z.text).join("\n");text+=`\n[PAGE ${p}]\n`+pageText+"\n";
     const v=pg.getViewport({scale:Math.min(1.5,900/v0.width)}),c=document.createElement("canvas");c.width=Math.ceil(v.width);c.height=Math.ceil(v.height);await pg.render({canvasContext:c.getContext("2d"),viewport:v}).promise;
-    const questionRows=[];
-    for(let j=0;j<rows.length;j++){
-     const r=rows[j],m=r.text.match(/^\s*(\d{1,3})\s*[.)-]?\s+(?=(?:Look|Choose|What|Which|How|Is|Are|Do|Does|Can|Where|When|Who|Fill|Complete|Select|Match|Write|Circle|True|False)\b)/i);
-     if(m){questionRows.push({...r,questionNumber:+m[1]});continue}
-     if(/^\s*\d{1,3}\s*$/.test(r.text)&&rows[j+1]&&/^(?:Look|Choose|What|Which|How|Is|Are|Do|Does|Can|Where|When|Who|Fill|Complete|Select|Match|Write|Circle|True|False)\b/i.test(rows[j+1].text))questionRows.push({...r,questionNumber:+r.text.trim()});
-    }
+    const questionRows=rows.filter(z=>/^\s*\d{1,3}[.)\s]+(?:Look|Choose|What|Which|How|Is|Are|Do|Does|Can|Where|When|Who|Fill|Complete|Select|Match|Write|Circle|True|False)/i.test(z.text));
     const regions=[];
     for(let i=0;i<questionRows.length;i++){
       const r=questionRows[i],next=questionRows[i+1],upper=Math.min(v0.height,r.y+75),lower=next?Math.min(r.y-12,next.y+35):Math.max(0,r.y-145);
       const top=Math.max(0,(v0.height-upper)*v.scale),bottom=Math.min(c.height,(v0.height-lower)*v.scale);
       if(bottom-top<25)continue;
       const crop=document.createElement("canvas");crop.width=c.width;crop.height=Math.ceil(bottom-top);crop.getContext("2d").drawImage(c,0,top,c.width,bottom-top,0,0,c.width,crop.height);
-      const id=`p${p}q${i+1}`;regions.push({id,page:p,questionNumber:r.questionNumber,nearbyText:r.text,image:crop.toDataURL("image/jpeg",.58)});
+      const id=`p${p}q${i+1}`;regions.push({id,page:p,nearbyText:r.text,image:crop.toDataURL("image/jpeg",.75)});
     }
-    pages.push({number:p,text:pageText,regions});
+    pages.push({number:p,text:pageText,regions,image:c.toDataURL("image/jpeg",.70)});
     if(images.length<6)images.push(c.toDataURL("image/jpeg",.65));
   }
   return{name:f.name,text:clean(text.trim()),images,pages,totalPages:doc.numPages};
@@ -504,7 +499,7 @@ async function readFile(f){
 }
 async function pickFile(inp){
   const f=inp.files[0];if(!f)return;const st=$("#gFi");st.textContent="⏳ جارٍ قراءة الملف…";
-  try{FILE=await readFile(f);st.textContent="✔ "+FILE.name+": "+FILE.text.length+" حرف · "+FILE.images.length+" صورة"+(FILE.text.length<40?" ⚠ لم يُستخرج نص (ملف ممسوح؟) — ستُرسل الصور فقط":"")}
+  try{FILE=await readFile(f);st.textContent="✔ "+FILE.name+": "+FILE.text.length+" حرف · "+FILE.images.length+" صورة"+(FILE.text.length<40?" 📷 ملف مصوّر: سيتم تحليل الصفحة بالذكاء الاصطناعي":"")}
   catch(e){FILE=null;st.textContent="⚠ "+e.message}
 }
 async function fileToForm(inp){
@@ -530,44 +525,36 @@ function normQ(x,kind){
  else{if(!answer&&opts.length)answer=opts[0];if(answer&&!opts.includes(answer))opts.push(answer)}
  return opts.length>=2&&answer?{...base,options:opts,answer}:null;
 }
-// Source-preserving MCQ parser for PDF text laid out in two columns.
-function parseOriginalMCQs(page){
- // Read positional PDF text, including a standalone question number and two-column answers.
- const lines=String(page.text||'').split(/\r?\n/).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean);
- const starts=[];
- const verbs=/^(?:Look|Choose|What|Which|How|Is|Are|Do|Does|Can|Where|When|Who|Fill|Complete|Select|Match|Write|Circle|True|False|Name|Identify|Find|Read)\b/i;
- for(let i=0;i<lines.length;i++){
-  let m=lines[i].match(/^(\d{1,3})\s*[.)-]?\s+(.+)$/);
-  if(m&&verbs.test(m[2])){starts.push({index:i,number:+m[1],question:m[2]});continue}
-  m=lines[i].match(/^(\d{1,3})\s*[.)-]?$/);
-  if(m&&lines[i+1]&&verbs.test(lines[i+1]))starts.push({index:i,number:+m[1],question:lines[i+1]});
- }
- const result=[];
- for(let j=0;j<starts.length;j++){
-  const st=starts[j],end=j+1<starts.length?starts[j+1].index:lines.length;
-  const tail=lines.slice(st.index+1,end).filter(x=>x!==st.question);
-  const options=new Map();
-  for(const line of tail){
-   // PDF.js may emit A bag B cat or A bag, B cat, or one option per line.
-   const re=/(?:^|\s)([A-D])\s*[.)-]?\s+(.+?)(?=\s+[A-D]\s*[.)-]?\s+|$)/g;
-   for(const m of line.matchAll(re)){
-    const value=m[2].trim();
-    if(value&&!options.has(m[1])&&!/^(?:Page|Unit|LEVEL)\b/i.test(value))options.set(m[1],value);
-   }
-  }
-  if(options.size<2)continue;
-  const region=(page.regions||[]).find(r=>r.questionNumber===st.number);
-  result.push({q:st.question,type:'mcq',options:[...options].sort((a,b)=>a[0].localeCompare(b[0])).map(x=>x[1]),answer:null,ai:false,sourcePage:page.number,sourceQuestionNumber:st.number,unverified:true,originalImport:true,image:region?.image||''});
- }
- return result;
-}
 function splitImportedQuestionBlocks(text){
- const lines=String(text||"").split(/\r?\n/),starts=[];
- for(let i=0;i<lines.length;i++)if(/^\s*\d{1,3}\s*[.)-]?\s+(?=[A-Za-z])/.test(lines[i])||/^\s*\d{1,3}\s*[.)-]?\s*$/.test(lines[i]))starts.push(i);
- return starts.map((v,i)=>lines.slice(v,starts[i+1]??lines.length).join("\n").trim()).filter(x=>x.length>12);
+ const normalized=String(text||"").replace(/\r/g,"\n").replace(/\u00a0/g," ");
+ const lines=normalized.split("\n");
+ const questionStarts=[];
+ for(let i=0;i<lines.length;i++){
+  const line=lines[i].trim();
+  if(/^\d{1,3}\s*[.)-]?\s+(?=[A-Za-z])/.test(line)||/^\d{1,3}[.)-]?$/.test(line))questionStarts.push(i);
+ }
+ const chunks=[];
+ for(let i=0;i<questionStarts.length;i++){
+  const start=questionStarts[i],end=i+1<questionStarts.length?questionStarts[i+1]:lines.length;
+  const block=lines.slice(start,end).join("\n").trim();
+  if(/[A-Za-z]{3,}/.test(block)&&block.length>12)chunks.push(block);
+ }
+ return chunks;
+}
+async function cropQuestionFromPage(image,box){
+ return new Promise(resolve=>{
+  const im=new Image();im.onload=()=>{
+   const coords=box.map(Number);if(coords.some(n=>!Number.isFinite(n))){resolve("");return}
+   const x=Math.max(0,Math.floor(im.width*Math.max(0,coords[0])/1000)),y=Math.max(0,Math.floor(im.height*Math.max(0,coords[1])/1000));
+   const right=Math.min(im.width,Math.ceil(im.width*Math.min(1000,coords[2])/1000)),bottom=Math.min(im.height,Math.ceil(im.height*Math.min(1000,coords[3])/1000));
+   if(right<=x||bottom<=y){resolve("");return}
+   const c=document.createElement("canvas");c.width=right-x;c.height=bottom-y;c.getContext("2d").drawImage(im,x,y,c.width,c.height,0,0,c.width,c.height);
+   resolve(c.toDataURL("image/jpeg",.70));
+  };im.onerror=()=>resolve("");im.src=image;
+ });
 }
 async function importExactQuestions(k,{count,images,status,button}){
- if(!FILE||!FILE.text){status.textContent="⚠ ارفع ملف PDF أو Word أولًا، وتأكد أن النص قابل للاستخراج";return}
+ if(!FILE){status.textContent="⚠ ارفع ملف PDF أو Word أولًا";return}
  const limit=count>0?Math.min(50,count):50;
  const pages=FILE.pages||[{number:1,text:FILE.text,regions:[]}];
  const result=[],warnings=[];button.disabled=true;
@@ -575,12 +562,24 @@ async function importExactQuestions(k,{count,images,status,button}){
   for(const page of pages){
    if(result.length>=limit)break;
    status.textContent=`⏳ استخراج الأسئلة من الصفحة ${page.number}… (${result.length}/${limit})`;
-   // Prefer exact, deterministic transcription; fall back to Workers AI only for unusual layouts.
-   const direct=parseOriginalMCQs(page);
-   if(direct.length){
-    for(const q of direct){if(result.length>=limit)break;if(!images)q.image="";result.push(q)}
+   // Image-only/scanned PDFs: send the rendered page to the Worker vision endpoint.
+   if(page.image && (!page.text || page.text.trim().length<40)){
+    const response=await fetch(AIEP,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({task:"import_page_vision",page:page.number,image:page.image,count:limit-result.length})});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok)throw Error(data.error||`تعذّر تحليل صورة الصفحة ${page.number}`);
+    warnings.push(...(data.warnings||[]));
+    for(const x of data.questions||[]){
+     if(result.length>=limit)break;
+     if(!x.q||typeof x.q!=="string")continue;
+     const options=Array.isArray(x.options)?x.options.filter(z=>typeof z==="string"):[];
+     const answer=typeof x.answer==="string"&&x.answer.trim()?x.answer.trim():null;
+     let crop="";
+     if(images&&Array.isArray(x.box)&&x.box.length===4){crop=await cropQuestionFromPage(page.image,x.box)}
+     result.push({q:x.q,type:"mcq",options,answer,ai:false,sourcePage:page.number,unverified:!answer,image:crop});
+    }
     continue;
    }
+   // Robustly identify numbered questions even if PDF.js puts the number on a separate line.
    const chunks=splitImportedQuestionBlocks(page.text);
    // Keep the model's work page-scoped, so it can associate images using nearby text.
    const metadata=(page.regions||[]).map(({id,page,nearbyText})=>({id,page,nearbyText}));
@@ -595,13 +594,13 @@ async function importExactQuestions(k,{count,images,status,button}){
      const opts=Array.isArray(x.options)?x.options.map(String):[];
      if(!x.q||opts.length<2){warnings.push(`صفحة ${page.number}: سؤال غير مكتمل يحتاج مراجعة`);continue}
      const matching=(page.regions||[]).find(r=>r.id===x.imageId);
-     const q={q:String(x.q),type:"mcq",options:opts,answer:opts.includes(x.answer)?x.answer:null,ai:false,sourcePage:page.number,unverified:!opts.includes(x.answer),originalImport:true,image:images&&matching?matching.image:""};
+     const q={q:String(x.q),type:"mcq",options:opts,answer:opts.includes(x.answer)?x.answer:null,ai:false,sourcePage:page.number,unverified:!opts.includes(x.answer),image:images&&matching?matching.image:""};
      if(images&&!matching&&page.regions?.length)warnings.push(`صفحة ${page.number}: تعذّر تأكيد الصورة المرتبطة بالسؤال: ${q.q.slice(0,45)}`);
      result.push(q);
     }
    }
   }
-  if(!result.length)throw Error("لم أتمكن من قراءة الأسئلة. تحقق من استخراج النص: "+(FILE.pages||[]).map(p=>`صفحة ${p.number}: ${p.text.slice(0,90)}`).join(" | ").slice(0,280)+". إذا كان النص فارغًا فالملف يحتاج OCR.");
+  if(!result.length)throw Error("لم تُستخرج أسئلة مكتملة. قد يكون PDF مصورًا أو تنسيقه غير مدعوم");
   mat(k);S.qs[k].push(...result);save();
   panel(k,`✅ استُورد ${result.length} سؤالًا من الصفحات المحددة. ${result.filter(q=>q.unverified).length} إجابة غير محددة في الملف؛ تحتاج مراجعة قبل الاختبار. ${warnings.length?"⚠ "+warnings.slice(0,3).join("؛ "):""}`);
  }catch(e){status.textContent="⚠ "+e.message}finally{button.disabled=false}
@@ -610,16 +609,15 @@ async function genQs(k){
   const o=srcOf(k);if(!o)return;
   const scope=$("#gScope").value,topic=$("#gTopic").value.trim(),cnt=+$("#gN").value,kind=$("#gT").value,voice=$("#gVoice").value,lvl=$("#gL").value,img=$("#gI").value,extra=clean($("#gX").value.trim()),st=$("#gS"),btn=$("[data-gen]");
   if(scope==="import"){await importExactQuestions(k,{count:cnt,images:img==="file",status:st,button:btn});return}
-  const generationCount=cnt||5;
   const useFile=scope==="same"&&!!(FILE&&(FILE.text||FILE.images.length)),base=(useFile&&FILE.text?FILE.text:srcText(o)).slice(0,6000);
   if(img==="file"&&!(FILE&&FILE.images.length)){st.textContent="⚠ ارفع ملفاً يحتوي صوراً لاستخدام خيار «صور الملف».";return}
   const prompt=[
    scope==="new"?`First create a COMPLETELY NEW ORIGINAL English reading passage of 120-250 words on the topic "${topic||"an engaging age-appropriate everyday adventure"}" at CEFR level ${lvl}. Do NOT use the source passage. Return JSON with {"passage":{"title":"English title","text":"full new passage"},"questions":[...]}. Every question must be answerable from this new passage.`:"",
-   `Create ${generationCount} NEW ${kind==="tf"?"True/False statements":"match"===kind?"matching exercises":"order"===kind?"word ordering puzzles":"missing"===kind?"missing-letter or missing-word exercises":"multiple-choice questions"} for English ${o.skill} at CEFR level ${lvl} (${LVD[lvl]}).`,
+   `Create ${cnt} NEW ${kind==="tf"?"True/False statements":"match"===kind?"matching exercises":"order"===kind?"word ordering puzzles":"missing"===kind?"missing-letter or missing-word exercises":"multiple-choice questions"} for English ${o.skill} at CEFR level ${lvl} (${LVD[lvl]}).`,
    scope==="new"?"All questions must refer exclusively to the newly generated passage; do not reuse existing content.":useFile?"The source below comes from an uploaded document that already contains questions. Study their style, format, difficulty and any pictures, then write NEW similar questions on the same content. Never copy them word for word.":"Base every question strictly on the source text below"+(o.ty==="a"?" (it is an audio transcript: each question must be answerable by listening).":"."),
    `Return valid JSON with a questions array. Every question must have type "${kind}" and q (question). For mcq: options and answer. For tf: options ["True","False"] and answer. For match: pairs array of 3-5 [left,right] pairs. For order: parts array of 3-7 words in the CORRECT order. For missing: q contains blanks "___" and answer is the exact missing text. Ensure the tasks are educational and correct.`,
    img==="ai"?"Add a simple, relevant image to every question.":"",extra?"Teacher notes: "+extra:"","SOURCE:",base].filter(Boolean).join("\n");
-  const body={task:"generate_activity_questions",generationScope:scope,generateNewPassage:scope==="new",topic:topic||undefined,text:scope==="new"?"":base,sourceText:scope==="new"?"":base,prompt,level:lvl,count:generationCount,questionType:kind,requestedQuestionType:kind,availableActivityTypes:[kind],allowedQuestionTypes:[kind],mediaType:voice==="real"?"audio":img==="ai"?"image":"none",requestedMediaTypes:[...(img==="ai"?["image"]:[]),...(voice==="real"?["audio"]:[])],audioFormat:voice==="real"?"mp3":undefined,generateAudio:voice==="real",language:"English",responseFormat:"json",skill:o.skill};
+  const body={task:"generate_activity_questions",generationScope:scope,generateNewPassage:scope==="new",topic:topic||undefined,text:scope==="new"?"":base,sourceText:scope==="new"?"":base,prompt,level:lvl,count:cnt,questionType:kind,requestedQuestionType:kind,availableActivityTypes:[kind],allowedQuestionTypes:[kind],mediaType:voice==="real"?"audio":img==="ai"?"image":"none",requestedMediaTypes:[...(img==="ai"?["image"]:[]),...(voice==="real"?["audio"]:[])],audioFormat:voice==="real"?"mp3":undefined,generateAudio:voice==="real",language:"English",responseFormat:"json",skill:o.skill};
   if(useFile){body.sourceFileName=FILE.name;if(FILE.images.length)body.sourceImages=FILE.images.slice(0,4)}
   btn.disabled=true;st.textContent="⏳ جارٍ التوليد… قد يستغرق حتى دقيقة";
   const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),120000);
@@ -627,7 +625,7 @@ async function genQs(k){
     const r=await fetch(AIEP,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body),signal:ac.signal});
     const raw=await r.text();let data;try{data=JSON.parse(raw)}catch(_){throw new Error("أرجعت الخدمة ردّاً غير صالح")}
     if(!r.ok)throw new Error(data?.error||"فشل الطلب ("+r.status+")");
-    let list=(Array.isArray(data)?data:data.questions||[]).slice(0,generationCount).map(x=>normQ(x,kind)).filter(Boolean);
+    let list=(Array.isArray(data)?data:data.questions||[]).slice(0,cnt).map(x=>normQ(x,kind)).filter(Boolean);
     if(!list.length)throw new Error("لم تُرجع الخدمة أسئلة صالحة بهذا النوع؛ قد يحتاج الـ Worker تحديثاً لدعم النوع المطلوب");
     if(img==="file")list.forEach((q,i)=>q.image=FILE.images[i%FILE.images.length]);
     if(scope==="new"){
