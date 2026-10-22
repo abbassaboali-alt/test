@@ -553,7 +553,7 @@ async function cropQuestionFromPage(image,box){
   };im.onerror=()=>resolve("");im.src=image;
  });
 }
-async function importExactQuestions(k,{count,images,status,button}){
+async function importExactQuestions(k,{count,images,status,button,kind}){
  if(!FILE){status.textContent="⚠ ارفع ملف PDF أو Word أولًا";return}
  const limit=count>0?Math.min(50,count):50;
  const pages=FILE.pages||[{number:1,text:FILE.text,regions:[]}];
@@ -564,7 +564,7 @@ async function importExactQuestions(k,{count,images,status,button}){
    status.textContent=`⏳ استخراج الأسئلة من الصفحة ${page.number}… (${result.length}/${limit})`;
    // Image-only/scanned PDFs: send the rendered page to the Worker vision endpoint.
    if(page.image && (!page.text || page.text.trim().length<40)){
-    const response=await fetch(AIEP,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({task:"import_page_vision",page:page.number,image:page.image,count:limit-result.length})});
+    const response=await fetch(AIEP,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({task:"import_page_vision",page:page.number,image:page.image,count:limit-result.length,questionType:kind})});
     const data=await response.json().catch(()=>({}));
     if(!response.ok)throw Error(data.error||`تعذّر تحليل صورة الصفحة ${page.number}`);
     warnings.push(...(data.warnings||[]));
@@ -574,8 +574,8 @@ async function importExactQuestions(k,{count,images,status,button}){
      const options=Array.isArray(x.options)?x.options.filter(z=>typeof z==="string"):[];
      const answer=typeof x.answer==="string"&&x.answer.trim()?x.answer.trim():null;
      let crop="";
-     if(images&&Array.isArray(x.box)&&x.box.length===4){crop=await cropQuestionFromPage(page.image,x.box)}
-     result.push({q:x.q,type:"mcq",options,answer,ai:false,sourcePage:page.number,unverified:!answer,answerSource:x.answerSource||"uncertain",image:crop});
+     if(images&&Array.isArray(x.pictureBox||x.box)&&(x.pictureBox||x.box).length===4){crop=await cropQuestionFromPage(page.image,x.pictureBox||x.box)}
+     result.push({q:x.q,type:kind,options,answer,ai:false,sourcePage:page.number,unverified:!answer,answerSource:x.answerSource||"uncertain",image:crop});
     }
     continue;
    }
@@ -586,7 +586,7 @@ async function importExactQuestions(k,{count,images,status,button}){
    if(!chunks.length){warnings.push(`صفحة ${page.number}: تنسيق غير معتاد؛ ستتم محاولة قراءة نص الصفحة كاملًا`);if(page.text.trim().length>20)chunks.push(page.text);else continue}
    for(let start=0;start<chunks.length&&result.length<limit;start+=8){
     const segment=chunks.slice(start,start+8).join("\n");
-    const res=await fetch(AIEP,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({task:"import_source_questions",sourceText:`[PAGE ${page.number}]\n${segment}`,sourceImages:metadata,count:Math.min(8,limit-result.length)})});
+    const res=await fetch(AIEP,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({task:"import_source_questions",sourceText:`[PAGE ${page.number}]\n${segment}`,sourceImages:metadata,count:Math.min(8,limit-result.length),questionType:kind})});
     const data=await res.json();if(!res.ok)throw Error(data.error||`فشل استخراج صفحة ${page.number}`);
     warnings.push(...(data.warnings||[]));
     for(const x of data.questions||[]){
@@ -594,7 +594,7 @@ async function importExactQuestions(k,{count,images,status,button}){
      const opts=Array.isArray(x.options)?x.options.map(String):[];
      if(!x.q||opts.length<2){warnings.push(`صفحة ${page.number}: سؤال غير مكتمل يحتاج مراجعة`);continue}
      const matching=(page.regions||[]).find(r=>r.id===x.imageId);
-     const q={q:String(x.q),type:"mcq",options:opts,answer:opts.includes(x.answer)?x.answer:null,ai:false,sourcePage:page.number,unverified:!opts.includes(x.answer),image:images&&matching?matching.image:""};
+     const q={q:String(x.q),type:kind,options:opts,answer:opts.includes(x.answer)?x.answer:null,ai:false,sourcePage:page.number,unverified:!opts.includes(x.answer),image:images&&matching?matching.image:""};
      if(images&&!matching&&page.regions?.length)warnings.push(`صفحة ${page.number}: تعذّر تأكيد الصورة المرتبطة بالسؤال: ${q.q.slice(0,45)}`);
      result.push(q);
     }
@@ -608,7 +608,7 @@ async function importExactQuestions(k,{count,images,status,button}){
 async function genQs(k){
   const o=srcOf(k);if(!o)return;
   const scope=$("#gScope").value,topic=$("#gTopic").value.trim(),cnt=+$("#gN").value,kind=$("#gT").value,voice=$("#gVoice").value,lvl=$("#gL").value,img=$("#gI").value,extra=clean($("#gX").value.trim()),st=$("#gS"),btn=$("[data-gen]");
-  if(scope==="import"){await importExactQuestions(k,{count:cnt,images:img==="file",status:st,button:btn});return}
+  if(scope==="import"){await importExactQuestions(k,{count:cnt,images:img==="file",status:st,button:btn,kind});return}
   const useFile=scope==="same"&&!!(FILE&&(FILE.text||FILE.images.length)),base=(useFile&&FILE.text?FILE.text:srcText(o)).slice(0,6000);
   if(img==="file"&&!(FILE&&FILE.images.length)){st.textContent="⚠ ارفع ملفاً يحتوي صوراً لاستخدام خيار «صور الملف».";return}
   const prompt=[
