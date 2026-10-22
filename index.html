@@ -384,7 +384,7 @@ function qpanel(k){
   return `<div class="qp" data-k="${k}"><h3>❓ أسئلة المصدر (${qs.length})${best!=null?" · أفضل نتيجة "+best+"%":""}</h3>
 <div class="qbar"><button class="cta" data-qstart>▶ ابدأ الاختبار</button>${ty==="a"||ty==="t"?'<button class="cta alt" data-qlisten>🔊 استمع للمقطع</button>':""}<button class="cta alt" data-qreset>↺ الأسئلة الجاهزة</button><button class="cta alt dng" data-clearqs>🗑 حذف جميع أسئلة المصدر</button><button class="cta alt dng" data-removebook>🗑 حذف المصدر بالكامل</button></div>
 <div id="qa"></div>
-<div class="qlist">${qs.map((q,i)=>`<div class="qi"><div dir="ltr" style="text-align:left"><b>${esc(q.q)}</b><small>${q.answer==null?"⚠ الإجابة غير محددة":"✔ "+esc(q.answer)}${q.ai?" · ✨ AI":""}</small>${q.image?`<img class="qimg" src="${q.image}" alt="">`:""}</div><button data-qdel="${i}" aria-label="حذف السؤال">🗑</button></div>`).join("")||'<p class="empty" style="padding:14px">لا توجد أسئلة بعد. ولّدها بالذكاء الاصطناعي بالأسفل.</p>'}</div>
+<div class="qlist">${qs.map((q,i)=>`<div class="qi"><div dir="ltr" style="text-align:left"><b>${esc(q.q)}</b><small>${q.answer==null?"⚠ الإجابة غير محددة":"✔ "+esc(q.answer)+(q.answerSource==="inferred_from_image"?" · مستنتجة من الصورة":"")}${q.ai?" · ✨ AI":""}</small>${q.image?`<img class="qimg" src="${q.image}" alt="">`:""}</div><button data-qdel="${i}" aria-label="حذف السؤال">🗑</button></div>`).join("")||'<p class="empty" style="padding:14px">لا توجد أسئلة بعد. ولّدها بالذكاء الاصطناعي بالأسفل.</p>'}</div>
 <details class="gen" ${qs.length?"":"open"}><summary>✨ توليد أسئلة بالذكاء الاصطناعي</summary>
 <label>محتوى التوليد</label><select id="gScope"><option value="same">📖 أسئلة جديدة من نفس القطعة المعروضة</option><option value="new">✨ توليد قطعة جديدة مستقلة مع أسئلتها وحفظها ككتاب جديد</option><option value="import">📥 استيراد نفس أسئلة PDF / Word حرفيًا</option></select><label>عنوان أو موضوع القطعة الجديدة (عند اختيار قطعة جديدة)</label><input id="gTopic" placeholder="مثال: A day at the zoo" dir="ltr"><label>عدد الأسئلة</label><select id="gN"><option>3</option><option>5</option><option>8</option><option>10</option><option>15</option><option>20</option><option>30</option><option>40</option><option>50</option><option value="0" selected>تلقائي: جميع الأسئلة حتى 50</option></select>
 <label>نوع الأسئلة</label><select id="gT"><option value="mcq">اختيار من متعدد</option><option value="tf">صح / خطأ</option><option value="match">🔗 وصل بين العناصر</option><option value="order">🔢 ترتيب الكلمات أو الجمل</option><option value="missing">🔤 أحرف ناقصة</option></select>
@@ -575,7 +575,7 @@ async function importExactQuestions(k,{count,images,status,button}){
      const answer=typeof x.answer==="string"&&x.answer.trim()?x.answer.trim():null;
      let crop="";
      if(images&&Array.isArray(x.box)&&x.box.length===4){crop=await cropQuestionFromPage(page.image,x.box)}
-     result.push({q:x.q,type:"mcq",options,answer,ai:false,sourcePage:page.number,unverified:!answer,image:crop});
+     result.push({q:x.q,type:"mcq",options,answer,ai:false,sourcePage:page.number,unverified:!answer,answerSource:x.answerSource||"uncertain",image:crop});
     }
     continue;
    }
