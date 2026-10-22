@@ -532,27 +532,32 @@ function normQ(x,kind){
 }
 // Source-preserving MCQ parser for PDF text laid out in two columns.
 function parseOriginalMCQs(page){
- const lines=String(page.text||"").split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+ // Read positional PDF text, including a standalone question number and two-column answers.
+ const lines=String(page.text||'').split(/\r?\n/).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean);
  const starts=[];
+ const verbs=/^(?:Look|Choose|What|Which|How|Is|Are|Do|Does|Can|Where|When|Who|Fill|Complete|Select|Match|Write|Circle|True|False|Name|Identify|Find|Read)\b/i;
  for(let i=0;i<lines.length;i++){
-  let m=lines[i].match(/^(\d{1,3})\s*[.)-]?\s+(?=[A-Za-z])(.+)$/);
-  if(m&&/\b(?:Look|Choose|What|Which|How|Is|Are|Do|Does|Can|Where|When|Who|Fill|Complete|Select|Match|Write|Circle|True|False)\b/i.test(m[2])){starts.push({index:i,number:+m[1],question:m[2].trim()});continue}
-  if(/^\d{1,3}[.)-]?$/.test(lines[i])&&lines[i+1]&&/^(Look|Choose|What|Which|How|Is|Are|Do|Does|Can|Where|When|Who|Fill|Complete|Select|Match|Write|Circle|True|False)/i.test(lines[i+1]))starts.push({index:i,number:parseInt(lines[i],10),question:lines[i+1],separate:true});
+  let m=lines[i].match(/^(\d{1,3})\s*[.)-]?\s+(.+)$/);
+  if(m&&verbs.test(m[2])){starts.push({index:i,number:+m[1],question:m[2]});continue}
+  m=lines[i].match(/^(\d{1,3})\s*[.)-]?$/);
+  if(m&&lines[i+1]&&verbs.test(lines[i+1]))starts.push({index:i,number:+m[1],question:lines[i+1]});
  }
  const result=[];
  for(let j=0;j<starts.length;j++){
-  const st=starts[j],stop=j+1<starts.length?starts[j+1].index:lines.length;
-  const tail=lines.slice(st.index+(st.separate?2:1),stop);
-  const options=[];
+  const st=starts[j],end=j+1<starts.length?starts[j+1].index:lines.length;
+  const tail=lines.slice(st.index+1,end).filter(x=>x!==st.question);
+  const options=new Map();
   for(const line of tail){
-   // Preserve the order A, B, C, D even when PDF places A/B on the same row.
-   const re=/(?:^|\s)([A-D])[.)]?\s+(.+?)(?=\s+[A-D][.)]?\s+|$)/g;
-   let m;while((m=re.exec(line))!==null){const value=m[2].trim();if(value&&!/^(?:Page|Unit|LEVEL)\b/i.test(value))options.push({letter:m[1],text:value})}
+   // PDF.js may emit A bag B cat or A bag, B cat, or one option per line.
+   const re=/(?:^|\s)([A-D])\s*[.)-]?\s+(.+?)(?=\s+[A-D]\s*[.)-]?\s+|$)/g;
+   for(const m of line.matchAll(re)){
+    const value=m[2].trim();
+    if(value&&!options.has(m[1])&&!/^(?:Page|Unit|LEVEL)\b/i.test(value))options.set(m[1],value);
+   }
   }
-  const unique=new Map();for(const o of options)if(!unique.has(o.letter))unique.set(o.letter,o.text);
-  if(unique.size<2)continue;
+  if(options.size<2)continue;
   const region=(page.regions||[]).find(r=>r.questionNumber===st.number);
-  result.push({q:st.question,type:"mcq",options:[...unique].sort((a,b)=>a[0].localeCompare(b[0])).map(x=>x[1]),answer:null,ai:false,sourcePage:page.number,sourceQuestionNumber:st.number,unverified:true,originalImport:true,image:region?.image||""});
+  result.push({q:st.question,type:'mcq',options:[...options].sort((a,b)=>a[0].localeCompare(b[0])).map(x=>x[1]),answer:null,ai:false,sourcePage:page.number,sourceQuestionNumber:st.number,unverified:true,originalImport:true,image:region?.image||''});
  }
  return result;
 }
@@ -596,7 +601,7 @@ async function importExactQuestions(k,{count,images,status,button}){
     }
    }
   }
-  if(!result.length)throw Error("تعذّر التعرف على أسئلة مكتملة. ملفات PDF المصورة بالكامل تحتاج OCR أو تحليل صور.");
+  if(!result.length)throw Error("لم أتمكن من قراءة الأسئلة. تحقق من استخراج النص: "+(FILE.pages||[]).map(p=>`صفحة ${p.number}: ${p.text.slice(0,90)}`).join(" | ").slice(0,280)+". إذا كان النص فارغًا فالملف يحتاج OCR.");
   mat(k);S.qs[k].push(...result);save();
   panel(k,`✅ استُورد ${result.length} سؤالًا من الصفحات المحددة. ${result.filter(q=>q.unverified).length} إجابة غير محددة في الملف؛ تحتاج مراجعة قبل الاختبار. ${warnings.length?"⚠ "+warnings.slice(0,3).join("؛ "):""}`);
  }catch(e){status.textContent="⚠ "+e.message}finally{button.disabled=false}
