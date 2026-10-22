@@ -384,18 +384,19 @@ function qpanel(k){
   return `<div class="qp" data-k="${k}"><h3>❓ أسئلة المصدر (${qs.length})${best!=null?" · أفضل نتيجة "+best+"%":""}</h3>
 <div class="qbar"><button class="cta" data-qstart>▶ ابدأ الاختبار</button>${ty==="a"||ty==="t"?'<button class="cta alt" data-qlisten>🔊 استمع للمقطع</button>':""}<button class="cta alt" data-qreset>↺ الأسئلة الجاهزة</button><button class="cta alt dng" data-clearqs>🗑 حذف جميع أسئلة المصدر</button><button class="cta alt dng" data-removebook>🗑 حذف المصدر بالكامل</button></div>
 <div id="qa"></div>
-<div class="qlist">${qs.map((q,i)=>`<div class="qi"><div dir="ltr" style="text-align:left"><b>${esc(q.q)}</b><small>✔ ${esc(q.answer)}${q.ai?" · ✨ AI":""}</small>${q.image?`<img class="qimg sm" src="${q.image}" alt="">`:""}</div><button data-qdel="${i}" aria-label="حذف السؤال">🗑</button></div>`).join("")||'<p class="empty" style="padding:14px">لا توجد أسئلة بعد. ولّدها بالذكاء الاصطناعي بالأسفل.</p>'}</div>
+<div class="qlist">${qs.map((q,i)=>`<div class="qi"><div dir="ltr" style="text-align:left"><b>${esc(q.q)}</b><small>${q.answer==null?"⚠ الإجابة غير محددة":"✔ "+esc(q.answer)}${q.ai?" · ✨ AI":""}</small>${q.image?`<img class="qimg sm" src="${q.image}" alt="">`:""}</div><button data-qdel="${i}" aria-label="حذف السؤال">🗑</button></div>`).join("")||'<p class="empty" style="padding:14px">لا توجد أسئلة بعد. ولّدها بالذكاء الاصطناعي بالأسفل.</p>'}</div>
 <details class="gen" ${qs.length?"":"open"}><summary>✨ توليد أسئلة بالذكاء الاصطناعي</summary>
-<label>محتوى التوليد</label><select id="gScope"><option value="same">📖 أسئلة جديدة من نفس القطعة المعروضة</option><option value="new">✨ توليد قطعة جديدة مستقلة مع أسئلتها وحفظها ككتاب جديد</option></select><label>عنوان أو موضوع القطعة الجديدة (عند اختيار قطعة جديدة)</label><input id="gTopic" placeholder="مثال: A day at the zoo" dir="ltr"><label>عدد الأسئلة</label><select id="gN"><option>3</option><option selected>5</option><option>8</option><option>10</option></select>
+<label>محتوى التوليد</label><select id="gScope"><option value="same">📖 أسئلة جديدة من نفس القطعة المعروضة</option><option value="new">✨ توليد قطعة جديدة مستقلة مع أسئلتها وحفظها ككتاب جديد</option><option value="import">📥 استيراد نفس أسئلة PDF / Word حرفيًا</option></select><label>عنوان أو موضوع القطعة الجديدة (عند اختيار قطعة جديدة)</label><input id="gTopic" placeholder="مثال: A day at the zoo" dir="ltr"><label>عدد الأسئلة</label><select id="gN"><option>3</option><option selected>5</option><option>8</option><option>10</option><option>15</option><option>20</option><option>30</option><option>40</option><option>50</option><option value="0">تلقائي: جميع الأسئلة حتى 50</option></select>
 <label>نوع الأسئلة</label><select id="gT"><option value="mcq">اختيار من متعدد</option><option value="tf">صح / خطأ</option><option value="match">🔗 وصل بين العناصر</option><option value="order">🔢 ترتيب الكلمات أو الجمل</option><option value="missing">🔤 أحرف ناقصة</option></select>
 <label>الصوت</label><select id="gVoice"><option value="browser">🔊 نطق المتصفح</option><option value="real">🎙️ صوت حقيقي (يتطلب دعم Worker لإنتاج MP3)</option></select><label>المستوى</label><select id="gL">${LV.map(l=>`<option ${l===lv?"selected":""}>${l}</option>`).join("")}</select>
 <label>الصور</label><select id="gI"><option value="none">بدون صور</option><option value="ai">توليد صور بالذكاء الاصطناعي</option><option value="file">استخدام صور الملف المرفوع</option></select>
-<label>📎 ملف Word (.docx) أو PDF (اختياري): يقرأ أسئلته وصوره وينشئ مثلها</label><input type="file" id="gF" accept=".docx,.pdf" onchange="pickFile(this)"><div id="gFi" class="hint">${FILE?"✔ "+esc(FILE.name)+": "+FILE.text.length+" حرف · "+FILE.images.length+" صورة":""}</div>
+<label>📄 الصفحات المطلوبة (PDF): اتركه فارغًا لكل الصفحات، أو اكتب 2 أو 2-4 أو 1,3,5</label><input id="gPages" dir="ltr" placeholder="كل الصفحات" oninput="FILE=null;document.getElementById('gFi').textContent='أعد اختيار الملف لتطبيق نطاق الصفحات'">
+<label>📎 ملف Word (.docx) أو PDF: لاستيراد الأسئلة والصور الأصلية</label><input type="file" id="gF" accept=".docx,.pdf" onchange="pickFile(this)"><div id="gFi" class="hint">${FILE?"✔ "+esc(FILE.name)+": "+FILE.text.length+" حرف · "+FILE.images.length+" صورة":""}</div>
 <label>تعليمات إضافية (اختياري)</label><input id="gX" placeholder="مثال: ركّز على الأفعال الشاذة">
 <p style="margin:12px 0 0"><button class="cta" data-gen>✨ ولّد الأسئلة</button></p><div id="gS" class="hint"></div></details></div>`;
 }
 function panel(k,msg){const p=$("#mdb .qp");if(!p)return;p.outerHTML=qpanel(k);if(msg)$("#qa").innerHTML='<p class="hint">'+msg+"</p>"}
-function qzStart(k){const qs=qsOf(k);if(!qs.length){$("#qa").innerHTML='<p class="hint">لا توجد أسئلة. ولّد بعضها بالذكاء الاصطناعي.</p>';return}QZ={k,qs:sh(qs),i:0,c:0};qzShow()}
+function qzStart(k){const qs=qsOf(k);if(qs.some(q=>q.answer==null&&q.type==="mcq")){document.getElementById("qa").innerHTML="<p class=\"hint\">⚠ بعض الأسئلة المستوردة لا تحتوي على إجابة صحيحة مؤكدة في الملف. راجعها قبل بدء الاختبار.</p>";return}if(!qs.length){$("#qa").innerHTML='<p class="hint">لا توجد أسئلة. ولّد بعضها بالذكاء الاصطناعي.</p>';return}QZ={k,qs:sh(qs),i:0,c:0};qzShow()}
 function qzShow(){
  const a=$("#qa");if(!a||!QZ)return;
  if(QZ.i>=QZ.qs.length){const p=Math.round(QZ.c/QZ.qs.length*100);S.sc[QZ.k]=Math.max(S.sc[QZ.k]||0,p);save();favDirty=true;a.innerHTML=`<div class="qres"><div class="big">${p>=80?"🏆":p>=50?"👍":"💪"}</div><b>${QZ.c} / ${QZ.qs.length}</b> (${p}%)<br><button class="cta" data-qstart style="margin-top:10px">↻ مرة أخرى</button></div>`;return}
@@ -452,6 +453,11 @@ function delSrc(k){
 const LP={},PDFJS="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",PDFW="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js",MAMMOTH="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js";
 const lib=src=>LP[src]||(LP[src]=new Promise((ok,no)=>{const e=document.createElement("script");e.src=src;e.onload=ok;e.onerror=()=>{delete LP[src];no(new Error("تعذّر تحميل مكتبة قراءة الملفات"))};document.head.appendChild(e)}));
 const shrink=(u,mw=640)=>new Promise(ok=>{const i=new Image();i.onload=()=>{const r=Math.min(1,mw/i.width),c=document.createElement("canvas");c.width=Math.max(1,i.width*r);c.height=Math.max(1,i.height*r);c.getContext("2d").drawImage(i,0,0,c.width,c.height);ok(c.toDataURL("image/jpeg",.65))};i.onerror=()=>ok("");i.src=u});
+function parsePageSelection(spec,total){
+ if(!spec.trim())return Array.from({length:Math.min(total,100)},(_,i)=>i+1);
+ const out=new Set();for(const part of spec.split(/[,،]/)){const m=part.trim().match(/^(\d+)(?:\s*-\s*(\d+))?$/);if(!m)throw Error("صيغة الصفحات غير صحيحة. مثال: 1,3,5-7");const a=+m[1],b=m[2]?+m[2]:a;if(a<1||b<a||b>total)throw Error("الصفحات يجب أن تكون بين 1 و "+total);for(let p=a;p<=b;p++)out.add(p)}
+ if(out.size>100)throw Error("الحد الأقصى 100 صفحة في المرة");return [...out].sort((a,b)=>a-b);
+}
 async function readDocx(f){
   await lib(MAMMOTH);
   const r=await mammoth.convertToHtml({arrayBuffer:await f.arrayBuffer()},{convertImage:mammoth.images.imgElement(im=>im.read("base64").then(b=>({src:"data:"+im.contentType+";base64,"+b})))});
@@ -459,16 +465,32 @@ async function readDocx(f){
   d.querySelectorAll("img").forEach(i=>i.replaceWith(d.createTextNode(" [IMAGE] ")));
   const text=[...d.querySelectorAll("p,li,h1,h2,h3,h4,h5,h6")].map(e=>e.textContent.trim()).filter(Boolean).join("\n");
   const images=(await Promise.all(raw.slice(0,8).map(u=>shrink(u)))).filter(Boolean);
-  return{name:f.name,text:clean(text),images};
+  return{name:f.name,text:clean(text),images,pages:[{number:1,text,regions:images.map((image,i)=>({id:"docimg"+(i+1),page:1,nearbyText:"",image}))}],totalPages:1};
 }
 async function readPdf(f){
   await lib(PDFJS);pdfjsLib.GlobalWorkerOptions.workerSrc=PDFW;
-  const doc=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise;let text="";const images=[];
-  for(let p=1;p<=Math.min(doc.numPages,20);p++){
-    const pg=await doc.getPage(p),tc=await pg.getTextContent();let line="";tc.items.forEach(it=>{line+=it.str+(it.hasEOL?"\n":" ")});text+=line+"\n";
-    if(images.length<6){const v=pg.getViewport({scale:Math.min(1.4,640/pg.getViewport({scale:1}).width)}),c=document.createElement("canvas");c.width=v.width;c.height=v.height;await pg.render({canvasContext:c.getContext("2d"),viewport:v}).promise;images.push(c.toDataURL("image/jpeg",.65))}
+  const doc=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise;let text="";const images=[],pages=[];const selected=parsePageSelection(document.getElementById("gPages")?.value||"",doc.numPages);
+  for(const p of selected){
+    const pg=await doc.getPage(p),tc=await pg.getTextContent();
+    const v0=pg.getViewport({scale:1});
+    const items=tc.items.filter(x=>x.str?.trim()).map(x=>({str:x.str,x:x.transform[4],y:x.transform[5]})).sort((a,b)=>b.y-a.y||a.x-b.x);
+    const lines=[];for(const item of items){let line=lines.find(z=>Math.abs(z.y-item.y)<3);if(!line){line={y:item.y,parts:[]};lines.push(line)}line.parts.push(item)}
+    lines.sort((a,b)=>b.y-a.y);const rows=lines.map(z=>({y:z.y,text:z.parts.sort((a,b)=>a.x-b.x).map(a=>a.str).join(" ")}));
+    const pageText=rows.map(z=>z.text).join("\n");text+=`\n[PAGE ${p}]\n`+pageText+"\n";
+    const v=pg.getViewport({scale:Math.min(1.5,900/v0.width)}),c=document.createElement("canvas");c.width=Math.ceil(v.width);c.height=Math.ceil(v.height);await pg.render({canvasContext:c.getContext("2d"),viewport:v}).promise;
+    const questionRows=rows.filter(z=>/^\s*\d{1,3}[.)\s]+(?:Look|Choose|What|Which|How|Is|Are|Do|Does|Can|Where|When|Who|Fill|Complete|Select|Match|Write|Circle|True|False)/i.test(z.text));
+    const regions=[];
+    for(let i=0;i<questionRows.length;i++){
+      const r=questionRows[i],next=questionRows[i+1],upper=Math.min(v0.height,r.y+75),lower=next?Math.min(r.y-12,next.y+35):Math.max(0,r.y-145);
+      const top=Math.max(0,(v0.height-upper)*v.scale),bottom=Math.min(c.height,(v0.height-lower)*v.scale);
+      if(bottom-top<25)continue;
+      const crop=document.createElement("canvas");crop.width=c.width;crop.height=Math.ceil(bottom-top);crop.getContext("2d").drawImage(c,0,top,c.width,bottom-top,0,0,c.width,crop.height);
+      const id=`p${p}q${i+1}`;regions.push({id,page:p,nearbyText:r.text,image:crop.toDataURL("image/jpeg",.75)});
+    }
+    pages.push({number:p,text:pageText,regions});
+    if(images.length<6)images.push(c.toDataURL("image/jpeg",.65));
   }
-  return{name:f.name,text:clean(text.trim()),images};
+  return{name:f.name,text:clean(text.trim()),images,pages,totalPages:doc.numPages};
 }
 async function readFile(f){
   const n=f.name.toLowerCase();if(f.size>15e6)throw new Error("الملف كبير (الحد 15MB)");
@@ -503,9 +525,44 @@ function normQ(x,kind){
  else{if(!answer&&opts.length)answer=opts[0];if(answer&&!opts.includes(answer))opts.push(answer)}
  return opts.length>=2&&answer?{...base,options:opts,answer}:null;
 }
+async function importExactQuestions(k,{count,images,status,button}){
+ if(!FILE||!FILE.text){status.textContent="⚠ ارفع ملف PDF أو Word أولًا، وتأكد أن النص قابل للاستخراج";return}
+ const limit=count>0?Math.min(50,count):50;
+ const pages=FILE.pages||[{number:1,text:FILE.text,regions:[]}];
+ const result=[],warnings=[];button.disabled=true;
+ try{
+  for(const page of pages){
+   if(result.length>=limit)break;
+   status.textContent=`⏳ استخراج الأسئلة من الصفحة ${page.number}… (${result.length}/${limit})`;
+   const chunks=page.text.split(/(?=^\s*\d{1,3}[.)\s]+(?:Look|Choose|What|Which|How|Is|Are|Do|Does|Can|Where|When|Who|Fill|Complete|Select|Match|Write|Circle|True|False))/im).filter(x=>/^\s*\d{1,3}[.)\s]+/.test(x));
+   // Keep the model's work page-scoped, so it can associate images using nearby text.
+   const metadata=(page.regions||[]).map(({id,page,nearbyText})=>({id,page,nearbyText}));
+   if(!chunks.length){warnings.push(`صفحة ${page.number}: لم يتم التعرف على أسئلة مرقمة`);continue}
+   for(let start=0;start<chunks.length&&result.length<limit;start+=8){
+    const segment=chunks.slice(start,start+8).join("\n");
+    const res=await fetch(AIEP,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({task:"import_source_questions",sourceText:`[PAGE ${page.number}]\n${segment}`,sourceImages:metadata,count:Math.min(8,limit-result.length)})});
+    const data=await res.json();if(!res.ok)throw Error(data.error||`فشل استخراج صفحة ${page.number}`);
+    warnings.push(...(data.warnings||[]));
+    for(const x of data.questions||[]){
+     if(result.length>=limit)break;
+     const opts=Array.isArray(x.options)?x.options.map(String):[];
+     if(!x.q||opts.length<2){warnings.push(`صفحة ${page.number}: سؤال غير مكتمل يحتاج مراجعة`);continue}
+     const matching=(page.regions||[]).find(r=>r.id===x.imageId);
+     const q={q:String(x.q),type:"mcq",options:opts,answer:opts.includes(x.answer)?x.answer:null,ai:false,sourcePage:page.number,unverified:!opts.includes(x.answer),image:images&&matching?matching.image:""};
+     if(images&&!matching&&page.regions?.length)warnings.push(`صفحة ${page.number}: تعذّر تأكيد الصورة المرتبطة بالسؤال: ${q.q.slice(0,45)}`);
+     result.push(q);
+    }
+   }
+  }
+  if(!result.length)throw Error("لم تُستخرج أسئلة مكتملة. قد يكون PDF مصورًا أو تنسيقه غير مدعوم");
+  mat(k);S.qs[k].push(...result);save();
+  panel(k,`✅ استُورد ${result.length} سؤالًا من الصفحات المحددة. ${result.filter(q=>q.unverified).length} إجابة غير محددة في الملف؛ تحتاج مراجعة قبل الاختبار. ${warnings.length?"⚠ "+warnings.slice(0,3).join("؛ "):""}`);
+ }catch(e){status.textContent="⚠ "+e.message}finally{button.disabled=false}
+}
 async function genQs(k){
   const o=srcOf(k);if(!o)return;
   const scope=$("#gScope").value,topic=$("#gTopic").value.trim(),cnt=+$("#gN").value,kind=$("#gT").value,voice=$("#gVoice").value,lvl=$("#gL").value,img=$("#gI").value,extra=clean($("#gX").value.trim()),st=$("#gS"),btn=$("[data-gen]");
+  if(scope==="import"){await importExactQuestions(k,{count:cnt,images:img==="file",status:st,button:btn});return}
   const useFile=scope==="same"&&!!(FILE&&(FILE.text||FILE.images.length)),base=(useFile&&FILE.text?FILE.text:srcText(o)).slice(0,6000);
   if(img==="file"&&!(FILE&&FILE.images.length)){st.textContent="⚠ ارفع ملفاً يحتوي صوراً لاستخدام خيار «صور الملف».";return}
   const prompt=[
