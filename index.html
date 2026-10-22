@@ -486,6 +486,7 @@ async function fileToForm(inp){
   catch(e){st.textContent="⚠ "+e.message}
 }
 /* ---------- AI generation: same secure Prudle Worker used by the activities app ---------- */
+const TTSEP="https://api-prudle.abbassaboali.workers.dev/public/library-tts";
 const AIEP="https://api-prudle.abbassaboali.workers.dev/public/library-ai"; // Replace with your deployed general Worker URL
 function normQ(x,kind){
  const text=clean(x?.text||x?.q||x?.question||"").trim();
@@ -543,17 +544,41 @@ async function genQs(k){
   }catch(e){st.textContent="⚠ "+(e.name==="AbortError"?"انتهت المهلة":e.message)+" — تحقق من الاتصال وإعدادات CORS للـ Worker."}
   finally{clearTimeout(tm);btn.disabled=false}
 }
+/* Real voice audio: server must synthesize and persist a playable URL. */
+let pendingGeneratedAudio=null;
+async function createRealAudio(text,title,level){
+ const r=await fetch(TTSEP,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,title,level,language:"en",voice:"female",format:"mp3"})});
+ const ct=r.headers.get("content-type")||"";
+ if(!r.ok){let d={};try{d=await r.json()}catch(_){}throw Error(d.error||"خدمة توليد الصوت غير متاحة ("+r.status+")")}
+ if(ct.includes("audio/")){
+  // Temporary local preview only: for durable storage the Worker must return a persisted URL.
+  throw Error("يجب أن يحفظ Worker الصوت في R2 ويرجع audioUrl دائم، وليس ملفاً مؤقتاً")
+ }
+ const d=await r.json();const u=d.audioUrl||d.url||d.src||d.result?.audioUrl;
+ if(!/^https:\/\//i.test(u||""))throw Error("Worker لم يرجع رابط ملف صوتي محفوظ (audioUrl)");
+ return u;
+}
+async function generateSourceAudio(){
+ const type=$("#fT").value,raw=$("#fC").value.trim(),title=$("#fE").value.trim(),level=$("#fL").value,st=$("#fS"),btn=$("[data-tts-source]");
+ if(!["b","a"].includes(type)){st.textContent="⚠ توليد الصوت مخصص للكتب والمقاطع الصوتية";return}
+ if(!raw){st.textContent="⚠ أنشئ المحتوى أولاً";return}
+ btn.disabled=true;st.textContent="⏳ جارٍ توليد الصوت الحقيقي وحفظه…";
+ try{pendingGeneratedAudio={url:await createRealAudio(raw,title,level),text:raw};st.textContent="✅ تم إنشاء الصوت الحقيقي. اضغط حفظ المصدر لإرفاقه بالكتاب."}
+ catch(e){pendingGeneratedAudio=null;st.textContent="⚠ "+e.message+". يجب إضافة مسار /public/library-tts إلى Worker مع تخزين R2."}
+ finally{btn.disabled=false}
+}
 /* ---------- Add a new source ---------- */
 const HINTS={b:"ألصق النص. افصل الصفحات بسطر فارغ (وإلا قسّمناه كل جملتين).",a:"اكتب كل جملة في سطر؛ ستُنطق بالتتابع.",v:"كل سطر: word = المعنى",g:"السطر الأول: الشرح. ثم كل مثال في سطر: English sentence = الترجمة",t:"كل سطر: A: الجملة | الترجمة (الترجمة اختيارية) ثم B: …",r:"السطر الأول: الرابط (https://…) ثم وصف قصير"};
 const fHint=()=>{$("#fHint").textContent=HINTS[$("#fT").value]};
 function openAdd(){
+  pendingGeneratedAudio=null;
   $("#mdb").innerHTML=`<div class="qp"><h3>➕ إضافة مصدر جديد</h3>
 <label>النوع</label><select id="fT" onchange="fHint()"><option value="b">📚 كتاب / قطعة قراءة</option><option value="a">🎧 مقطع صوتي</option><option value="v">🔤 مجموعة كلمات</option><option value="g">✍️ درس قواعد</option><option value="t">💬 محادثة</option><option value="r">🧭 رابط / مصدر خارجي</option></select>
 <label>العنوان (English)</label><input id="fE" dir="ltr"><label>العنوان بالعربية (اختياري)</label><input id="fA">
 <label>المستوى</label><select id="fL">${LV.map(l=>`<option ${l==="A2"?"selected":""}>${l}</option>`).join("")}</select>
 <label>المحتوى</label><textarea id="fC" rows="8" dir="ltr"></textarea><div class="hint" id="fHint"></div>
 <label>أو ارفع ملف Word (.docx) / PDF لاستخراج النص تلقائياً</label><input type="file" accept=".docx,.pdf" onchange="fileToForm(this)">
-<label>فكرة المصدر الجديد بالذكاء الاصطناعي (اختياري)</label><input id="fTopic" placeholder="مثال: A1 story about animals / airport conversation"><p style="margin:12px 0"><button class="cta alt" data-aisource>✨ إنشاء محتوى المصدر بالذكاء الاصطناعي</button></p><p style="margin:14px 0 0"><button class="cta" data-addsave>حفظ المصدر</button></p><div class="hint" id="fS"></div></div>`;
+<label>فكرة المصدر الجديد بالذكاء الاصطناعي (اختياري)</label><input id="fTopic" placeholder="مثال: A1 story about animals / airport conversation"><p style="margin:12px 0"><button class="cta alt" data-aisource>✨ إنشاء محتوى المصدر بالذكاء الاصطناعي مع صوت إنجليزي حقيقي</button></p><p style="margin:14px 0 0"><button class="cta" data-addsave>حفظ المصدر</button></p><div class="hint" id="fS"></div></div>`;
   $("#md").hidden=false;fHint();
 }
 async function generateSource(){
@@ -573,7 +598,16 @@ async function generateSource(){
  if(!$("#fC").value.trim())throw Error("الـ Worker لم يرجع محتوى مصدراً؛ يحتاج دعم generate_learning_source");
  if(!$("#fE").value)$("#fE").value=out.title||topic;
  if(!$("#fA").value)$("#fA").value=out.arabicTitle||"";
- st.textContent="✅ تم إنشاء المحتوى. راجعه ثم اضغط حفظ المصدر.";
+ pendingGeneratedAudio=null;
+ if(["b","a"].includes(type)){
+   st.textContent="⏳ تم إنشاء المحتوى. جارٍ توليد الصوت الإنجليزي الحقيقي وحفظه…";
+   try{
+     const audioText=$("#fC").value.trim();
+     const audioUrl=await createRealAudio(audioText,$("#fE").value.trim(),level);
+     pendingGeneratedAudio={url:audioUrl,text:audioText};
+     st.textContent="✅ تم إنشاء المحتوى والصوت الإنجليزي الحقيقي وحفظ ملف الصوت. اضغط حفظ المصدر.";
+   }catch(audioError){st.textContent="⚠ تم إنشاء المحتوى، لكن تعذر توليد الصوت: "+audioError.message+". أعد الضغط على زر الإنشاء للمحاولة.";}
+ }else st.textContent="✅ تم إنشاء المحتوى. اضغط حفظ المصدر.";
  }catch(e){st.textContent="⚠ "+(e.name==="AbortError"?"انتهت مهلة الاتصال":e.message)}
  finally{clearTimeout(timer);btn.disabled=false}
 }
@@ -588,7 +622,8 @@ function addSave(){
   else if(ty==="g"){x.r=lines[0];x.ex=lines.slice(1).map(z=>z.split(/\s*=\s*/)).map(a=>[a[0],a[1]||""]);x.q=null}
   else if(ty==="t")x.x=lines.map((z,i)=>{const m=z.match(/^([AB])\s*:\s*(.*)$/i),p=(m?m[2]:z).split("|");return[m?m[1].toUpperCase():(i%2?"B":"A"),p[0].trim(),(p[1]||"").trim()]});
   else{x.u=lines[0].replace(/["\s]/g,"");if(!/^https:\/\//.test(x.u))return fs("السطر الأول يجب أن يكون رابطاً يبدأ بـ https://");x.d=lines.slice(1).join(" ")||t;x.ta=x.d;x.e="🔗"}
-  TY[ty][1].push(x);(S.custom[ty]=S.custom[ty]||[]).push(x);save();view();openQs(ty+":"+x.id);
+  if(pendingGeneratedAudio&&pendingGeneratedAudio.text===raw&&["b","a"].includes(ty))x.src=pendingGeneratedAudio.url;
+  TY[ty][1].push(x);(S.custom[ty]=S.custom[ty]||[]).push(x);save();view();if(ty==="b")reader(x.id,0);else openItem(ty+":"+x.id);
 }
 /* Scroll: parallax wall + books sway with scroll speed */
 let ly=scrollY,sw=0,tk=0;const root=document.documentElement;
@@ -626,15 +661,19 @@ function reader(id,i){
   const b=BOOKS.find(x=>x.id===id);i=Math.max(0,Math.min(i,b.p.length-1));
   S.read[id]=i;S.last=id;save();
   const[em,en,ar]=b.p[i],rd=$("#rd");rd.hidden=false;rd.dataset.b=id;rd.dataset.i=i;
-  rd.innerHTML=`<div class="rin"><div class="rtop"><button class="back" data-x>✕ إغلاق</button><b>${b.t}</b><span>${i+1} / ${b.p.length}</span></div><div class="pgw"><div class="pg"><div class="sc">${em}</div><p class="tx" dir="ltr">${en.split(" ").map(w=>`<span class="w">${w}</span>`).join(" ")}</p><p class="ar" id="tr" hidden>${ar}</p><p class="gl" id="gl">اضغط على أي كلمة لتسمعها وتعرف معناها</p></div></div><div class="rc"><button class="cta alt" data-pv ${i?"":"disabled"}>السابق</button><button class="cta" data-rd>🔊 اقرأ الصفحة</button><button class="cta alt" data-trn ${ar?"":"hidden"}>ع ترجمة</button><button class="cta alt" data-qs>❓ الأسئلة</button><button class="cta" data-nx>${i<b.p.length-1?"التالي":"اختبرني ❓"}</button></div></div>`;
+  rd.innerHTML=`<div class="rin"><div class="rtop"><button class="back" data-x>✕ إغلاق</button><b>${b.t}</b><span>${i+1} / ${b.p.length}</span></div><div class="pgw"><div class="pg"><div class="sc">${em}</div><p class="tx" dir="ltr">${en.split(" ").map(w=>`<span class="w">${w}</span>`).join(" ")}</p><p class="ar" id="tr" hidden>${ar}</p><p class="gl" id="gl">اضغط على أي كلمة لتسمعها وتعرف معناها</p></div></div><div class="rc"><button class="cta alt" data-pv ${i?"":"disabled"}>السابق</button><button class="cta" data-rd>🔊 اقرأ الصفحة</button>${b.src?`<button class="cta alt" data-bookaudio>🎧 استمع للكتاب كاملًا</button>`:""}<button class="cta alt" data-trn ${ar?"":"hidden"}>ع ترجمة</button><button class="cta alt" data-qs>❓ الأسئلة</button><button class="cta" data-nx>${i<b.p.length-1?"التالي":"اختبرني ❓"}</button></div></div>`;
 }
 $("#rd").addEventListener("click",e=>{
   const rd=e.currentTarget,id=rd.dataset.b,i=+rd.dataset.i,t=e.target,b=BOOKS.find(x=>x.id===id);
-  if(t.closest("[data-x]")){halt();rd.hidden=true;refresh();return}
-  if(t.closest("[data-pv]")){halt();return reader(id,i-1)}
-  if(t.closest("[data-nx]")){halt();if(i<b.p.length-1)return reader(id,i+1);halt();openQs("b:"+id);return}
+  if(t.closest("[data-x]")){halt();rd.querySelectorAll("audio").forEach(a=>a.pause());rd.hidden=true;refresh();return}
+  if(t.closest("[data-pv]")){rd.querySelectorAll("audio").forEach(a=>a.pause());halt();return reader(id,i-1)}
+  if(t.closest("[data-nx]")){rd.querySelectorAll("audio").forEach(a=>a.pause());halt();if(i<b.p.length-1)return reader(id,i+1);halt();openQs("b:"+id);return}
   if(t.closest("[data-qs]")){halt();openQs("b:"+id);return}
   if(t.closest("[data-trn]")){$("#tr").hidden=!$("#tr").hidden;return}
+  if(t.closest("[data-bookaudio]")){
+    halt();const old=rd.querySelector("audio[data-realbook]");if(old){old.paused?old.play():old.pause();return}
+    const player=document.createElement("audio");player.controls=true;player.dataset.realbook="1";player.src=b.src;player.style.cssText="display:block;width:min(100%,600px);margin:12px auto";rd.querySelector(".rc").after(player);player.play().catch(()=>{});return;
+  }
   if(t.closest("[data-rd]")){
     halt();const ns=[...rd.querySelectorAll(".w")],ws=ns.map(n=>n.textContent),u=new SpeechSynthesisUtterance(ws.join(" ")),st=[];let p=0;
     ws.forEach(w=>{st.push(p);p+=w.length+1});
@@ -670,6 +709,7 @@ app.addEventListener("click",e=>{
   if(el=t.closest("[data-add]")){openAdd();return}
   if(el=t.closest("[data-addsave]")){addSave();return}
   if(el=t.closest("[data-aisource]")){generateSource();return}
+
   if(el=t.closest("[data-speakq]")){sayT(QZ?.qs[QZ.i]?.q||"");return}
   if(el=t.closest("[data-part]")){qzPart(el);return}
   if(el=t.closest("[data-left],[data-right]")){qzMatch(el);return}
