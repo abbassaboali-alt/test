@@ -546,6 +546,7 @@ async function genQs(k){
 }
 /* Real voice audio: server must synthesize and persist a playable URL. */
 let pendingGeneratedAudio=null;
+let pendingSourceQuestions=[];
 async function createRealAudio(text,title,level){
  const r=await fetch(TTSEP,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,title,level,language:"en",voice:"female",format:"mp3"})});
  const ct=r.headers.get("content-type")||"";
@@ -571,20 +572,20 @@ async function generateSourceAudio(){
 const HINTS={b:"ألصق النص. افصل الصفحات بسطر فارغ (وإلا قسّمناه كل جملتين).",a:"اكتب كل جملة في سطر؛ ستُنطق بالتتابع.",v:"كل سطر: word = المعنى",g:"السطر الأول: الشرح. ثم كل مثال في سطر: English sentence = الترجمة",t:"كل سطر: A: الجملة | الترجمة (الترجمة اختيارية) ثم B: …",r:"السطر الأول: الرابط (https://…) ثم وصف قصير"};
 const fHint=()=>{$("#fHint").textContent=HINTS[$("#fT").value]};
 function openAdd(){
-  pendingGeneratedAudio=null;
+  pendingGeneratedAudio=null;pendingSourceQuestions=[];
   $("#mdb").innerHTML=`<div class="qp"><h3>➕ إضافة مصدر جديد</h3>
 <label>النوع</label><select id="fT" onchange="fHint()"><option value="b">📚 كتاب / قطعة قراءة</option><option value="a">🎧 مقطع صوتي</option><option value="v">🔤 مجموعة كلمات</option><option value="g">✍️ درس قواعد</option><option value="t">💬 محادثة</option><option value="r">🧭 رابط / مصدر خارجي</option></select>
 <label>العنوان (English)</label><input id="fE" dir="ltr"><label>العنوان بالعربية (اختياري)</label><input id="fA">
 <label>المستوى</label><select id="fL">${LV.map(l=>`<option ${l==="A2"?"selected":""}>${l}</option>`).join("")}</select>
 <label>المحتوى</label><textarea id="fC" rows="8" dir="ltr"></textarea><div class="hint" id="fHint"></div>
 <label>أو ارفع ملف Word (.docx) / PDF لاستخراج النص تلقائياً</label><input type="file" accept=".docx,.pdf" onchange="fileToForm(this)">
-<label>فكرة المصدر الجديد بالذكاء الاصطناعي (اختياري)</label><input id="fTopic" placeholder="مثال: A1 story about animals / airport conversation"><p style="margin:12px 0"><button class="cta alt" data-aisource>✨ إنشاء محتوى المصدر بالذكاء الاصطناعي مع صوت إنجليزي حقيقي</button></p><p style="margin:14px 0 0"><button class="cta" data-addsave>حفظ المصدر</button></p><div class="hint" id="fS"></div></div>`;
+<label>عدد الأسئلة عند إنشاء المصدر</label><select id="fQN"><option value="0">بدون أسئلة</option><option value="3">3 أسئلة</option><option value="5" selected>5 أسئلة</option><option value="8">8 أسئلة</option><option value="10">10 أسئلة</option><option value="15">15 سؤالًا</option></select><label>نوع الأسئلة</label><select id="fQT"><option value="mcq">اختيار من متعدد</option><option value="match">وصل / مطابقة</option><option value="order">ترتيب كلمات</option><option value="missing">حروف أو كلمات ناقصة</option><option value="tf">صح أو خطأ</option></select><label>فكرة المصدر الجديد بالذكاء الاصطناعي (اختياري)</label><input id="fTopic" placeholder="مثال: A1 story about animals / airport conversation"><p style="margin:12px 0"><button class="cta alt" data-aisource>✨ إنشاء محتوى المصدر بالذكاء الاصطناعي مع صوت إنجليزي حقيقي</button></p><p style="margin:14px 0 0"><button class="cta" data-addsave>حفظ المصدر</button></p><div class="hint" id="fS"></div></div>`;
   $("#md").hidden=false;fHint();
 }
 async function generateSource(){
  const type=$("#fT").value,level=$("#fL").value,topic=($("#fTopic").value||$("#fE").value).trim(),st=$("#fS");
  if(!topic){st.textContent="⚠ اكتب عنواناً أو فكرة المصدر أولاً";return}
- const btn=$("[data-aisource]");btn.disabled=true;st.textContent="⏳ جارٍ إنشاء محتوى المصدر…";
+ const btn=$("[data-aisource]");btn.disabled=true;pendingSourceQuestions=[];st.textContent="⏳ جارٍ إنشاء محتوى المصدر…";
  const instruction={b:"Write an original short English reading story in 4-6 paragraphs separated by blank lines.",a:"Write 8-12 short English listening sentences, one per line.",v:"Write 12 English vocabulary entries in the format English = Arabic, one per line.",g:"Write a clear Arabic grammar explanation on the first line, then 8 English example = Arabic translation lines.",t:"Write a natural English conversation of 10 turns, formatted A: English | Arabic and B: English | Arabic.",r:"Provide a trustworthy HTTPS learning resource URL on first line and a description on second line."}[type];
  const prompt=`Create learning source material for level ${level} (${LVD[level]}), topic: ${topic}. ${instruction} Return JSON object {"title":"English title","arabicTitle":"Arabic title","content":"plain text in required format"}. No markdown fences.`;
  const ac=new AbortController(),timer=setTimeout(()=>ac.abort(),90000);
@@ -599,13 +600,23 @@ async function generateSource(){
  if(!$("#fE").value)$("#fE").value=out.title||topic;
  if(!$("#fA").value)$("#fA").value=out.arabicTitle||"";
  pendingGeneratedAudio=null;
+ const questionCount=Number($("#fQN").value)||0, questionType=$("#fQT").value;
+ if(questionCount){
+   st.textContent="⏳ تم إنشاء القطعة. جارٍ إعداد "+questionCount+" أسئلة…";
+   try{
+     const qres=await fetch(AIEP,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({task:"generate_activity_questions",generationScope:"same",generateNewPassage:false,sourceText:$("#fC").value.trim(),text:$("#fC").value.trim(),level,count:questionCount,questionType,topic,responseFormat:"json"})});
+     const qdata=await qres.json();if(!qres.ok)throw Error(qdata.error||"تعذر إنشاء الأسئلة");
+     pendingSourceQuestions=(qdata.questions||[]).map(q=>normQ(q,questionType)).filter(Boolean).slice(0,questionCount);
+     if(!pendingSourceQuestions.length)throw Error("لم ترجع أسئلة صالحة");
+   }catch(qerror){pendingSourceQuestions=[];st.textContent="⚠ تم إنشاء النص ولكن تعذر إنشاء الأسئلة: "+qerror.message;}
+ }
  if(["b","a"].includes(type)){
    st.textContent="⏳ تم إنشاء المحتوى. جارٍ توليد الصوت الإنجليزي الحقيقي وحفظه…";
    try{
      const audioText=$("#fC").value.trim();
      const audioUrl=await createRealAudio(audioText,$("#fE").value.trim(),level);
      pendingGeneratedAudio={url:audioUrl,text:audioText};
-     st.textContent="✅ تم إنشاء المحتوى والصوت الإنجليزي الحقيقي وحفظ ملف الصوت. اضغط حفظ المصدر.";
+     st.textContent="✅ تم إنشاء النص والصوت الحقيقي"+(pendingSourceQuestions.length?" و"+pendingSourceQuestions.length+" أسئلة":"")+". اضغط حفظ المصدر.";
    }catch(audioError){st.textContent="⚠ تم إنشاء المحتوى، لكن تعذر توليد الصوت: "+audioError.message+". أعد الضغط على زر الإنشاء للمحاولة.";}
  }else st.textContent="✅ تم إنشاء المحتوى. اضغط حفظ المصدر.";
  }catch(e){st.textContent="⚠ "+(e.name==="AbortError"?"انتهت مهلة الاتصال":e.message)}
@@ -616,14 +627,14 @@ function addSave(){
   const ty=$("#fT").value,t=clean($("#fE").value.trim()),ta=clean($("#fA").value.trim()),l=$("#fL").value,raw=clean($("#fC").value.trim()),fs=m=>{$("#fS").textContent="⚠ "+m};
   if(!t)return fs("اكتب العنوان");if(!raw)return fs("اكتب المحتوى أو ارفع ملفاً");
   const lines=raw.split(/\n+/).map(z=>z.trim()).filter(Boolean),x={id:"c"+Date.now().toString(36),t,ta:ta||t,l,custom:1};
-  if(ty==="b"){const paras=raw.split(/\n\s*\n/).map(z=>z.trim().replace(/\s+/g," ")).filter(Boolean);x.e="📖";x.c=[];x.g={};x.p=(paras.length>1?paras:sentences(raw,2)).map(p=>["📖",p,""])}
+  if(ty==="b"){const paras=raw.split(/\n\s*\n/).map(z=>z.trim().replace(/\s+/g," ")).filter(Boolean);x.e="📖";x.c=["#214e5a","#357d88"];x.g={};x.p=(paras.length>1?paras:sentences(raw,2)).map(p=>["📖",p,""])}
   else if(ty==="a")x.s=lines.length>1?lines:sentences(raw,1);
   else if(ty==="v"){x.w=lines.map(z=>z.split(/\s*=\s*|\s+[-–:]\s+/)).filter(a=>a.length>1).map(a=>[a[0],a.slice(1).join(" - ")]);if(!x.w.length)return fs("اكتب كل كلمة بصيغة: word = المعنى")}
   else if(ty==="g"){x.r=lines[0];x.ex=lines.slice(1).map(z=>z.split(/\s*=\s*/)).map(a=>[a[0],a[1]||""]);x.q=null}
   else if(ty==="t")x.x=lines.map((z,i)=>{const m=z.match(/^([AB])\s*:\s*(.*)$/i),p=(m?m[2]:z).split("|");return[m?m[1].toUpperCase():(i%2?"B":"A"),p[0].trim(),(p[1]||"").trim()]});
   else{x.u=lines[0].replace(/["\s]/g,"");if(!/^https:\/\//.test(x.u))return fs("السطر الأول يجب أن يكون رابطاً يبدأ بـ https://");x.d=lines.slice(1).join(" ")||t;x.ta=x.d;x.e="🔗"}
   if(pendingGeneratedAudio&&pendingGeneratedAudio.text===raw&&["b","a"].includes(ty))x.src=pendingGeneratedAudio.url;
-  TY[ty][1].push(x);(S.custom[ty]=S.custom[ty]||[]).push(x);save();view();if(ty==="b")reader(x.id,0);else openItem(ty+":"+x.id);
+  TY[ty][1].push(x);(S.custom[ty]=S.custom[ty]||[]).push(x);if(pendingSourceQuestions.length){S.qs=S.qs||{};S.qs[ty+":"+x.id]=pendingSourceQuestions;}save();view();if(ty==="b")reader(x.id,0);else openItem(ty+":"+x.id);
 }
 /* Scroll: parallax wall + books sway with scroll speed */
 let ly=scrollY,sw=0,tk=0;const root=document.documentElement;
@@ -659,28 +670,42 @@ function playTalk(card,from=0,toggle=true){
 /* ---------- Reader ---------- */
 function reader(id,i){
   const b=BOOKS.find(x=>x.id===id);i=Math.max(0,Math.min(i,b.p.length-1));
+  document.querySelectorAll("#rd audio").forEach(a=>{a.pause();a.remove()});
   S.read[id]=i;S.last=id;save();
   const[em,en,ar]=b.p[i],rd=$("#rd");rd.hidden=false;rd.dataset.b=id;rd.dataset.i=i;
   rd.innerHTML=`<div class="rin"><div class="rtop"><button class="back" data-x>✕ إغلاق</button><b>${b.t}</b><span>${i+1} / ${b.p.length}</span></div><div class="pgw"><div class="pg"><div class="sc">${em}</div><p class="tx" dir="ltr">${en.split(" ").map(w=>`<span class="w">${w}</span>`).join(" ")}</p><p class="ar" id="tr" hidden>${ar}</p><p class="gl" id="gl">اضغط على أي كلمة لتسمعها وتعرف معناها</p></div></div><div class="rc"><button class="cta alt" data-pv ${i?"":"disabled"}>السابق</button><button class="cta" data-rd>🔊 اقرأ الصفحة</button>${b.src?`<button class="cta alt" data-bookaudio>🎧 استمع للكتاب كاملًا</button>`:""}<button class="cta alt" data-trn ${ar?"":"hidden"}>ع ترجمة</button><button class="cta alt" data-qs>❓ الأسئلة</button><button class="cta" data-nx>${i<b.p.length-1?"التالي":"اختبرني ❓"}</button></div></div>`;
 }
-$("#rd").addEventListener("click",e=>{
+$("#rd").addEventListener("click",async e=>{
   const rd=e.currentTarget,id=rd.dataset.b,i=+rd.dataset.i,t=e.target,b=BOOKS.find(x=>x.id===id);
   if(t.closest("[data-x]")){halt();rd.querySelectorAll("audio").forEach(a=>a.pause());rd.hidden=true;refresh();return}
   if(t.closest("[data-pv]")){rd.querySelectorAll("audio").forEach(a=>a.pause());halt();return reader(id,i-1)}
   if(t.closest("[data-nx]")){rd.querySelectorAll("audio").forEach(a=>a.pause());halt();if(i<b.p.length-1)return reader(id,i+1);halt();openQs("b:"+id);return}
-  if(t.closest("[data-qs]")){halt();openQs("b:"+id);return}
+  if(t.closest("[data-qs]")){rd.querySelectorAll("audio").forEach(a=>a.pause());halt();openQs("b:"+id);return}
   if(t.closest("[data-trn]")){$("#tr").hidden=!$("#tr").hidden;return}
   if(t.closest("[data-bookaudio]")){
     halt();const old=rd.querySelector("audio[data-realbook]");if(old){old.paused?old.play():old.pause();return}
     const player=document.createElement("audio");player.controls=true;player.dataset.realbook="1";player.src=b.src;player.style.cssText="display:block;width:min(100%,600px);margin:12px auto";rd.querySelector(".rc").after(player);player.play().catch(()=>{});return;
   }
   if(t.closest("[data-rd]")){
-    halt();const ns=[...rd.querySelectorAll(".w")],ws=ns.map(n=>n.textContent),u=new SpeechSynthesisUtterance(ws.join(" ")),st=[];let p=0;
-    ws.forEach(w=>{st.push(p);p+=w.length+1});
-    u.lang="en-US";u.rate=.8;
-    u.onboundary=ev=>{let k=0;st.forEach((s,j)=>{if(s<=ev.charIndex)k=j});ns.forEach((n,j)=>n.classList.toggle("hl",j===k))};
-    u.onend=u.onerror=()=>ns.forEach(n=>n.classList.remove("hl"));
-    try{speechSynthesis.speak(u)}catch(_){}
+    const button=t.closest("[data-rd]");
+    const text=b.p[i][1];
+    const current=rd.querySelector("audio[data-pageaudio]");
+    if(current){if(current.paused){current.play().catch(()=>{});button.textContent="⏸ إيقاف القراءة"}else{current.pause();button.textContent="🔊 اقرأ الصفحة"}return;}
+    if(!b.pageAudio)b.pageAudio={};
+    button.disabled=true;button.textContent="⏳ جارٍ تجهيز الصوت الحقيقي…";
+    try{
+      if(!b.pageAudio[i]){
+        b.pageAudio[i]=await createRealAudio(text,b.t+" — page "+(i+1),b.l);
+        save();
+      }
+      if(rd.dataset.b!==id||Number(rd.dataset.i)!==i)return;
+      const player=document.createElement("audio");player.dataset.pageaudio="1";player.src=b.pageAudio[i];player.preload="auto";player.style.display="none";
+      rd.appendChild(player);
+      player.onended=()=>{button.textContent="🔊 اقرأ الصفحة"};
+      player.onpause=()=>{button.textContent="🔊 اقرأ الصفحة"};
+      await player.play();button.textContent="⏸ إيقاف القراءة";
+    }catch(err){button.textContent="⚠ تعذر تشغيل الصوت الحقيقي";alert("تعذر توليد صوت الصفحة الحقيقي: "+err.message)}
+    finally{button.disabled=false}
     return;
   }
   const w=t.closest(".w");
