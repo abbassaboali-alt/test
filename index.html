@@ -486,7 +486,7 @@ async function fileToForm(inp){
   catch(e){st.textContent="⚠ "+e.message}
 }
 /* ---------- AI generation: same secure Prudle Worker used by the activities app ---------- */
-const TTSEP="https://api-prudle.abbassaboali.workers.dev/public/library-tts";
+const TTSEP="https://muddy-frost-dfd0.abbassaboali.workers.dev";
 const AIEP="https://api-prudle.abbassaboali.workers.dev/public/library-ai"; // Replace with your deployed general Worker URL
 function normQ(x,kind){
  const text=clean(x?.text||x?.q||x?.question||"").trim();
@@ -549,15 +549,31 @@ let pendingGeneratedAudio=null;
 let pendingGeneratedPages=null;
 let pendingSourceQuestions=[];
 async function createRealAudio(text,title,level){
- const r=await fetch(TTSEP,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,title,level,language:"en",voice:"female",format:"mp3"})});
- const ct=r.headers.get("content-type")||"";
- if(!r.ok){let d={};try{d=await r.json()}catch(_){}throw Error(d.error||"خدمة توليد الصوت غير متاحة ("+r.status+")")}
- if(ct.includes("audio/")){
-  // Temporary local preview only: for durable storage the Worker must return a persisted URL.
-  throw Error("يجب أن يحفظ Worker الصوت في R2 ويرجع audioUrl دائم، وليس ملفاً مؤقتاً")
- }
- const d=await r.json();const u=d.audioUrl||d.url||d.src||d.result?.audioUrl;
- if(!/^https:\/\//i.test(u||""))throw Error("Worker لم يرجع رابط ملف صوتي محفوظ (audioUrl)");
+ // Same natural AI voice request used by Prudle Games & Activities-9.
+ // Uses the already-running game audio service; no new R2 binding or Worker route.
+ const endpoint="https://muddy-frost-dfd0.abbassaboali.workers.dev";
+ const audioText=String(text||"").trim();
+ if(!audioText)throw Error("Audio text is empty.");
+ const r=await fetch(endpoint,{
+  method:"POST",headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({
+   task:"generate_question_media",mediaType:"audio",questionText:audioText,
+   text:audioText,audioText:audioText,
+   prompt:["Create natural human-like English audio for an ESL learner.",
+    "Read ONLY the supplied text; do not add explanations.",
+    "Use a warm, realistic native English voice.",
+    "Use natural rhythm, stress, intonation and pauses.",
+    "Do not sound robotic or like browser text-to-speech.",
+    "CEFR level: "+(level||"A1")+".","Text:",audioText].join("\n"),
+   mediaPrompt:"Natural realistic human English voice; native pronunciation; clear ESL delivery; no music; no sound effects.",
+   voiceStyle:"natural realistic human ESL voice",accent:"American English"
+  })
+ });
+ const raw=await r.text();let d={};
+ try{d=raw?JSON.parse(raw):{}}catch(_){throw Error("Audio service returned invalid JSON.")}
+ if(!r.ok)throw Error(d?.error||"Audio generation failed ("+r.status+").");
+ const u=String(d?.url||d?.mediaUrl||d?.audioUrl||d?.audio_url||"").trim();
+ if(!/^https:\/\//i.test(u))throw Error("Audio service did not return a playable URL.");
  return u;
 }
 async function generateSourceAudio(){
@@ -566,7 +582,7 @@ async function generateSourceAudio(){
  if(!raw){st.textContent="⚠ أنشئ المحتوى أولاً";return}
  btn.disabled=true;st.textContent="⏳ جارٍ توليد الصوت الحقيقي وحفظه…";
  try{pendingGeneratedAudio={url:await createRealAudio(raw,title,level),text:raw};st.textContent="✅ تم إنشاء الصوت الحقيقي. اضغط حفظ المصدر لإرفاقه بالكتاب."}
- catch(e){pendingGeneratedAudio=null;st.textContent="⚠ "+e.message+". يجب إضافة مسار /public/library-tts إلى Worker مع تخزين R2."}
+ catch(e){pendingGeneratedAudio=null;st.textContent="⚠ "+e.message+". تحقق من خدمة الصوت الموجودة في Prudle Games & Activities."}
  finally{btn.disabled=false}
 }
 /* ---------- Add a new source ---------- */
