@@ -254,6 +254,9 @@ img,video,canvas,svg{max-width:100%}
 #rd .tx .w.reading-done{background:#c9f0df;color:#193c30;border-radius:4px}
 #rd .tx{line-height:2.1;overflow-wrap:anywhere}
 @media(max-width:600px){#rd .tx{font-size:clamp(18px,4.6vw,23px);line-height:2.25}#rd .tx .w{display:inline-block;padding:0 3px}}
+.speed-control{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin:0 auto 12px;padding:10px 14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,210,138,.35);border-radius:14px;color:#fff5df;font:700 15px Cairo,Tahoma,sans-serif}
+.speed-control select{min-width:190px;max-width:100%;border:1px solid #d7aa68;border-radius:10px;background:#fff8e9;color:#31200e;padding:9px 12px;font:700 15px Cairo,Tahoma,sans-serif}
+@media(max-width:500px){.speed-control{flex-direction:column;gap:6px}.speed-control select{width:100%}}
 </style>
 <style>.sourcePages{max-height:65vh;overflow:auto;margin-top:12px}.sourcePage{background:#fff8e9;color:#23170d;margin:9px 0;border-radius:12px;padding:12px}.sourcePage summary{font-weight:800;cursor:pointer}.sourceText{direction:ltr;text-align:left;white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.7 Arial,sans-serif;padding:15px;background:white;border-radius:9px;margin-top:10px}.bk .tt{font-size:13px}</style></head>
 <body>
@@ -385,6 +388,17 @@ const mat=k=>{S.qs=S.qs||{};if(!S.qs[k])S.qs[k]=defQs(k)};
 
 /* ---------- State ---------- */
 let S={fav:[],read:{},last:null},KEY="prudleLib:guest",tab="books",q="",spd=1;
+/* Reading speed: automatic CEFR-level default, with a saved user override. */
+const LEVEL_SPEED={"Pre-A1":0.75,"A1":0.85,"A2":0.95,"B1":1,"B2":1.05,"C1":1.10,"C2":1.10};
+const SPEED_OPTIONS=[0.6,0.7,0.75,0.8,0.85,0.9,0.95,1,1.05,1.1,1.15,1.25,1.4,1.5];
+let speedOverride=null;
+try{const v=localStorage.getItem("prudle:readingSpeedOverride:v1");if(v!==null&&v!=="auto"&&Number.isFinite(Number(v))&&Number(v)>=0.6&&Number(v)<=1.5)speedOverride=Number(v)}catch(_){}
+function defaultSpeed(level){return LEVEL_SPEED[level]||1}
+function readingSpeed(level){return speedOverride===null?defaultSpeed(level):speedOverride}
+function speedOptions(level){return `<option value="auto" ${speedOverride===null?"selected":""}>تلقائي حسب المستوى (${defaultSpeed(level).toFixed(2)}×)</option>`+SPEED_OPTIONS.map(v=>`<option value="${v}" ${speedOverride===v?"selected":""}>${v.toFixed(2)}×</option>`).join("")}
+function speedSelector(level){return `<label class="speed-control">🎚️ سرعة القراءة <select data-reading-speed aria-label="سرعة القراءة">${speedOptions(level)}</select></label>`}
+function applySpeedToPlayers(){document.querySelectorAll("audio[data-pageaudio],audio[data-realbook]").forEach(a=>{const b=BOOKS.find(x=>x.id===(document.querySelector("#rd")?.dataset.b||""));a.playbackRate=readingSpeed(b?.l);a.preservesPitch=true});document.querySelectorAll("[data-reading-speed]").forEach(el=>{const b=BOOKS.find(x=>x.id===(document.querySelector("#rd")?.dataset.b||""));el.innerHTML=speedOptions(b?.l)})}
+
 const load=()=>{try{S=Object.assign(S,JSON.parse(localStorage.getItem(KEY)||"{}"))}catch(_){}};
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(_){}};
 const fv=id=>`<button class="fv ${S.fav.includes(id)?"on":""}" data-fav="${id}" aria-label="مفضلة">★</button>`;
@@ -402,11 +416,11 @@ function seq(items,rate,on,end){
     const it=items[i];on&&on(i);
     const nx=()=>{if(my!==tok)return;i++;n()};
     if(it.wait){setTimeout(nx,it.wait/rate);return}
-    const u=new SpeechSynthesisUtterance(it.t);u.lang="en-US";u.rate=rate*.9;u.pitch=it.p||1;u.onend=nx;u.onerror=nx;
+    const u=new SpeechSynthesisUtterance(it.t);u.lang="en-US";u.rate=Math.min(1.5,Math.max(.6,rate));u.pitch=it.p||1;u.onend=nx;u.onerror=nx;
     try{speechSynthesis.speak(u)}catch(_){nx()}
   })();
 }
-const sayT=(t,p)=>{halt();seq([{t,p}],1)};
+const sayT=(t,p)=>{halt();seq([{t,p}],readingSpeed("A1"))};
 const cur=(card,sel,i)=>{const L=card.querySelectorAll(sel);L.forEach((n,k)=>n.classList.toggle("cur",k===i));if(L[i])L[i].scrollIntoView({block:"nearest",behavior:"smooth"})};
 
 /* ---------- Views: realistic bookcase ---------- */
@@ -902,12 +916,12 @@ function talkCard(d){
 function playAudio(card,from=0,toggle=true){
   const was=card.classList.contains("ply");halt();if(toggle&&was)return;
   const a=AUDIO.find(x=>x.id===card.dataset.id);card.classList.add("ply");
-  seq(a.s.slice(from).map(t=>({t})),spd,i=>cur(card,".ln",from+i),halt);
+  seq(a.s.slice(from).map(t=>({t})),readingSpeed(a.l),i=>cur(card,".ln",from+i),halt);
 }
 function playTalk(card,from=0,toggle=true){
   const was=card.classList.contains("ply");halt();if(toggle&&was)return;
   const d=TALK.find(x=>x.id===card.dataset.id),role=card.dataset.role;card.classList.add("ply");
-  seq(d.x.slice(from).map(([s,en])=>role===s?{wait:1500+en.length*70}:{t:en,p:s==="B"?1.3:1}),spd,i=>{cur(card,".bb",from+i);card.classList.toggle("turn",role===d.x[from+i][0])},halt);
+  seq(d.x.slice(from).map(([s,en])=>role===s?{wait:1500+en.length*70}:{t:en,p:s==="B"?1.3:1}),readingSpeed(d.l),i=>{cur(card,".bb",from+i);card.classList.toggle("turn",role===d.x[from+i][0])},halt);
 }
 
 /* Persistent generated-audio URL cache. Only URLs are stored, not audio bytes.
@@ -948,8 +962,14 @@ function reader(id,i){
   document.querySelectorAll("#rd audio").forEach(a=>{a.pause();a.remove()});
   S.read[id]=i;S.last=id;save();
   const[em,en,ar]=b.p[i],rd=$("#rd");rd.hidden=false;rd.dataset.b=id;rd.dataset.i=i;
-  rd.innerHTML=`<div class="rin"><div class="rtop"><button class="back" data-x>✕ إغلاق</button><b>${b.t}</b><span>${i+1} / ${b.p.length}</span></div><div class="pgw"><div class="pg"><div class="sc">${em}</div><p class="tx" dir="ltr">${en.split(" ").map(w=>`<span class="w">${w}</span>`).join(" ")}</p><p class="ar" id="tr" hidden>${ar}</p><p class="gl" id="gl">اضغط على أي كلمة لتسمعها وتعرف معناها</p></div></div><div class="rc"><button class="cta alt" data-pv ${i?"":"disabled"}>السابق</button><button class="cta" data-rd>🔊 اقرأ الصفحة</button>${b.src?`<button class="cta alt" data-bookaudio>🎧 استمع للكتاب كاملًا</button>`:""}<button class="cta alt" data-trn ${ar?"":"hidden"}>ع ترجمة</button><button class="cta alt" data-qs>❓ الأسئلة</button><button class="cta" data-nx>${i<b.p.length-1?"التالي":"اختبرني ❓"}</button></div></div>`;
+  rd.innerHTML=`<div class="rin">${speedSelector(b.l)}<div class="rtop"><button class="back" data-x>✕ إغلاق</button><b>${b.t}</b><span>${i+1} / ${b.p.length}</span></div><div class="pgw"><div class="pg"><div class="sc">${em}</div><p class="tx" dir="ltr">${en.split(" ").map(w=>`<span class="w">${w}</span>`).join(" ")}</p><p class="ar" id="tr" hidden>${ar}</p><p class="gl" id="gl">اضغط على أي كلمة لتسمعها وتعرف معناها</p></div></div><div class="rc"><button class="cta alt" data-pv ${i?"":"disabled"}>السابق</button><button class="cta" data-rd>🔊 اقرأ الصفحة</button>${b.src?`<button class="cta alt" data-bookaudio>🎧 استمع للكتاب كاملًا</button>`:""}<button class="cta alt" data-trn ${ar?"":"hidden"}>ع ترجمة</button><button class="cta alt" data-qs>❓ الأسئلة</button><button class="cta" data-nx>${i<b.p.length-1?"التالي":"اختبرني ❓"}</button></div></div>`;
 }
+$("#rd").addEventListener("change",e=>{
+ const el=e.target.closest("[data-reading-speed]");if(!el)return;
+ speedOverride=el.value==="auto"?null:Number(el.value);
+ try{localStorage.setItem("prudle:readingSpeedOverride:v1",speedOverride===null?"auto":String(speedOverride))}catch(_){}
+ applySpeedToPlayers();
+});
 $("#rd").addEventListener("click",async e=>{
   const rd=e.currentTarget,id=rd.dataset.b,i=+rd.dataset.i,t=e.target,b=BOOKS.find(x=>x.id===id);
   if(t.closest("[data-x]")){halt();rd.querySelectorAll("audio").forEach(a=>a.pause());rd.hidden=true;refresh();return}
@@ -959,7 +979,7 @@ $("#rd").addEventListener("click",async e=>{
   if(t.closest("[data-trn]")){$("#tr").hidden=!$("#tr").hidden;return}
   if(t.closest("[data-bookaudio]")){
     halt();const old=rd.querySelector("audio[data-realbook]");if(old){old.paused?old.play():old.pause();return}
-    const player=document.createElement("audio");player.controls=true;player.dataset.realbook="1";player.src=b.src;player.style.cssText="display:block;width:min(100%,600px);margin:12px auto";rd.querySelector(".rc").after(player);player.play().catch(()=>{});return;
+    const player=document.createElement("audio");player.controls=true;player.dataset.realbook="1";player.src=b.src;player.playbackRate=readingSpeed(b.l);player.preservesPitch=true;player.style.cssText="display:block;width:min(100%,600px);margin:12px auto";rd.querySelector(".rc").after(player);player.play().catch(()=>{});return;
   }
   if(t.closest("[data-rd]")){
     const button=t.closest("[data-rd]");
@@ -974,7 +994,7 @@ $("#rd").addEventListener("click",async e=>{
       b.pageAudio[i]=await createRealAudio(text,b.t+" — page "+(i+1),b.l);
       storeAudio(id,i,text,b.pageAudio[i]);
       if(rd.dataset.b!==id||Number(rd.dataset.i)!==i)return;
-      const player=document.createElement("audio");player.dataset.pageaudio="1";player.src=b.pageAudio[i];player.preload="auto";player.style.display="none";
+      const player=document.createElement("audio");player.dataset.pageaudio="1";player.src=b.pageAudio[i];player.playbackRate=readingSpeed(b.l);player.preservesPitch=true;player.preload="auto";player.style.display="none";
       rd.appendChild(player);
       wordFollow(player,rd.querySelector(".tx"));
       player.onended=()=>{button.textContent="🔊 اقرأ الصفحة"};
@@ -996,7 +1016,7 @@ app.addEventListener("click",e=>{
   if(el=t.closest("[data-item]")){openItem(el.dataset.item);return}
   if(el=t.closest("[data-mx]")){closeMd();return}
   if(el=t.closest("[data-fav]")){const id=el.dataset.fav,i=S.fav.indexOf(id);i<0?S.fav.push(id):S.fav.splice(i,1);save();el.classList.toggle("on");favDirty=true;return}
-  if(el=t.closest("[data-spd]")){spd=spd===1?1.25:spd===1.25?.7:1;document.querySelectorAll("[data-spd]").forEach(b=>b.textContent=spd+"×");return}
+  if(el=t.closest("[data-spd]")){const v=readingSpeed("A1"),i=SPEED_OPTIONS.findIndex(x=>x>=v);speedOverride=SPEED_OPTIONS[(i+1)%SPEED_OPTIONS.length];try{localStorage.setItem("prudle:readingSpeedOverride:v1",String(speedOverride))}catch(_){}document.querySelectorAll("[data-spd]").forEach(b=>b.textContent=speedOverride.toFixed(2)+"×");applySpeedToPlayers();return}
   if(el=t.closest("[data-play]")){playAudio(el.closest(".au"));return}
   if(el=t.closest("[data-ln]")){playAudio(el.closest(".au"),+el.dataset.ln,false);return}
   if(el=t.closest("[data-playt]")){playTalk(el.closest(".dl"));return}
