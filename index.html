@@ -257,6 +257,38 @@ img,video,canvas,svg{max-width:100%}
 .speed-control{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin:0 auto 12px;padding:10px 14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,210,138,.35);border-radius:14px;color:#fff5df;font:700 15px Cairo,Tahoma,sans-serif}
 .speed-control select{min-width:190px;max-width:100%;border:1px solid #d7aa68;border-radius:10px;background:#fff8e9;color:#31200e;padding:9px 12px;font:700 15px Cairo,Tahoma,sans-serif}
 @media(max-width:500px){.speed-control{flex-direction:column;gap:6px}.speed-control select{width:100%}}
+
+/* Mobile performance and layout refinements; desktop design remains unchanged. */
+@media(max-width:700px),(pointer:coarse){
+  body{background:#21150f!important}
+  body::before{display:none}
+  .lamp,.hero::before{animation:none!important;opacity:.5}
+  .stick,#md,#rd{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .case{box-shadow:inset 0 0 22px rgba(0,0,0,.55),0 8px 18px rgba(0,0,0,.3)}
+  .bk{transition:transform .18s ease,filter .18s ease;animation-duration:.35s!important}
+  .bay.in .bk{animation-duration:.35s!important;animation-delay:0ms!important}
+  .bk:hover{transform:none;filter:none}
+  .row{scroll-snap-type:x proximity;touch-action:pan-x;overscroll-behavior-x:contain}
+  .row>.bk{scroll-snap-align:center;min-width:40px}
+  .plank{box-shadow:0 7px 12px rgba(0,0,0,.5)}
+  .pg{box-shadow:0 10px 22px rgba(0,0,0,.4);animation-duration:.25s}
+  .wv i{animation-duration:1s}
+  #dust i:nth-child(n+6){display:none}
+  .tabs,.lvs{scrollbar-width:none}
+  .tabs::-webkit-scrollbar,.lvs::-webkit-scrollbar{display:none}
+  .bb,.ln,.ex,.qi{min-width:0}
+  .lesson-simple,.qp,.gm,.au,.dl{max-width:100%}
+}
+@media(max-width:420px){
+  main{padding-inline:8px}
+  .case{border-width:7px;padding-inline:3px}
+  .row{padding-inline:6px;gap:5px}
+  .row>.bk{width:calc(var(--w)*.76)}
+  .row>.plq{flex-basis:78px;width:78px;margin-inline-end:5px}
+  .pg{padding:16px 10px}
+  .rc{justify-content:center}
+  .rc button{max-width:100%;white-space:normal}
+}
 </style>
 <style>.sourcePages{max-height:65vh;overflow:auto;margin-top:12px}.sourcePage{background:#fff8e9;color:#23170d;margin:9px 0;border-radius:12px;padding:12px}.sourcePage summary{font-weight:800;cursor:pointer}.sourceText{direction:ltr;text-align:left;white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.7 Arial,sans-serif;padding:15px;background:white;border-radius:9px;margin-top:10px}.bk .tt{font-size:13px}</style></head>
 <body>
@@ -861,8 +893,9 @@ function addSave(){
 }
 /* Scroll: parallax wall + books sway with scroll speed */
 let ly=scrollY,sw=0,tk=0;const root=document.documentElement;
-function decay(){sw*=.88;root.style.setProperty("--sway",sw.toFixed(2)+"deg");if(Math.abs(sw)>.05)requestAnimationFrame(decay);else{tk=0;root.style.setProperty("--sway","0deg")}}
-addEventListener("scroll",()=>{const y=scrollY;sw=Math.max(-6,Math.min(6,sw+(y-ly)*.25));ly=y;root.style.setProperty("--py",y+"px");if(!tk){tk=1;requestAnimationFrame(decay)}},{passive:true});
+const mobileLight=matchMedia("(max-width: 700px), (pointer: coarse)").matches;
+function decay(){if(mobileLight){tk=0;return}sw*=.88;root.style.setProperty("--sway",sw.toFixed(2)+"deg");if(Math.abs(sw)>.05)requestAnimationFrame(decay);else{tk=0;root.style.setProperty("--sway","0deg")}}
+if(!mobileLight)addEventListener("scroll",()=>{const y=scrollY;sw=Math.max(-6,Math.min(6,sw+(y-ly)*.25));ly=y;root.style.setProperty("--py",y+"px");if(!tk){tk=1;requestAnimationFrame(decay)}},{passive:true});
 
 function bookCard(b){
   const i=S.read[b.id];
@@ -1051,7 +1084,7 @@ app.addEventListener("click",e=>{
 });
 
 /* ---------- Ambient dust ---------- */
-(function(){const d=$("#dust");for(let i=0;i<22;i++){const s=document.createElement("i");s.style.cssText="left:"+Math.random()*100+"%;animation-duration:"+(16+Math.random()*18)+"s;animation-delay:-"+Math.random()*20+"s;transform:scale("+(.5+Math.random())+")";d.appendChild(s)}})();
+(function(){const d=$("#dust");for(let i=0;i<(matchMedia("(max-width: 700px), (pointer: coarse)").matches?5:22);i++){const s=document.createElement("i");s.style.cssText="left:"+Math.random()*100+"%;animation-duration:"+(16+Math.random()*18)+"s;animation-delay:-"+Math.random()*20+"s;transform:scale("+(.5+Math.random())+")";d.appendChild(s)}})();
 
 /* ---------- Public mode: no login or parent handshake ---------- */
 function startPublic(){
