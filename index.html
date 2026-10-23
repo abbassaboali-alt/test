@@ -594,7 +594,7 @@ async function fileToForm(inp){
   catch(e){st.textContent="⚠ "+e.message}
 }
 /* ---------- AI generation: same secure Prudle Worker used by the activities app ---------- */
-const TTSEP="https://muddy-frost-dfd0.abbassaboali.workers.dev";
+const TTSEP="https://api-prudle.abbassaboali.workers.dev/public/library-tts";
 const AIEP="https://api-prudle.abbassaboali.workers.dev/public/library-ai"; // Replace with your deployed general Worker URL
 function normQ(x,kind){
  const text=clean(x?.text||x?.q||x?.question||"").trim();
@@ -738,30 +738,18 @@ let pendingGeneratedAudio=null;
 let pendingGeneratedPages=null;
 let pendingSourceQuestions=[];
 async function createRealAudio(text,title,level){
- // Same natural AI voice request used by Prudle Games & Activities-9.
- // Uses the already-running game audio service; no new R2 binding or Worker route.
- const endpoint="https://muddy-frost-dfd0.abbassaboali.workers.dev";
+ // Shared cross-device R2 cache. The Worker computes the stable content hash.
  const audioText=String(text||"").trim();
  if(!audioText)throw Error("Audio text is empty.");
+ const endpoint="https://api-prudle.abbassaboali.workers.dev/public/library-tts";
  const r=await fetch(endpoint,{
   method:"POST",headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({
-   task:"generate_question_media",mediaType:"audio",questionText:audioText,
-   text:audioText,audioText:audioText,
-   prompt:["Create natural human-like English audio for an ESL learner.",
-    "Read ONLY the supplied text; do not add explanations.",
-    "Use a warm, realistic native English voice.",
-    "Use natural rhythm, stress, intonation and pauses.",
-    "Do not sound robotic or like browser text-to-speech.",
-    "CEFR level: "+(level||"A1")+".","Text:",audioText].join("\n"),
-   mediaPrompt:"Natural realistic human English voice; native pronunciation; clear ESL delivery; no music; no sound effects.",
-   voiceStyle:"natural realistic human ESL voice",accent:"American English"
-  })
+  body:JSON.stringify({text:audioText,voice:"nova"})
  });
  const raw=await r.text();let d={};
  try{d=raw?JSON.parse(raw):{}}catch(_){throw Error("Audio service returned invalid JSON.")}
  if(!r.ok)throw Error(d?.error||"Audio generation failed ("+r.status+").");
- const u=String(d?.url||d?.mediaUrl||d?.audioUrl||d?.audio_url||"").trim();
+ const u=String(d?.audioUrl||d?.url||"").trim();
  if(!/^https:\/\//i.test(u))throw Error("Audio service did not return a playable URL.");
  return u;
 }
@@ -981,11 +969,10 @@ $("#rd").addEventListener("click",async e=>{
     if(!b.pageAudio)b.pageAudio={};
     button.disabled=true;button.textContent=b.pageAudio[i]?"⏳ جارٍ تشغيل الصوت…":"⏳ جارٍ تجهيز الصوت الحقيقي…";
     try{
-      if(!b.pageAudio[i])b.pageAudio[i]=cachedAudio(id,i,text);
-      if(!b.pageAudio[i]){
-        b.pageAudio[i]=await createRealAudio(text,b.t+" — page "+(i+1),b.l);
-        storeAudio(id,i,text,b.pageAudio[i]);
-      }
+      // Always consult the shared Worker cache for this page first.
+      // Browser-only saved URLs are not authoritative across devices.
+      b.pageAudio[i]=await createRealAudio(text,b.t+" — page "+(i+1),b.l);
+      storeAudio(id,i,text,b.pageAudio[i]);
       if(rd.dataset.b!==id||Number(rd.dataset.i)!==i)return;
       const player=document.createElement("audio");player.dataset.pageaudio="1";player.src=b.pageAudio[i];player.preload="auto";player.style.display="none";
       rd.appendChild(player);
